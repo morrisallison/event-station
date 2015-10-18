@@ -1,0 +1,37 @@
+{
+  "name": "event-station",
+  "authors": [
+    "Morris Allison III <author@morris.xyz> (http://morris.xyz)"
+  ],
+  "description": "A versatile and robust event emitter class.",
+  "homepage": "http://morrisallison.bitbucket.org/event-station",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://bitbucket.org/morrisallison/event-station.git"
+  },
+  "keywords": [
+    "event",
+    "events",
+    "emitter",
+    "class",
+    "dispatcher",
+    "typescript"
+  ],
+  "main": "./dist/event-station.min.js",
+  "typings": "./dist/event-station.d.ts",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "ignore": [
+    "/*",
+    "/*/",
+    "!/dist/",
+    "!/README.md",
+    "!/CHANGELOG.md",
+    "!/USAGE.md",
+    "!/LICENSE"
+  ]
+}
