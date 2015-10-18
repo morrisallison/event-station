@@ -1,11 +1,28 @@
 # Changelog
 
+### v0.5.1
+
+* Distributed modules now assign an `EventStation` global when not imported as a module.
+    * Allows Event-Station to be used in Web browsers via a `<script>` tag.
+* Added members
+    1. `EventStation.prototype.getListeners()`
+    3. `Listeners.prototype.count`
+    2. `Listeners.prototype.has()`
+    4. `Listeners.prototype.clone()`
+* Added package to [Bower](http://bower.io).
+
 ### v0.5.0
+
+#### Breaking Changes
 
 * Changed the `off()` listener modifier to remove listeners from ***ALL*** stations.
     * Before `0.5.0` the `off()` listener modifier removed listeners from only the origin station.
     * The `removeFrom()` listener modifier can be used instead to remove listeners from one station.
     * Initially, this was the expected behavior.
+* Renamed `heardCount` to `hearingCount` for clarity.
+
+#### Non-breaking Changes
+
 * Added listener modifiers
     1. `forEach()`
     2. `index()`

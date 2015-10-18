@@ -1,8 +1,8 @@
 # Usage
 
-This guide will explain general usage of Event-Station.
+This guide will explain the general usage of Event-Station.
 
-Usage examples can be found in [Event-Station's tests](https://bitbucket.org/morrisallison/event-station/src/default/tests/). Tests are written in [CoffeeScript](http://coffeescript.org/).
+Usage examples can be found in Event-Station's [tests](https://bitbucket.org/morrisallison/event-station/src/default/tests/), which are written in [CoffeeScript](http://coffeescript.org/).
 
 ## Table of Contents
 
@@ -49,23 +49,33 @@ SystemJS via [jspm](http://jspm.io/)
 $ jspm install npm:event-station
 ```
 
-See the [Browser Usage](#browser-usage) section for how to use Event-Station within Web browsers.
+Web browser via [Bower](http://bower.io/search/?q=event-station)
+
+```bash
+$ bower install event-station
+```
+
+Web browser via `<script>`
+
+```html
+<script src="event-station.js"></script>
+```
 
 ## Configuration
 
-Event-Station can be configured globally using:
+Event-Station can be configured globally using the `config()` static method.
 
 ```
 EventStation.config(options);
 ```
 
-`EventStation` instances can configured during initialization by providing a literal object with options:
+`EventStation` instances can configured during initialization by providing the constructor an object of options.
 
 ```
 new EventStation(options);
 ```
 
-Other objects can be configured and initialized by using:
+Other objects can be configured and initialized by using the `init()` static method.
 
 ```
 EventStation.init(obj, options);
@@ -104,14 +114,29 @@ Each listener is an object with its own state. As a result, listeners can mainta
 
 Methods on the `EventStation` class share the same basic interface, which accepts:
 
-* A `string` with a single event name
-* A `string` with delimited event names
-* An event name array containing event name strings
-* An listener map with event names as keys and callbacks as properties
+* A `string` with a single event
+```javascript
+"foo"
+```
+* A `string` of delimited events
+```javascript
+"foo bar"
+```
+* An `Array` of `string` events
+```javascript
+["foo", "bar"]
+```
+* A listener map with events as keys and callbacks as properties
+```javascript
+{
+    foo: function () {},
+    bar: function () {},
+}
+```
 
-### Single Event Name
+### Single Event
 
-A single event name can be given to create one listener for one event name.
+A single event can be given to create one listener for one event.
 
 ```javascript
 var listeners = student.on('wakeup', function () {
@@ -119,11 +144,11 @@ var listeners = student.on('wakeup', function () {
 });
 ```
 
-### Delimited Event Names
+### Delimited Event
 
-Delimited event names can be given to create *multiple* listeners with the same callback and/or context.
+Delimited events can be given to create multiple listeners with the same callback and/or context.
 
-By default, event names are delimited by spaces. This can be changed by setting the `delimiter` option.
+By default, events are delimited by spaces. This can be changed by setting the `delimiter` option.
 
 ```javascript
 var listeners = student.on('eating-breakfast taking-shower', function () {
@@ -131,11 +156,11 @@ var listeners = student.on('eating-breakfast taking-shower', function () {
 });
 ```
 
-### Event Name Array
+### Event Array
 
-An event name array can be given to create *multiple* listeners with the same callback and/or context.
+An array of events can be given to create multiple listeners with the same callback and/or context.
 
-Delimiters are ignored in event name arrays.
+Delimiters are ignored in event arrays.
 
 ```javascript
 var listeners = student.on(['need more', 'sleep'], function () {
@@ -145,7 +170,7 @@ var listeners = student.on(['need more', 'sleep'], function () {
 
 ### Listener Map
 
-A listener map can be given to create multiple listeners each with different callbacks, and optionally, the same given context.
+A listener map can be given to create multiple listeners, each with a different callback. Optionally, a shared context can also be given.
 
 Delimiters are ignored in listener maps.
 
@@ -185,6 +210,8 @@ Listeners can be removed via the `off()` and `disregard()` methods.
 
 The `removeFrom()` and `moveTo()` modifiers can also be used to remove listeners from a station.
 
+The `off()` modifier will remove the collection of listeners from *all* stations.
+
 ```javascript
 // Removes all listeners from the teacher
 // that were attached by the student
@@ -202,19 +229,17 @@ var listeners = student.on('read', function () {
     console.log("The student is reading.");
 });
 
-// Removes the listener from `student`
-listeners.remove();
+// Removes the listener from all stations, including `student`
+listeners.off();
 ```
 
 ## Emitting Events
 
 Events are emitted via a station's `emit()` method.
 
-The first argument can be a single event name, delimited event names, or an array of event names.
+The first argument can be an event string, a string of delimited events, or an array of events.
 
-All following arguments are passed to each listener's callback.
-
-Delimiters are ignored by `emit()`.
+All arguments after the first are passed to each listener's callback function.
 
 ```javascript
 station.emit('lecture', 'History 101', 741);
@@ -222,7 +247,8 @@ station.emit('lecture', 'History 101', 741);
 
 ## Providing Context
 
-Context can be provided to listeners as the last argument on the following methods: `on()`, `once()`, `hear()`, `hearOnce()`, `off()`, and `disregard()`.
+Context can be provided as the last argument on several methods.
+Please refer to the [API documentation](http://morrisallison.bitbucket.org/event-station/api/) for details.
 
 The `using()` modifier can be used to change the context of listeners.
 
@@ -248,7 +274,7 @@ student.hear(teacher, 'lecture', function (book, pageNum) {
 });
 ```
 
-Then that listener can be removed via the `disregard()` method.
+After the listener is attached, it can be removed via the `disregard()` method.
 
 The following example removes all listeners from `teacher` that were attached by `student`.
 
@@ -262,7 +288,7 @@ The number of times a listener's callback is applied can be limited.
 
 Occurrences can be limited via the `occur()` and `once()` listener modifiers, or the `once()` and `hearOnce()` methods.
 
-Each listener will be removed when it reaches its occurrence limit.
+When a listener reaches its occurrence limit, it will be removed from all stations which it's attached to.
 
 ```javascript
 student.once('talk', function () {});
@@ -278,7 +304,7 @@ student.hear(teacher, 'lecture').once(function () {});
 
 Regular expression (RegExp) listeners are disabled by default for improved performance. RegExp listeners can be enabled globally or per station by setting the `enableRegExp` option.
 
-When enabled, RegExp listeners are recognized by a marker. The marker is single character located at the beginning of an event name.
+When enabled, RegExp listeners are recognized by a marker. The marker is single character located at the beginning of an event.
 
 The RegExp marker is `"%"` by default and can be changed by setting the `regExpMarker` option.
 
@@ -287,6 +313,7 @@ station.on('%foo/bar/[^/]+/1', callback);
 ```
 
 Aside from the marker, the general interface remains unchanged.
+In the following code, both a RegExp listener and a normal listeners will be attached to the station.
 
 ```javascript
 station.on(['%foo/bar/[^/]+/1', 'hello-world'], callback);
@@ -296,7 +323,7 @@ station.on(['%foo/bar/[^/]+/1', 'hello-world'], callback);
 
 Listener modifiers are located on the `EventStation.Listeners` class and provide a fluent interface for modifying Listeners.
 
-A `Listeners` instance can be created via the `on()`, `once()`, `hear()`, `hearOnce()`, and `makeListeners()` methods.
+A `Listeners` instance can be created via the `on()`, `once()`, `hear()`, `hearOnce()`, `makeListeners()`, and `getListeners()` methods.
 
 Please refer to the [API documentation](http://morrisallison.bitbucket.org/event-station/api/) for details on each modifier.
 
@@ -304,9 +331,9 @@ Please refer to the [API documentation](http://morrisallison.bitbucket.org/event
 
 Event-Station can be used in Web browsers that support ES5.
 
-A minified [UMD module](https://github.com/umdjs/umd) is located at [`dist/event-station.min.js`](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.min.js).
+Please view the section on [Installation](#installation) for how to load Event-Station in a Web browser.
 
-UMD modules are compatible with both CommonJS and AMD module loaders.
+If Event-Station is loaded via a `<script>` tag, an `EventStation` global will be assigned.
 
 ## Object Inheritance
 

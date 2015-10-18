@@ -1,7 +1,7 @@
 /*
  * Event-Station
  *
- * Copyright (c) 2015 Morris Allison III <author@morrisallison.com>
+ * Copyright (c) 2015 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT License.
  *
  * For the full copyright and license information, please view
@@ -16,7 +16,11 @@
     else if (typeof define === 'function' && define.amd) {
         define(deps, factory);
     }
+    else if (typeof self === "object") {
+        self.EventStation = factory();
+    }
 })(["require", "exports"], function (require, exports) {
+    "use strict";
     /**
      * Event emitter class and namespace
      */
@@ -153,7 +157,7 @@
             var listenerCount = stationMeta.listenerCount;
             if (listenerCount < 1)
                 return false;
-            if (arguments.length === 0) {
+            if (arguments.length < 1) {
                 // Determine if any listeners are attached
                 return listenerCount > 0;
             }
@@ -224,7 +228,7 @@
             var enableRegExp = stationMeta.enableRegExp;
             var listenersAll;
             if (stationMeta.emitAllEvent) {
-                listenersAll = listenersMap['all'];
+                listenersAll = listenersMap.all;
             }
             var originStation = this;
             for (var i = 0, c = names.length; i < c; i++) {
@@ -248,6 +252,32 @@
         };
         EventStation.prototype.makeListeners = function (q, r, s) {
             var listeners = makeListeners(this, false, q, r, s);
+            return new EventStation.Listeners(this, listeners);
+        };
+        EventStation.prototype.getListeners = function (q, r, s) {
+            var attachedListeners = getAllListeners(this.stationMeta);
+            var attachedCount = attachedListeners.length;
+            if (attachedCount < 1) {
+                return undefined;
+            }
+            if (arguments.length < 1) {
+                return new EventStation.Listeners(this, attachedListeners);
+            }
+            var matchingListeners = makeListeners(this, true, q, r, s);
+            var listeners = [];
+            for (var i = 0; i < attachedCount; i++) {
+                var attachedListener = attachedListeners[i];
+                for (var i_1 = 0, c = matchingListeners.length; i_1 < c; i_1++) {
+                    var matchingListener = matchingListeners[i_1];
+                    if (matchListener(matchingListener, attachedListener)) {
+                        listeners.push(attachedListener);
+                        break;
+                    }
+                }
+            }
+            // No matching listeners were found
+            if (listeners.length < 1)
+                return undefined;
             return new EventStation.Listeners(this, listeners);
         };
         EventStation.prototype.toObservable = function (q, s, selector) {
@@ -416,6 +446,14 @@
                 this.originStation = originStation;
                 this.listeners = listeners;
             }
+            Object.defineProperty(Listeners.prototype, "count", {
+                /** @returns The number of listeners in the collection */
+                get: function () {
+                    return this.listeners.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
             /**
              * Sets each listener's maximum occurrence
              */
@@ -504,6 +542,14 @@
                 this.originStation = station;
                 this.addTo(station);
                 return this;
+            };
+            /**
+             * Determines whether any listener in the collection matches the given listener.
+             * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+             */
+            Listeners.prototype.has = function (matchingListener, exactMatch) {
+                if (exactMatch === void 0) { exactMatch = false; }
+                return matchListeners(matchingListener, this.listeners, exactMatch);
             };
             /**
              * Determines whether the listeners are attached to the given station
@@ -618,6 +664,18 @@
                 }
                 return undefined;
             };
+            /**
+             * @returns A new `Listeners` object containing a clone of each Listener
+             * The new object will not have an `originStation`.
+             */
+            Listeners.prototype.clone = function () {
+                var clonedListeners = [];
+                var listeners = this.listeners;
+                for (var i = 0, c = listeners.length; i < c; i++) {
+                    clonedListeners[i] = cloneListener(listeners[i]);
+                }
+                return new Listeners(undefined, clonedListeners);
+            };
             return Listeners;
         })();
         EventStation.Listeners = Listeners;
@@ -649,8 +707,10 @@
         return String(++stationIdIterator);
     }
     /** Creates a new station meta object from the given configuration options */
-    function makeStationMeta(options) {
-        if (options === void 0) { options = {}; }
+    function makeStationMeta(opts) {
+        if (opts === void 0) { opts = {}; }
+        var glob = globalOptions;
+        var undef;
         return {
             stationId: makeStationId(),
             listenerCount: 0,
@@ -658,11 +718,11 @@
             listenersMap: Object.create(null),
             heardStations: Object.create(null),
             isPropagationStopped: false,
-            emitAllEvent: options.emitAllEvent === undefined ? globalOptions.emitAllEvent : options.emitAllEvent,
-            enableRegExp: options.enableRegExp === undefined ? globalOptions.enableRegExp : options.enableRegExp,
-            regExpMarker: options.regExpMarker === undefined ? globalOptions.regExpMarker : options.regExpMarker,
-            enableDelimiter: options.enableDelimiter === undefined ? globalOptions.enableDelimiter : options.enableDelimiter,
-            delimiter: options.delimiter === undefined ? globalOptions.delimiter : options.delimiter,
+            emitAllEvent: opts.emitAllEvent === undef ? glob.emitAllEvent : opts.emitAllEvent,
+            enableRegExp: opts.enableRegExp === undef ? glob.enableRegExp : opts.enableRegExp,
+            regExpMarker: opts.regExpMarker === undef ? glob.regExpMarker : opts.regExpMarker,
+            enableDelimiter: opts.enableDelimiter === undef ? glob.enableDelimiter : opts.enableDelimiter,
+            delimiter: opts.delimiter === undef ? glob.delimiter : opts.delimiter,
         };
     }
     /** Adds the given listener to the given station meta */
@@ -706,7 +766,7 @@
                     continue;
             }
             else {
-                if (!matchListeners(listener, attachedListener))
+                if (!matchListener(listener, attachedListener))
                     continue;
             }
             attachedListeners.splice(x, 1);
@@ -718,7 +778,7 @@
                 hearer.stationMeta.hearingCount--;
             }
         }
-        if (attachedListeners.length === 0) {
+        if (attachedListeners.length < 1) {
             delete listenersMap[eventName];
         }
     }
@@ -732,37 +792,21 @@
         var eventName = listener.eventName;
         var attachedListeners;
         if (eventName === undefined) {
-            attachedListeners = [];
-            for (var eventName_1 in listenersMap) {
-                attachedListeners = attachedListeners.concat(listenersMap[eventName_1]);
-            }
+            attachedListeners = getAllListeners(stationMeta);
         }
         else {
             attachedListeners = listenersMap[eventName];
-            if (attachedListeners === undefined)
+            if (attachedListeners === undefined) {
                 return false;
-        }
-        var c = attachedListeners.length;
-        if (c === 0)
-            return false;
-        for (var x = 0; x < c; x++) {
-            var attachedListener = attachedListeners[x];
-            if (exactMatch === true) {
-                if (listener === attachedListener)
-                    return true;
-            }
-            else {
-                if (matchListeners(listener, attachedListener))
-                    return true;
             }
         }
-        return false;
+        return matchListeners(listener, attachedListeners, exactMatch);
     }
     /**
      * Determines whether the given listeners match by performing an approximate match
-     * using the `hearer`, `matchCallback`, and `matchContext` properties.
+     * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
      */
-    function matchListeners(matchingListener, attachedListener) {
+    function matchListener(matchingListener, attachedListener) {
         var matchCallback = matchingListener.matchCallback;
         if (matchCallback !== undefined
             && matchCallback !== attachedListener.matchCallback) {
@@ -778,7 +822,30 @@
             && hearer !== attachedListener.hearer) {
             return false;
         }
+        var eventName = matchingListener.eventName;
+        if (eventName !== undefined
+            && eventName !== attachedListener.eventName) {
+            return false;
+        }
         return true;
+    }
+    function matchListeners(matchingListener, attachedListeners, exactMatch) {
+        if (exactMatch === void 0) { exactMatch = false; }
+        var count = attachedListeners.length;
+        if (count < 1)
+            return false;
+        for (var i = 0; i < count; i++) {
+            var attachedListener = attachedListeners[i];
+            if (exactMatch === true) {
+                if (matchingListener === attachedListener)
+                    return true;
+            }
+            else {
+                if (matchListener(matchingListener, attachedListener))
+                    return true;
+            }
+        }
+        return false;
     }
     /** Applies the given listeners with the given arguments */
     function applyListeners(listeners, args, originStation) {
@@ -814,8 +881,8 @@
             }
             var resolves = listener.resolves;
             if (resolves !== undefined) {
-                for (var i_1 = 0, c_1 = resolves.length; i_1 < c_1; i_1++) {
-                    resolves[i_1](listener);
+                for (var i_2 = 0, c_1 = resolves.length; i_2 < c_1; i_2++) {
+                    resolves[i_2](listener);
                 }
                 listener.resolves = undefined;
             }
@@ -847,6 +914,37 @@
                 listener.resolves.push(resolve);
             }
         });
+    }
+    /**
+     * Clones the given listener
+     * Does not clone the listener's `stationMetas` or `resolves` properties
+     * @throws an `Error` if the listener is a cross-emitter listener
+     */
+    function cloneListener(listener) {
+        if (listener.hearer !== undefined) {
+            throw new Error("Cross-emitter listeners can not be cloned.");
+        }
+        return {
+            eventName: listener.eventName,
+            callback: listener.callback,
+            context: listener.context,
+            matchCallback: listener.matchCallback,
+            matchContext: listener.matchContext,
+            isPaused: listener.isPaused,
+            occurrences: listener.occurrences,
+            maxOccurrences: listener.maxOccurrences,
+        };
+    }
+    /** Retrieves all listeners attached to the given EventStation.Meta */
+    function getAllListeners(stationMeta) {
+        if (stationMeta.listenerCount < 1)
+            return [];
+        var listenersMap = stationMeta.listenersMap;
+        var listeners = [];
+        for (var eventName in listenersMap) {
+            listeners = listeners.concat(listenersMap[eventName]);
+        }
+        return listeners;
     }
     /**
      * @returns the heard stations of a given station's meta as an array
@@ -1002,4 +1100,3 @@
     }
     return EventStation;
 });
-//# sourceMappingURL=EventStation.js.map

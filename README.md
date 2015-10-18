@@ -3,8 +3,9 @@
 A versatile and robust event emitter class.
 
 [![npm Version](https://img.shields.io/npm/v/event-station.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
+[![Bower Version](https://img.shields.io/bower/v/event-station.svg?style=flat-square)](http://bower.io/search/?q=event-station)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://bitbucket.org/morrisallison/event-station/raw/default/LICENSE)
-[![Codeship Build Status](https://img.shields.io/codeship/4ade98f0-4121-0133-db1d-62bb193b9897.svg?style=flat-square)](https://codeship.com/projects/103550)
+[![Codeship Build Status](https://img.shields.io/codeship/4ade98f0-4121-0133-db1d-62bb193b9897.svg?style=flat-square)](https://codeship.com/)
 [![Codecov Coverage Status](https://img.shields.io/codecov/c/bitbucket/morrisallison/event-station/default.svg?style=flat-square)](https://codecov.io/bitbucket/morrisallison/event-station/commits)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 
@@ -12,15 +13,22 @@ A versatile and robust event emitter class.
 
 * [Versatile API](http://morrisallison.bitbucket.org/event-station/api/) that's flexible and consistent
 * [Cross-emitter listening](http://morrisallison.bitbucket.org/event-station/usage.html#cross-emitter-listening), allowing for easier management of many listeners
-* [Regular expression listeners](http://morrisallison.bitbucket.org/event-station/usage.html#regular-expression-listeners) <sup>(optional)</sup>
+* [Regular expression listeners](http://morrisallison.bitbucket.org/event-station/usage.html#regular-expression-listeners)
 * [Listener modifiers](http://morrisallison.bitbucket.org/event-station/usage.html#listener-modifiers); a fluent interface for modifying listeners
-    * Set callbacks and contexts
-    * Move between stations
-    * Occurrence limitation
-    * Pause and resume
-    * Promises <sup>(optional)</sup>
-* Browser environment compatible
+    * Set callbacks and contexts with `calling()` and `using()`
+    * Migration with `moveTo()`, `addTo()`, and `removeFrom()`
+    * Remove listeners from *all* emitters with `off()`
+    * Limit occurrences with `occur()`
+    * `pause()`, `resume()`, and `isPaused()`
+    * `race()` and `all()` Promises
+    * Duplication with `clone()`
+* [Browser environment compatible](http://morrisallison.bitbucket.org/event-station/usage.html#browser-usage)
 * [Competitive and consistent performance](http://morrisallison.bitbucket.org/event-station/performance.html)
+* [Rx](https://www.npmjs.com/package/rx) compatible with `toObservable()`
+* `stopPropagation()`
+* `extend()` any object
+* Global and per-instance `config()` options
+* Written in [TypeScript](http://www.typescriptlang.org/)
 
 ## Examples
 
@@ -87,19 +95,45 @@ SystemJS via [jspm](http://jspm.io/)
 $ jspm install npm:event-station
 ```
 
-## Usage
+Web browser via [Bower](http://bower.io/search/?q=event-station)
 
-For documentation on the general usage of Event-Station, please view the [usage documentation](http://morrisallison.bitbucket.org/event-station/usage/).
+```bash
+$ bower install event-station
+```
 
-## API
+Web browser via `<script>`
 
-The [API documentation](http://morrisallison.bitbucket.org/event-station/api/) is generated using [typedoc](http://typedoc.io/).
+```html
+<script src="event-station.js"></script>
+```
 
-The associated [module definition](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.d.ts) can also be used as an API reference.
+## Downloads
+
+### Latest Release
+
+* [Build](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.js)
+<br>Compatible with AMD and CommonJS module loaders
+<br>Assigns an `EventStation` global when not imported as a module
+* [Minified Build](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.min.js)
+<br>Build minified with [UglifyJS 2](https://github.com/mishoo/UglifyJS2)
+* [Source Map](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.min.js.map)
+<br>The source map for the minified build
+* [Definition](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.d.ts)
+<br>Generated TypeScript definition
+
+## Documentation
+
+* [Usage documentation](http://morrisallison.bitbucket.org/event-station/usage/)
+<br>This guide will explain the general usage of Event-Station.
+* [API documentation](http://morrisallison.bitbucket.org/event-station/api/)
+<br>Generated using [typedoc](http://typedoc.io/).
+* [Module definition](https://bitbucket.org/morrisallison/event-station/src/default/dist/event-station.d.ts)
+<br>The associated definition file can also be used as an API reference.
 
 ## License
 
-Copyright &copy; 2015 Morris Allison III. Released under the [MIT License](https://bitbucket.org/morrisallison/event-station/raw/default/LICENSE).
+Copyright &copy; 2015 Morris Allison III.
+<br>Released under the [MIT License](https://bitbucket.org/morrisallison/event-station/raw/default/LICENSE).
 
 ## References
 
