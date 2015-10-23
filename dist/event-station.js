@@ -58,15 +58,7 @@
         Object.defineProperty(EventStation.prototype, "listenerEventNames", {
             /** Array of event names which have listeners on the station */
             get: function () {
-                var stationMeta = this.stationMeta;
-                if (stationMeta.listenerCount < 1)
-                    return [];
-                var eventNames = [];
-                var listenersMap = stationMeta.listenersMap;
-                for (var eventName in listenersMap) {
-                    eventNames.push(eventName);
-                }
-                return eventNames;
+                return Object.getOwnPropertyNames(this.stationMeta.listenersMap);
             },
             enumerable: true,
             configurable: true
@@ -352,89 +344,18 @@
          * Extends an object with EventStation's public members
          */
         function extend(obj) {
-            var $ = EventStation.prototype;
-            Object.defineProperties(obj, {
-                stationId: {
-                    enumerable: true,
-                    configurable: true,
-                    get: Object.getOwnPropertyDescriptor($, 'stationId').get,
-                },
-                listenerCount: {
-                    enumerable: true,
-                    configurable: true,
-                    get: Object.getOwnPropertyDescriptor($, 'listenerCount').get,
-                },
-                hearingCount: {
-                    enumerable: true,
-                    configurable: true,
-                    get: Object.getOwnPropertyDescriptor($, 'hearingCount').get,
-                },
-                listenerEventNames: {
-                    enumerable: true,
-                    configurable: true,
-                    get: Object.getOwnPropertyDescriptor($, 'listenerEventNames').get,
-                },
-                on: {
-                    configurable: true,
-                    value: $.on,
-                },
-                once: {
-                    configurable: true,
-                    value: $.once,
-                },
-                off: {
-                    configurable: true,
-                    value: $.off,
-                },
-                hear: {
-                    configurable: true,
-                    value: $.hear,
-                },
-                hearOnce: {
-                    configurable: true,
-                    value: $.hearOnce,
-                },
-                disregard: {
-                    configurable: true,
-                    value: $.disregard,
-                },
-                isHeard: {
-                    configurable: true,
-                    value: $.isHeard,
-                },
-                isHearing: {
-                    configurable: true,
-                    value: $.isHearing,
-                },
-                emit: {
-                    configurable: true,
-                    value: $.emit,
-                },
-                makeListeners: {
-                    configurable: true,
-                    value: $.makeListeners,
-                },
-                toObservable: {
-                    configurable: true,
-                    value: $.toObservable,
-                },
-                stopPropagation: {
-                    configurable: true,
-                    value: $.stopPropagation,
-                },
-                addListener: {
-                    configurable: true,
-                    value: $.addListener,
-                },
-                removeListener: {
-                    configurable: true,
-                    value: $.removeListener,
-                },
-                hasListener: {
-                    configurable: true,
-                    value: $.hasListener,
-                },
-            });
+            var proto = EventStation.prototype;
+            for (var propertyName in proto) {
+                var descriptor = Object.getOwnPropertyDescriptor(proto, propertyName);
+                var newDescriptor = { configurable: true };
+                if (descriptor.get !== undefined) {
+                    newDescriptor.get = descriptor.get;
+                }
+                else {
+                    newDescriptor.value = descriptor.value;
+                }
+                Object.defineProperty(obj, propertyName, newDescriptor);
+            }
             return obj;
         }
         EventStation.extend = extend;
@@ -548,23 +469,33 @@
              * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
              */
             Listeners.prototype.has = function (matchingListener, exactMatch) {
-                if (exactMatch === void 0) { exactMatch = false; }
                 return matchListeners(matchingListener, this.listeners, exactMatch);
             };
             /**
-             * Determines whether the listeners are attached to the given station
+             * Adds the listeners to the origin station
              */
-            Listeners.prototype.isAttachedTo = function (station) {
-                var listeners = this.listeners;
-                var stationMeta = station.stationMeta;
-                for (var i = 0, c = listeners.length; i < c; i++) {
-                    if (hasListener(stationMeta, listeners[i], true))
-                        return true;
-                }
-                return false;
+            Listeners.prototype.attach = function () {
+                return this.addTo(this.originStation);
             };
             /**
-             * Determines whether the listeners are attached to the origin station
+             * Removes the listeners from the origin station
+             */
+            Listeners.prototype.detach = function () {
+                return this.removeFrom(this.originStation);
+            };
+            /**
+             * Determines whether any of the listeners are attached to the given station.
+             * If no station is given, the method determines whether any of the listeners
+             * are attached to *any* station.
+             */
+            Listeners.prototype.isAttachedTo = function (station) {
+                if (station === undefined) {
+                    return isListenersAttached(this.listeners);
+                }
+                return hasListeners(station.stationMeta, this.listeners, true);
+            };
+            /**
+             * Determines whether any of the listeners are attached to the origin station
              */
             Listeners.prototype.isAttached = function () {
                 return this.isAttachedTo(this.originStation);
@@ -674,7 +605,7 @@
                 for (var i = 0, c = listeners.length; i < c; i++) {
                     clonedListeners[i] = cloneListener(listeners[i]);
                 }
-                return new Listeners(undefined, clonedListeners);
+                return new Listeners(this.originStation, clonedListeners);
             };
             return Listeners;
         })();
@@ -751,7 +682,6 @@
      * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
     function removeListener(stationMeta, listener, exactMatch) {
-        if (exactMatch === void 0) { exactMatch = false; }
         if (stationMeta.listenerCount < 1)
             return;
         var listenersMap = stationMeta.listenersMap;
@@ -759,24 +689,27 @@
         var attachedListeners = listenersMap[eventName];
         if (attachedListeners === undefined)
             return;
-        for (var x = 0, c = attachedListeners.length; x < c; x++) {
-            var attachedListener = attachedListeners[x];
-            if (exactMatch) {
-                if (listener !== attachedListener)
-                    continue;
-            }
-            else {
-                if (!matchListener(listener, attachedListener))
-                    continue;
-            }
-            attachedListeners.splice(x, 1);
+        var attachedListenersCount = attachedListeners.length;
+        if (attachedListenersCount === 1) {
+            if (!matchListener(listener, attachedListeners[0], exactMatch))
+                return;
+            delete listenersMap[eventName];
             stationMeta.listenerCount--;
-            x--;
+            reduceHearerHearingCount(listener);
+            removeMetaFromStation(stationMeta, listener);
+            return;
+        }
+        for (var i = 0, c = attachedListenersCount; i < c; i++) {
+            var attachedListener = attachedListeners[i];
+            if (!matchListener(listener, attachedListener, exactMatch))
+                continue;
+            /* Remove the listener from the given EventStation.Meta */
+            attachedListeners.splice(i, 1);
+            stationMeta.listenerCount--;
+            i--;
             c--;
-            var hearer = listener.hearer;
-            if (hearer !== undefined) {
-                hearer.stationMeta.hearingCount--;
-            }
+            reduceHearerHearingCount(listener);
+            removeMetaFromStation(stationMeta, listener);
         }
         if (attachedListeners.length < 1) {
             delete listenersMap[eventName];
@@ -787,7 +720,6 @@
      * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
     function hasListener(stationMeta, listener, exactMatch) {
-        if (exactMatch === void 0) { exactMatch = false; }
         var listenersMap = stationMeta.listenersMap;
         var eventName = listener.eventName;
         var attachedListeners;
@@ -803,10 +735,39 @@
         return matchListeners(listener, attachedListeners, exactMatch);
     }
     /**
+     * Determines whether the given station meta has listeners that match the given listeners
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+     */
+    function hasListeners(stationMeta, listeners, exactMatch) {
+        for (var i = 0, c = listeners.length; i < c; i++) {
+            if (hasListener(stationMeta, listeners[i], exactMatch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /** Determines whether the given listener is attached to any stations */
+    function isListenerAttached(listener) {
+        return listener.stationMetas !== undefined;
+    }
+    /** Determines whether the given listeners are attached to any stations */
+    function isListenersAttached(listeners) {
+        for (var i = 0, c = listeners.length; i < c; i++) {
+            if (isListenerAttached(listeners[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Determines whether the given listeners match by performing an approximate match
      * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
-    function matchListener(matchingListener, attachedListener) {
+    function matchListener(matchingListener, attachedListener, exactMatch) {
+        if (exactMatch === true) {
+            return matchingListener == attachedListener;
+        }
         var matchCallback = matchingListener.matchCallback;
         if (matchCallback !== undefined
             && matchCallback !== attachedListener.matchCallback) {
@@ -830,19 +791,13 @@
         return true;
     }
     function matchListeners(matchingListener, attachedListeners, exactMatch) {
-        if (exactMatch === void 0) { exactMatch = false; }
         var count = attachedListeners.length;
         if (count < 1)
             return false;
         for (var i = 0; i < count; i++) {
             var attachedListener = attachedListeners[i];
-            if (exactMatch === true) {
-                if (matchingListener === attachedListener)
-                    return true;
-            }
-            else {
-                if (matchListener(matchingListener, attachedListener))
-                    return true;
+            if (matchListener(matchingListener, attachedListener, exactMatch)) {
+                return true;
             }
         }
         return false;
@@ -1097,6 +1052,46 @@
             }
         }
         station.stationMeta.heardStations = stationMap;
+    }
+    function reduceHearerHearingCount(listener) {
+        /*
+         * Update the hearingCount of given listener's hearer
+         */
+        var hearer = listener.hearer;
+        if (hearer !== undefined) {
+            hearer.stationMeta.hearingCount--;
+        }
+    }
+    function removeMetaFromStation(targetMeta, listener) {
+        var stationMetas = listener.stationMetas;
+        if (stationMetas === undefined)
+            return;
+        var stationMetasCount = stationMetas.length;
+        if (stationMetasCount === 1) {
+            if (stationMetas[0] === targetMeta) {
+                listener.stationMetas = undefined;
+            }
+            return;
+        }
+        var newStationMetas = [];
+        for (var i = 0; i < stationMetasCount; i++) {
+            var stationMeta = stationMetas[i];
+            if (stationMeta !== targetMeta) {
+                newStationMetas.push(stationMeta);
+            }
+        }
+        if (newStationMetas.length < 1) {
+            /*
+             * This line is necessary in the rare case that
+             * the exact same listener object has been added to
+             * a station multiple times, and is then removed from
+             * said station.
+             */
+            listener.stationMetas = undefined;
+        }
+        else {
+            listener.stationMetas = newStationMetas;
+        }
     }
     return EventStation;
 });

@@ -1,0 +1,65 @@
+{
+  "name": "event-station",
+  "version": "0.5.2",
+  "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
+  "description": "A versatile and robust event emitter class.",
+  "main": "./dist/event-station.js",
+  "typings": "./dist/event-station.d.ts",
+  "license": "MIT",
+  "homepage": "http://morrisallison.bitbucket.org/event-station",
+  "bugs": "https://bitbucket.org/morrisallison/event-station/issues",
+  "repository": {
+    "type": "hg",
+    "url": "https://bitbucket.org/morrisallison/event-station/"
+  },
+  "keywords": [
+    "event",
+    "events",
+    "emitter",
+    "class",
+    "dispatcher",
+    "typescript"
+  ],
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "backbone": "^1.2.3",
+    "benchmark": "^1.0.0",
+    "blanket": "^1.1.7",
+    "bluebird": "^2.10.2",
+    "codecov.io": "^0.1.6",
+    "coffee-script": "^1.10.0",
+    "eventemitter2": "^0.4.14",
+    "eventemitter3": "^1.1.1",
+    "jake": "^8.0.12",
+    "mocha": "^2.3.3",
+    "mocha-lcov-reporter": "^1.0.0",
+    "must": "^0.13.1",
+    "rx": "^4.0.6",
+    "typescript": "^1.6.2",
+    "uglify-js": "^2.5.0",
+    "underscore": "^1.8.3"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/jake test"
+  },
+  "config": {
+    "blanket": {
+      "data-cover-only": [
+        "lib/EventStation.js"
+      ]
+    }
+  },
+  "jspm": {
+    "main": "./dist/event-station.min.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "USAGE.md",
+    "LICENSE"
+  ]
+}

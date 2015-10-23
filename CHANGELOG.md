@@ -1,5 +1,14 @@
 # Changelog
 
+### v0.5.2
+
+* Added listener modifiers
+    1. `attach()`
+    2. `detach()`
+* Improved listener removal performance.
+* If `Listeners.prototype.isAttachedTo()` is applied with no parameters, it now determines whether *any* of the listeners are attached to *any* station.
+* Changed `Listeners.prototype.clone()` to set an origin station on the created `Listeners` instance.
+
 ### v0.5.1
 
 * Distributed modules now assign an `EventStation` global when not imported as a module.

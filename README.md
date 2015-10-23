@@ -50,16 +50,22 @@ teacher.emit('read', 42);
 ### Using a listener map and the `addTo()` modifier
 
 ```javascript
-var worker = new EventStation();
-var secondWorker = new EventStation();
+class MyWorker extends EventStation {}
 
+var worker = new MyWorker();
+var secondWorker = new MyWorker();
+
+// Add two listeners to the worker
 var listeners = worker.on({
     start: () => console.log("Worker started!"),
     stop:  () => console.log("Worker stopped!"),
 });
 
-// The same listeners are now attached to both instances
+// Add the exact same listeners to the second worker
 listeners.addTo(secondWorker);
+
+// Remove the listeners from both workers
+listeners.off();
 ```
 
 ### Chaining listener modifiers
@@ -132,7 +138,7 @@ Web browser via `<script>`
 
 ## License
 
-Copyright &copy; 2015 Morris Allison III.
+Copyright &copy; 2015 [Morris Allison III](http://morris.xyz).
 <br>Released under the [MIT License](https://bitbucket.org/morrisallison/event-station/raw/default/LICENSE).
 
 ## References

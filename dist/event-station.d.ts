@@ -41,16 +41,16 @@ declare class EventStation {
      * Creates and attaches listeners to another station.
      * Listeners attached using this method can be removed specifically by using `disregard()`.
      */
-    hear(station: EventStation, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    hear(station: EventStation, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    hear(station: EventStation, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
+    hear(station: EventStation.Emitter, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
+    hear(station: EventStation.Emitter, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
+    hear(station: EventStation.Emitter, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
     /**
      * Attaches listeners to another station that are applied once and removed
      * Listeners attached using this method can be removed specifically by using `disregard()`.
      */
-    hearOnce(station: EventStation, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    hearOnce(station: EventStation, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    hearOnce(station: EventStation, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
+    hearOnce(station: EventStation.Emitter, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
+    hearOnce(station: EventStation.Emitter, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
+    hearOnce(station: EventStation.Emitter, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
     /**
      * Removes listeners from other stations that were attached by the station
      * via `hear()` and `hearOnce()`. If no arguments are given, all listeners
@@ -168,7 +168,7 @@ declare namespace EventStation {
         private originStation;
         /** An array of listeners */
         private listeners;
-        constructor(originStation: EventStation, listeners: EventStation.Listener[]);
+        constructor(originStation: Emitter, listeners: Listener[]);
         /**
          * Sets each listener's maximum occurrence
          */
@@ -201,18 +201,28 @@ declare namespace EventStation {
          * Moves the listeners to another station.
          * This method changes the origin station.
          */
-        moveTo(station: EventStation): Listeners;
+        moveTo(station: Emitter): Listeners;
         /**
          * Determines whether any listener in the collection matches the given listener.
          * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
          */
-        has(matchingListener: EventStation.MatchListener, exactMatch?: boolean): boolean;
+        has(matchingListener: MatchListener, exactMatch?: boolean): boolean;
         /**
-         * Determines whether the listeners are attached to the given station
+         * Adds the listeners to the origin station
          */
-        isAttachedTo(station: EventStation): boolean;
+        attach(): Listeners;
         /**
-         * Determines whether the listeners are attached to the origin station
+         * Removes the listeners from the origin station
+         */
+        detach(): Listeners;
+        /**
+         * Determines whether any of the listeners are attached to the given station.
+         * If no station is given, the method determines whether any of the listeners
+         * are attached to *any* station.
+         */
+        isAttachedTo(station?: EventStation): boolean;
+        /**
+         * Determines whether any of the listeners are attached to the origin station
          */
         isAttached(): boolean;
         /**
@@ -252,7 +262,7 @@ declare namespace EventStation {
          */
         reset(): Listeners;
         /** Similar to Array.prototype.forEach() */
-        forEach(func: EventStation.ForEachCallback): Listeners;
+        forEach(func: ForEachCallback): Listeners;
         /** Retrieves a listener located at the given index */
         get(index: number): Listener;
         /** Retrieves the index of the given listener */
@@ -267,6 +277,8 @@ declare namespace EventStation {
 declare namespace EventStation {
     /** A semantic alias */
     type StationId = string;
+    interface Emitter extends EventStation {
+    }
     /**
      * A subset of the Listener interface used only for
      * comparing two Listener objects.
@@ -281,7 +293,7 @@ declare namespace EventStation {
         /** @see Listener.matchContext */
         matchContext?: any;
         /** @see Listener.hearer */
-        hearer?: EventStation;
+        hearer?: EventStation.Emitter;
     }
     /**
      * An object that holds the state of a listener.
@@ -310,7 +322,7 @@ declare namespace EventStation {
         /**
          * A station instance that attached the listener to it's origin station.
          */
-        hearer?: EventStation;
+        hearer?: EventStation.Emitter;
         /**
          * Determines whether the listener is paused.
          * `undefined` by default.
@@ -385,7 +397,7 @@ declare namespace EventStation {
     }
     /** An object of station instances with unique station IDs as keys */
     interface StationMap {
-        [stationId: string]: EventStation;
+        [stationId: string]: EventStation.Emitter;
     }
     interface Meta {
         /** Unique ID */
