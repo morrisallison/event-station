@@ -1,3 +1,5 @@
+> This is a repository of tags for Bower and other services that rely on Git and/or Github. The canonical repository is located on Bitbucket at: [bitbucket.org/morrisallison/event-station](https://bitbucket.org/morrisallison/event-station)
+
 # [![Event-Station](https://cldup.com/nNDX7LGO96.svg)](http://morrisallison.bitbucket.org/event-station)
 
 A versatile and robust event emitter class.
