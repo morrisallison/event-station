@@ -102,6 +102,7 @@
             for (var i = 0, c = listeners.length; i < c; i++) {
                 var listener = listeners[i];
                 listener.hearer = this;
+                listener.crossOrigin = station;
                 addListener(targetStationMeta, listener);
                 heardStations[station.stationId] = station;
             }
@@ -198,48 +199,33 @@
             var stationMeta = this.stationMeta;
             if (stationMeta.listenerCount < 1)
                 return;
-            var names;
-            if (typeof input === 'string') {
-                var enableDelimiter = stationMeta.enableDelimiter;
-                var delimiter = stationMeta.delimiter;
-                if (enableDelimiter && input.indexOf(delimiter) >= 0) {
-                    names = input.split(delimiter);
-                }
-                else {
-                    names = [input];
-                }
+            var eventNames = parseEventNames(input, stationMeta);
+            for (var i = 0, c = eventNames.length; i < c; i++) {
+                emitEvent(eventNames[i], this, false, args);
             }
-            else if (Array.isArray(input)) {
-                names = input;
+        };
+        EventStation.prototype.emitAsync = function (input) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if ($Promise === undefined) {
+                throw new Error('No promises implementation available.');
+            }
+            var stationMeta = this.stationMeta;
+            if (stationMeta.listenerCount < 1) {
+                return $Promise.resolve();
+            }
+            var eventNames = parseEventNames(input, stationMeta);
+            var promises = [];
+            for (var i = 0, c = eventNames.length; i < c; i++) {
+                promises = promises.concat(emitEvent(eventNames[i], this, true, args));
+            }
+            if (promises.length > 0) {
+                return $Promise.all(promises);
             }
             else {
-                throw new Error("Invalid first argument");
-            }
-            var listenersMap = stationMeta.listenersMap;
-            var regExpMarker = stationMeta.regExpMarker;
-            var enableRegExp = stationMeta.enableRegExp;
-            var listenersAll;
-            if (stationMeta.emitAllEvent) {
-                listenersAll = listenersMap.all;
-            }
-            var originStation = this;
-            for (var i = 0, c = names.length; i < c; i++) {
-                var eventName = names[i];
-                var listeners = void 0;
-                if (enableRegExp) {
-                    listeners = searchListeners(eventName, listenersMap, regExpMarker);
-                }
-                else {
-                    listeners = listenersMap[eventName];
-                }
-                if (listeners !== undefined) {
-                    applyListeners(listeners, args, originStation);
-                }
-                if (listenersAll !== undefined) {
-                    var argsAll = args.slice();
-                    argsAll.splice(0, 0, eventName);
-                    applyListeners(listenersAll, argsAll, originStation);
-                }
+                return $Promise.resolve();
             }
         };
         EventStation.prototype.makeListeners = function (q, r, s) {
@@ -436,8 +422,9 @@
                 var stationMeta = station.stationMeta;
                 for (var i = 0, c = listeners.length; i < c; i++) {
                     var listener = listeners[i];
-                    if (listener.hearer !== undefined) {
-                        throw new Error("Cross-emitter listeners can only be attached to one emitter.");
+                    var crossOrigin = listener.crossOrigin;
+                    if (crossOrigin !== undefined && crossOrigin !== station) {
+                        throw new Error("Cross-emitter listeners can only be attached to their origin station.");
                     }
                     addListener(stationMeta, listener);
                 }
@@ -803,10 +790,14 @@
         return false;
     }
     /** Applies the given listeners with the given arguments */
-    function applyListeners(listeners, args, originStation) {
+    function applyListeners(listeners, originStation, enableAsync, args) {
         var argsLength = args.length;
         var stationMeta = originStation.stationMeta;
         stationMeta.isPropagationStopped = false;
+        var promises;
+        if (enableAsync)
+            promises = [];
+        var result;
         for (var i = 0, c = listeners.length; i < c; i++) {
             if (stationMeta.isPropagationStopped) {
                 stationMeta.isPropagationStopped = false;
@@ -819,20 +810,29 @@
             var context = listener.context;
             switch (argsLength) {
                 case 0:
-                    callback.call(context);
+                    result = callback.call(context);
                     break;
                 case 1:
-                    callback.call(context, args[0]);
+                    result = callback.call(context, args[0]);
                     break;
                 case 2:
-                    callback.call(context, args[0], args[1]);
+                    result = callback.call(context, args[0], args[1]);
                     break;
                 case 3:
-                    callback.call(context, args[0], args[1], args[2]);
+                    result = callback.call(context, args[0], args[1], args[2]);
                     break;
                 default:
-                    callback.apply(context, args);
+                    result = callback.apply(context, args);
                     break;
+            }
+            /*
+             * Is async enabled, and is the result a Promise-like object
+             */
+            if (enableAsync
+                && result !== undefined
+                && typeof result.then === 'function'
+                && typeof result.catch === 'function') {
+                promises.push(result);
             }
             var resolves = listener.resolves;
             if (resolves !== undefined) {
@@ -855,11 +855,12 @@
                 }
             }
         }
+        return promises;
     }
     /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
     function makePromise(listener) {
         if ($Promise === undefined) {
-            throw new Error('No promise implementation detected.');
+            throw new Error('No promises implementation available.');
         }
         return new $Promise(function (resolve) {
             if (listener.resolves === undefined) {
@@ -1092,6 +1093,59 @@
         else {
             listener.stationMetas = newStationMetas;
         }
+    }
+    function parseEventNames(input, options) {
+        if (options === void 0) { options = {}; }
+        var names;
+        if (typeof input === 'string') {
+            var delimiter = options.delimiter;
+            if (options.enableDelimiter && input.indexOf(delimiter) >= 0) {
+                names = input.split(delimiter);
+            }
+            else {
+                names = [input];
+            }
+        }
+        else if (Array.isArray(input)) {
+            names = input;
+        }
+        else {
+            throw new Error("Invalid first argument");
+        }
+        return names;
+    }
+    function emitEvent(eventName, originStation, enableAsync, args) {
+        var stationMeta = originStation.stationMeta;
+        var listenersMap = stationMeta.listenersMap;
+        var listeners;
+        if (stationMeta.enableRegExp) {
+            listeners = searchListeners(eventName, listenersMap, stationMeta.regExpMarker);
+        }
+        else {
+            listeners = listenersMap[eventName];
+        }
+        var promises;
+        if (enableAsync)
+            promises = [];
+        if (listeners !== undefined) {
+            var result = applyListeners(listeners, originStation, enableAsync, args);
+            if (enableAsync && result !== undefined) {
+                promises = promises.concat(result);
+            }
+        }
+        var listenersAll;
+        if (stationMeta.emitAllEvent) {
+            listenersAll = listenersMap.all;
+        }
+        if (listenersAll !== undefined) {
+            var argsAll = args.slice();
+            argsAll.splice(0, 0, eventName);
+            var result = applyListeners(listenersAll, originStation, enableAsync, argsAll);
+            if (enableAsync && result !== undefined) {
+                promises = promises.concat(result);
+            }
+        }
+        return promises;
     }
     return EventStation;
 });

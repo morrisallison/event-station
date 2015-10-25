@@ -83,10 +83,17 @@ declare class EventStation {
     isHearing(target: EventStation | EventStation[], eventName: string, callback?: Function): boolean;
     /**
      * Emits events on the station.
-     * Parameters after the first are passed to eachlistener's callback function.
+     * Parameters after the first are passed to each listener's callback function.
      */
     emit(eventNames: string[], ...args: any[]): void;
     emit(eventName: string, ...args: any[]): void;
+    /**
+     * Emits events on the station, and then completes asynchronously.
+     * Parameters after the first are passed to each listener's callback function.
+     * @returns A `Promise` that resolves after all of the return listener promises resolve.
+     */
+    emitAsync<R extends any>(eventNames: string[], ...args: any[]): Promise<R[]>;
+    emitAsync<R extends any>(eventName: string, ...args: any[]): Promise<R[]>;
     /**
      * Creates listeners without attaching them to the station
      */
@@ -262,7 +269,7 @@ declare namespace EventStation {
          */
         reset(): Listeners;
         /** Similar to Array.prototype.forEach() */
-        forEach(func: ForEachCallback): Listeners;
+        forEach(func: EventStation.ForEachCallback): Listeners;
         /** Retrieves a listener located at the given index */
         get(index: number): Listener;
         /** Retrieves the index of the given listener */
@@ -277,6 +284,7 @@ declare namespace EventStation {
 declare namespace EventStation {
     /** A semantic alias */
     type StationId = string;
+    /** An interface to accommodate objects that extend EventStation */
     interface Emitter extends EventStation {
     }
     /**
@@ -320,9 +328,15 @@ declare namespace EventStation {
          */
         matchContext?: any;
         /**
-         * A station instance that attached the listener to it's origin station.
+         * Use in cross-emitter listeners
+         * The station that attached the listener to it's origin station.
          */
         hearer?: EventStation.Emitter;
+        /**
+         * Use in cross-emitter listeners
+         * The origin station of the listener which was attached by `hearer`
+         */
+        crossOrigin?: EventStation.Emitter;
         /**
          * Determines whether the listener is paused.
          * `undefined` by default.
@@ -428,10 +442,10 @@ declare namespace EventStation {
         length: number;
     }
     interface ListenerPromiseResolve {
-        (value?: Listener | Thenable<Listener>): void;
+        (value?: EventStation.Listener | Thenable<EventStation.Listener>): void;
     }
     interface ForEachCallback {
-        (listener: Listener, index: number, listeners: EventStation.Listener[]): any;
+        (listener: EventStation.Listener, index: number, listeners: EventStation.Listener[]): any;
     }
 }
 export = EventStation;

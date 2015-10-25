@@ -16,20 +16,22 @@ A versatile and robust event emitter class.
 * [Versatile API](http://morrisallison.bitbucket.org/event-station/api/) that's flexible and consistent
 * [Cross-emitter listening](http://morrisallison.bitbucket.org/event-station/usage.html#cross-emitter-listening), allowing for easier management of many listeners
 * [Regular expression listeners](http://morrisallison.bitbucket.org/event-station/usage.html#regular-expression-listeners)
+* [Asynchronous Listeners](http://morrisallison.bitbucket.org/event-station/usage.html#asynchronous-listeners) with `emitAsync()`
 * [Listener modifiers](http://morrisallison.bitbucket.org/event-station/usage.html#listener-modifiers); a fluent interface for modifying listeners
     * Set callbacks and contexts with `calling()` and `using()`
-    * Migration with `moveTo()`, `addTo()`, and `removeFrom()`
+    * Migration via `moveTo()`, `addTo()`, and `removeFrom()`
     * Remove listeners from *all* emitters with `off()`
     * Limit occurrences with `occur()`
     * `pause()`, `resume()`, and `isPaused()`
-    * `race()` and `all()` Promises
+    * Create evented `race()` and `all()` promises
     * Duplication with `clone()`
 * [Browser environment compatible](http://morrisallison.bitbucket.org/event-station/usage.html#browser-usage)
 * [Competitive and consistent performance](http://morrisallison.bitbucket.org/event-station/performance.html)
 * [Rx](https://www.npmjs.com/package/rx) compatible with `toObservable()`
-* `stopPropagation()`
+* Helpers like `stopPropagation()` and `listenerCount`
 * `extend()` any object
 * Global and per-instance `config()` options
+* Over 160 tests with 100% code coverage
 * Written in [TypeScript](http://www.typescriptlang.org/)
 
 ## Examples
@@ -49,7 +51,7 @@ student.hear(teacher, 'read', function (pageNumber) {
 // Logs: "Today the class is reading Harry Potter on page 42."
 teacher.emit('read', 42);
 ```
-### Using a listener map and the `addTo()` modifier
+### Using a listener map with the `addTo()` and `off()` modifiers
 
 ```javascript
 class MyWorker extends EventStation {}
@@ -87,6 +89,33 @@ new EventStation()
     .then(function () {
         console.log('Either "boom" or "pow" was emitted.');
     });
+```
+
+### Asynchronous Listeners
+
+```javascript
+var station = new EventStation();
+
+// Attach a listener that writes a message to file
+station.on('message', function (message) {
+    return new Promise(function (resolve, reject) {
+        fs.appendFile('log.txt', message, function (err) {
+            if (err) return reject(err);
+            console.log('The message was successfully written to a file.');
+            resolve();
+        });
+    });
+});
+
+// Attach a listener that logs a message to stdout
+station.on('message', function (message) {
+    console.log(message);
+});
+
+// Emit a message that will be logged to stdout and written to a file.
+station.emitAsync('message', 'Hello World').then(function () {
+    console.log('This message will display after the message is written to the file.');
+});
 ```
 
 ## Installation

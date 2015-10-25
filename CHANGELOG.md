@@ -1,5 +1,12 @@
 # Changelog
 
+### v1.0.0-beta
+
+* Add `emitAsync()`.
+    * Works just like `emit()`, except it returns a `Promise` that resolves when all of the called listeners have completed.
+    * Asynchronous listeners must return a Promise-like object.
+    * Please view the documentation for [asynchronous listeners](http://morrisallison.bitbucket.org/event-station/usage.html#asynchronous-listeners) for more details.
+
 ### v0.5.2
 
 * Added listener modifiers

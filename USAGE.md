@@ -17,6 +17,7 @@ Usage examples can be found in Event-Station's [tests](https://bitbucket.org/mor
     4. [Listener Map](#listener-map)
 * [Adding Listeners](#adding-listeners)
 * [Removing Listeners](#removing-listeners)
+* [Asynchronous Listeners](#asynchronous-listeners)
 * [Emitting Events](#emitting-events)
 * [Providing Context](#providing-context)
 * [Cross-emitter Listening](#cross-emitter-listening)
@@ -232,6 +233,40 @@ var listeners = student.on('read', function () {
 // Removes the listener from all stations, including `student`
 listeners.off();
 ```
+
+## Asynchronous Listeners
+
+An asynchronous listener has a callback that returns a `Promise` compatible object.
+
+Examples of asynchronous listeners:
+
+```javascript
+station.on('foo', function () {
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            resolve();
+        }, 2000);
+    });
+});
+
+station.on('bar', function () {
+    return Promise.reject();
+});
+```
+
+The `emitAsync()` method will capture the returned listeners, and return a `Promise` that resolves after all of the captured promises resolve.
+
+```javascript
+station.emitAsync(['foo', 'bar']).then(function () {
+    console.log('All "foo" and "bar" listeners have completed.');
+});
+```
+
+The `emit()` method doesn't recognize asynchronous listeners, and will simply iterate over them as per normal.
+
+`emit()` and `emitAsync()` can be used interchangeably without any issues. Both synchronous and asynchronous listeners can be attached to a station, listening to the same event, and called with either method.
+
+In short, `emitAsync()` should be used whenever you want to make sure, that all invoked listeners have finished handling an event.
 
 ## Emitting Events
 

@@ -1,6 +1,6 @@
 {
   "name": "event-station",
-  "version": "0.5.2",
+  "version": "1.0.0-beta",
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
   "main": "./dist/event-station.js",
@@ -27,7 +27,7 @@
   "devDependencies": {
     "backbone": "^1.2.3",
     "benchmark": "^1.0.0",
-    "blanket": "^1.1.7",
+    "blanket": "^1.1.9",
     "bluebird": "^2.10.2",
     "codecov.io": "^0.1.6",
     "coffee-script": "^1.10.0",
