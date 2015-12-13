@@ -254,7 +254,7 @@ station.on('bar', function () {
 });
 ```
 
-The `emitAsync()` method will capture the returned listeners, and return a `Promise` that resolves after all of the captured promises resolve.
+The `emitAsync()` method will capture the returned promises, and return a promise that resolves after all of the captured promises resolve.
 
 ```javascript
 station.emitAsync(['foo', 'bar']).then(function () {

@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.0.0
+
+* The definition file now requires TypeScript 1.7.3.
+
 ### v1.0.0-beta
 
 * Add `emitAsync()`.

@@ -9,18 +9,18 @@
  *
  * @preserve
  */
-(function (deps, factory) {
+(function (factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(deps, factory);
+        define(["require", "exports"], factory);
     }
     else if (typeof self === "object") {
         self.EventStation = factory();
     }
-})(["require", "exports"], function (require, exports) {
-    "use strict";
+})(function (require, exports) {
+    'use strict';
     /**
      * Event emitter class and namespace
      */
@@ -753,7 +753,7 @@
      */
     function matchListener(matchingListener, attachedListener, exactMatch) {
         if (exactMatch === true) {
-            return matchingListener == attachedListener;
+            return matchingListener === attachedListener;
         }
         var matchCallback = matchingListener.matchCallback;
         if (matchCallback !== undefined
