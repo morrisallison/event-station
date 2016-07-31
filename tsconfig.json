@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"target": "ES5",
+		"module": "commonjs",
+		"outDir": "lib"
+	},
+	"files": [
+        "src/EventStation.ts",
+        "typings/all.d.ts"
+	]
+}

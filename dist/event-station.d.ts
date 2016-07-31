@@ -179,36 +179,36 @@ declare namespace EventStation {
         /**
          * Sets each listener's maximum occurrence
          */
-        occur(maxOccurrences: number): this;
+        occur(maxOccurrences: number): Listeners;
         /**
          * Sets each listener's callback function
          */
-        calling(callback: Function): this;
+        calling(callback: Function): Listeners;
         /**
          * Sets each listener's callback function, and maximum occurrence to one(1)
          */
-        once(callback: Function): this;
+        once(callback: Function): Listeners;
         /**
          * Removes the listeners from all stations
          */
-        off(): this;
+        off(): Listeners;
         /**
          * Sets the context of each listener
          */
-        using(context: any): this;
+        using(context: any): Listeners;
         /**
          * Adds each listener to the given station
          */
-        addTo(station: EventStation): this;
+        addTo(station: EventStation): Listeners;
         /**
          * Removes each listener from the given station
          */
-        removeFrom(station: EventStation): this;
+        removeFrom(station: EventStation): Listeners;
         /**
          * Moves the listeners to another station.
          * This method changes the origin station.
          */
-        moveTo(station: Emitter): this;
+        moveTo(station: Emitter): Listeners;
         /**
          * Determines whether any listener in the collection matches the given listener.
          * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
@@ -217,11 +217,11 @@ declare namespace EventStation {
         /**
          * Adds the listeners to the origin station
          */
-        attach(): this;
+        attach(): Listeners;
         /**
          * Removes the listeners from the origin station
          */
-        detach(): this;
+        detach(): Listeners;
         /**
          * Determines whether any of the listeners are attached to the given station.
          * If no station is given, the method determines whether any of the listeners
@@ -235,11 +235,11 @@ declare namespace EventStation {
         /**
          * Pauses each listener
          */
-        pause(): this;
+        pause(): Listeners;
         /**
          * Un-pauses each listener
          */
-        resume(): this;
+        resume(): Listeners;
         /**
          * Determines whether any of listeners are paused
          */
@@ -267,9 +267,9 @@ declare namespace EventStation {
         /**
          * Un-pauses each listener, and resets each listener's occurrence count
          */
-        reset(): this;
+        reset(): Listeners;
         /** Similar to Array.prototype.forEach() */
-        forEach(func: EventStation.ForEachCallback): this;
+        forEach(func: EventStation.ForEachCallback): Listeners;
         /** Retrieves a listener located at the given index */
         get(index: number): Listener;
         /** Retrieves the index of the given listener */
