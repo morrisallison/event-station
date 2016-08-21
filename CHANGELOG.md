@@ -1,11 +1,22 @@
 # Changelog
 
+### next version wip
+
+* init now returns EventStation
+* config now throws on empty delimiter string
+* regex markers can now be any length
+* add global reset
+* fix global promise
+* add make
+
+### v1.0.0
+
 ### v1.0.0-beta
 
 * Add `emitAsync()`.
     * Works just like `emit()`, except it returns a `Promise` that resolves when all of the called listeners have completed.
     * Asynchronous listeners must return a Promise-like object.
-    * Please view the documentation for [asynchronous listeners](http://morrisallison.bitbucket.org/event-station/usage.html#asynchronous-listeners) for more details.
+    * Please view the documentation for [asynchronous listeners](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md#asynchronous-listeners) for more details.
 
 ### v0.5.2
 
@@ -47,7 +58,7 @@
     * Using `calling()` after using either `race()` and `all()` no longer breaks promises.
 * Added `EventStation.prototype.toObservable()` for creating Rx Observables
 * Added `EventStation.inject()` for injecting the `rx` namespace and `Promise`-like objects
-    * See the [API documentation](http://morrisallison.bitbucket.org/event-station/api/) for details.
+    * See the [module definition](https://github.com/morrisallison/event-station/blob/master/dist/event-station.d.ts) for details.
 
 ### v0.4.1
 
@@ -58,7 +69,6 @@
 
 ### v0.4.0
 
-* [New website](http://morrisallison.bitbucket.org/event-station)
 * Added `stopPropagation()`
 * Callbacks are now optional for event name strings and event name arrays.
     * `station.on('boom').calling(function () {});`
@@ -95,7 +105,7 @@
 
 * EventStation now uses a `constructor`
     * Direct prototypal inheritance and how literal objects are extended has changed
-        * Please view [USAGE.md](https://bitbucket.org/morrisallison/event-station/src/default/USAGE.md) to see how to do this in v0.2.0.
+        * Please view [USAGE.md](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md) to see how to do this in v0.2.0.
     * More advanced forms of inheritance remain unchanged, e.g. TypeScript and CoffeeScript
 
 #### Non-breaking Changes

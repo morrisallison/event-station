@@ -1,24 +1,28 @@
-/*
- * Event-Station
- *
- * Copyright (c) 2015 Morris Allison III <author@morris.xyz> (http://morris.xyz)
- * Released under the MIT License.
- *
- * For the full copyright and license information, please view
- * the LICENSE file distributed with this source code.
- *
- * @preserve
- */
+import {addListener} from './addListener';
+import {applyListeners} from './applyListeners';
+import {Emitter} from './Emitter';
+import {getAllListeners} from './getAllListeners';
+import {hasListener} from './hasListener';
+import {Listener} from './Listener';
+import {Listeners} from './Listeners';
+import {ListenersMap} from './ListenersMap';
+import {makeStationId} from './makeStationId';
+import {matchListener} from './matchListener';
+import {Meta} from './Meta';
+import {removeListener} from './removeListener';
+import {StationMap} from './StationMap';
+import * as injection from './injection';
+import * as options from './options';
 
 /**
  * Event emitter class and namespace
  */
-class EventStation {
+export class EventStation {
 
     /** Container for the station's context */
-    public stationMeta: EventStation.Meta;
+    public stationMeta: Meta;
 
-    constructor(options?: EventStation.Options) {
+    constructor(options?: options.Options) {
         EventStation.init(this, options);
     }
 
@@ -48,28 +52,28 @@ class EventStation {
     /**
      * Creates and attaches listeners to the station
      */
-    public on(listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public on(eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public on(eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public on(q: any, r?: any, s?: any): EventStation.Listeners {
+    public on(listenerMap: CallbackMap, context?: any): Listeners;
+    public on(eventNames: string[], callback?: Function, context?: any): Listeners;
+    public on(eventName: string, callback?: Function, context?: any): Listeners;
+    public on(q: any, r?: any, s?: any): Listeners {
 
         const stationMeta = this.stationMeta;
         const listeners = makeListeners(this, false, q, r, s);
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            addListener(stationMeta, listeners[i]);
+        for (let listener of listeners) {
+            addListener(stationMeta, listener);
         }
 
-        return new EventStation.Listeners(this, listeners);
+        return new Listeners(this, listeners);
     }
 
     /**
      * Creates and attaches listeners to the station that are applied once and removed
      */
-    public once(listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public once(eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public once(eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public once(q: any, r?: any, s?: any): EventStation.Listeners {
+    public once(listenerMap: CallbackMap, context?: any): Listeners;
+    public once(eventNames: string[], callback?: Function, context?: any): Listeners;
+    public once(eventName: string, callback?: Function, context?: any): Listeners;
+    public once(q: any, r?: any, s?: any): Listeners {
 
         return this.on(q, r, s).occur(1);
     }
@@ -80,7 +84,7 @@ class EventStation {
      * including listeners that were attached via `hear()` or `hearOnce()`.
      */
     public off(): void;
-    public off(listenerMap: EventStation.CallbackMap, context?: any): void;
+    public off(listenerMap: CallbackMap, context?: any): void;
     public off(eventNames: string[], callback?: Function, context?: any): void;
     public off(eventName: string, callback?: Function, context?: any): void;
     public off(q?: any, r?: any, s?: any): void {
@@ -99,7 +103,7 @@ class EventStation {
             r === undefined
             && s === undefined
             && typeof q === 'string'
-            && ( ! stationMeta.enableDelimiter || q.indexOf(stationMeta.delimiter) < 0)
+            && (!stationMeta.enableDelimiter || q.indexOf(stationMeta.delimiter) < 0)
         ) {
             removeListeners(q, stationMeta);
             return;
@@ -107,8 +111,8 @@ class EventStation {
 
         const listeners = makeListeners(this, true, q, r, s);
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            removeListener(stationMeta, listeners[i]);
+        for (let listener of listeners) {
+            removeListener(stationMeta, listener);
         }
     }
 
@@ -116,34 +120,33 @@ class EventStation {
      * Creates and attaches listeners to another station.
      * Listeners attached using this method can be removed specifically by using `disregard()`.
      */
-    public hear(station: EventStation.Emitter, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public hear(station: EventStation.Emitter, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public hear(station: EventStation.Emitter, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public hear(station: EventStation.Emitter, q: any, r?: any, s?: any): EventStation.Listeners {
+    public hear(station: Emitter, listenerMap: CallbackMap, context?: any): Listeners;
+    public hear(station: Emitter, eventNames: string[], callback?: Function, context?: any): Listeners;
+    public hear(station: Emitter, eventName: string, callback?: Function, context?: any): Listeners;
+    public hear(station: Emitter, q: any, r?: any, s?: any): Listeners {
 
         const heardStations = this.stationMeta.heardStations;
         const listeners = makeListeners(this, false, q, r, s);
         const targetStationMeta = station.stationMeta;
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            const listener = listeners[i];
+        for (let listener of listeners) {
             listener.hearer = this;
             listener.crossOrigin = station;
             addListener(targetStationMeta, listener);
             heardStations[station.stationId] = station;
         }
 
-        return new EventStation.Listeners(station, listeners);
+        return new Listeners(station, listeners);
     }
 
     /**
      * Attaches listeners to another station that are applied once and removed
      * Listeners attached using this method can be removed specifically by using `disregard()`.
      */
-    public hearOnce(station: EventStation.Emitter, listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public hearOnce(station: EventStation.Emitter, eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public hearOnce(station: EventStation.Emitter, eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public hearOnce(station: EventStation.Emitter, q: any, r?: any, s?: any): EventStation.Listeners {
+    public hearOnce(station: Emitter, listenerMap: CallbackMap, context?: any): Listeners;
+    public hearOnce(station: Emitter, eventNames: string[], callback?: Function, context?: any): Listeners;
+    public hearOnce(station: Emitter, eventName: string, callback?: Function, context?: any): Listeners;
+    public hearOnce(station: Emitter, q: any, r?: any, s?: any): Listeners {
 
         return this.hear(station, q, r, s).occur(1);
     }
@@ -155,7 +158,7 @@ class EventStation {
      */
     public disregard(): void;
     public disregard(target: EventStation | EventStation[]): void;
-    public disregard(target: EventStation | EventStation[], listenerMap: EventStation.CallbackMap, context?: any): void;
+    public disregard(target: EventStation | EventStation[], listenerMap: CallbackMap, context?: any): void;
     public disregard(target: EventStation | EventStation[], eventNames: string[], callback?: Function, context?: any): void;
     public disregard(target: EventStation | EventStation[], eventName: string, callback?: Function, context?: any): void;
     public disregard(target?: any, q?: any, r?: any, s?: any): void {
@@ -165,7 +168,7 @@ class EventStation {
         if (stationMeta.hearingCount < 1) return;
 
         var isRemovingAll = false;
-        var listeners: EventStation.Listener[];
+        var listeners: Listener[] = [];
 
         // If no listener targets were given
         if (q === undefined) {
@@ -186,8 +189,7 @@ class EventStation {
                 listeners = makeListeners(this, true, q, r, s);
             }
 
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                const listener = listeners[i];
+            for (let listener of listeners) {
                 listener.hearer = this;
                 removeListener(targetStationMeta, listener);
             }
@@ -206,7 +208,7 @@ class EventStation {
      * whether the station has any attached listeners.
      */
     public isHeard(): boolean;
-    public isHeard(listenerMap: EventStation.CallbackMap, context?: any): boolean;
+    public isHeard(listenerMap: CallbackMap, context?: any): boolean;
     public isHeard(eventNames: string[], callback?: Function, context?: any): boolean;
     public isHeard(eventName: string, callback?: Function, context?: any): boolean;
     public isHeard(q?: any, r?: any, s?: any): boolean {
@@ -223,8 +225,8 @@ class EventStation {
 
         const listeners = makeListeners(this, true, q, r, s);
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            if (hasListener(stationMeta, listeners[i])) return true;
+        for (let listener of listeners) {
+            if (hasListener(stationMeta, listener)) return true;
         }
 
         return false;
@@ -238,7 +240,7 @@ class EventStation {
      */
     public isHearing(): boolean;
     public isHearing(target: EventStation | EventStation[]): boolean;
-    public isHearing(target: EventStation | EventStation[], listenerMap: EventStation.CallbackMap): boolean;
+    public isHearing(target: EventStation | EventStation[], listenerMap: CallbackMap): boolean;
     public isHearing(target: EventStation | EventStation[], eventNames: string[], callback?: Function): boolean;
     public isHearing(target: EventStation | EventStation[], eventName: string, callback?: Function): boolean;
     public isHearing(target?: any, q?: any, r?: any, s?: any): boolean {
@@ -250,13 +252,13 @@ class EventStation {
         const stations = getTargetedStations(stationMeta, target);
         var matchAllListeners: boolean = false;
 
-        var listeners: EventStation.Listener[];
+        var listeners: Listener[] = [];
 
         // If no listener targets were given
-        if (q === undefined) {
-            matchAllListeners = true;
-        } else {
+        if (q) {
             listeners = makeListeners(this, true, q, r, s);
+        } else {
+            matchAllListeners = true;
         }
 
         for (let x = 0, y = stations.length; x < y; x++) {
@@ -269,9 +271,7 @@ class EventStation {
                 listeners = makeListeners(this, true, q, r, s);
             }
 
-            for (let i = 0, c = listeners.length; i < c; i++) {
-
-                const listener = listeners[i];
+            for (let listener of listeners) {
                 listener.hearer = this;
 
                 if (hasListener(targetStationMeta, listener)) return true;
@@ -295,8 +295,8 @@ class EventStation {
 
         const eventNames = parseEventNames(input, stationMeta);
 
-        for (let i = 0, c = eventNames.length; i < c; i++) {
-            emitEvent(eventNames[i], this, false, args);
+        for (let eventName of eventNames) {
+            emitEvent(eventName, this, false, args);
         }
     }
 
@@ -309,44 +309,44 @@ class EventStation {
     public emitAsync<R extends any>(eventName: string, ...args: any[]): Promise<R[]>;
     public emitAsync<R extends any>(input: any, ...args: any[]): Promise<R[]> {
 
-        if ($Promise === undefined) {
+        if (!injection.deps.$Promise) {
             throw new Error('No promises implementation available.');
         }
 
         const stationMeta = this.stationMeta;
 
         if (stationMeta.listenerCount < 1) {
-            return $Promise.resolve();
+            return injection.deps.$Promise.resolve([]);
         }
 
         const eventNames = parseEventNames(input, stationMeta);
 
         var promises: Promise<R>[] = [];
 
-        for (let i = 0, c = eventNames.length; i < c; i++) {
+        for (let eventName of eventNames) {
             promises = promises.concat(
-                emitEvent<Promise<R>>(eventNames[i], this, true, args)
+                emitEvent<Promise<R>>(eventName, this, true, args)
             );
         }
 
         if (promises.length > 0) {
-            return $Promise.all<R>(promises);
+            return injection.deps.$Promise.all<R>(promises);
         } else {
-            return $Promise.resolve();
+            return injection.deps.$Promise.resolve([]);
         }
     }
 
     /**
      * Creates listeners without attaching them to the station
      */
-    public makeListeners(listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public makeListeners(eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public makeListeners(eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public makeListeners(q: any, r?: any, s?: any): EventStation.Listeners {
+    public makeListeners(listenerMap: CallbackMap, context?: any): Listeners;
+    public makeListeners(eventNames: string[], callback?: Function, context?: any): Listeners;
+    public makeListeners(eventName: string, callback?: Function, context?: any): Listeners;
+    public makeListeners(q: any, r?: any, s?: any): Listeners {
 
         const listeners = makeListeners(this, false, q, r, s);
 
-        return new EventStation.Listeners(this, listeners);
+        return new Listeners(this, listeners);
     }
 
     /**
@@ -354,33 +354,26 @@ class EventStation {
      * If no arguments are given, all listeners will be returned;
      * including listeners that were attached via `hear()` or `hearOnce()`.
      */
-    public getListeners(): EventStation.Listeners;
-    public getListeners(listenerMap: EventStation.CallbackMap, context?: any): EventStation.Listeners;
-    public getListeners(eventNames: string[], callback?: Function, context?: any): EventStation.Listeners;
-    public getListeners(eventName: string, callback?: Function, context?: any): EventStation.Listeners;
-    public getListeners(q?: any, r?: any, s?: any): EventStation.Listeners {
+    public getListeners(): Listeners;
+    public getListeners(listenerMap: CallbackMap, context?: any): Listeners;
+    public getListeners(eventNames: string[], callback?: Function, context?: any): Listeners;
+    public getListeners(eventName: string, callback?: Function, context?: any): Listeners;
+    public getListeners(q?: any, r?: any, s?: any): Listeners | void {
 
         const attachedListeners = getAllListeners(this.stationMeta);
-        const attachedCount = attachedListeners.length;
 
-        if (attachedCount < 1) {
+        if (attachedListeners.length < 1) {
             return undefined;
         }
         if (arguments.length < 1) {
-            return new EventStation.Listeners(this, attachedListeners);
+            return new Listeners(this, attachedListeners);
         }
 
         const matchingListeners = makeListeners(this, true, q, r, s);
-        const listeners: EventStation.Listener[] = [];
+        const listeners: Listener[] = [];
 
-        for (let i = 0; i < attachedCount; i++) {
-
-            let attachedListener = attachedListeners[i];
-
-            for (let i = 0, c = matchingListeners.length; i < c; i++) {
-
-                let matchingListener = matchingListeners[i];
-
+        for (let attachedListener of attachedListeners) {
+            for (let matchingListener of matchingListeners) {
                 if (matchListener(matchingListener, attachedListener)) {
                     listeners.push(attachedListener);
                     break;
@@ -391,23 +384,23 @@ class EventStation {
         // No matching listeners were found
         if (listeners.length < 1) return undefined;
 
-        return new EventStation.Listeners(this, listeners);
+        return new Listeners(this, listeners);
     }
 
     /**
      * @returns A new Rx.Observable object from the station
      * This method is dependant on `rx`.
-     * @see EventStation.inject()
+     * @see inject()
      */
     public toObservable<T>(eventNames: string[], context?: any, selector?: (args: any[]) => T): Rx.Observable<T>;
     public toObservable<T>(eventName: string, context?: any, selector?: (args: any[]) => T): Rx.Observable<T>;
     public toObservable<T>(q: any, s?: any, selector?: (args: any[]) => T): Rx.Observable<T> {
 
-        if ($RxObservable === undefined) {
+        if (!injection.deps.$RxObservable) {
             throw new Error('Rx has not been injected. See documentation for details.');
         }
 
-        return $RxObservable.fromEventPattern<T>((r) => {
+        return injection.deps.$RxObservable.fromEventPattern<T>((r) => {
             this.on(q, r, s);
         }, (r) => {
             this.off(q, r, s);
@@ -425,7 +418,7 @@ class EventStation {
     /**
      * Adds the given listener to the station
      */
-    public addListener(listener: EventStation.Listener): void {
+    public addListener(listener: Listener): void {
         addListener(this.stationMeta, listener);
     }
 
@@ -433,7 +426,7 @@ class EventStation {
     * Removes all listeners that match the given listener from the station
     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
     */
-    public removeListener(listener: EventStation.Listener, exactMatch?: boolean): void {
+    public removeListener(listener: Listener, exactMatch?: boolean): void {
         removeListener(this.stationMeta, listener, exactMatch);
     }
 
@@ -441,57 +434,34 @@ class EventStation {
     * Determines whether any listener attached to the station matches the given listener.
     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
     */
-    public hasListener(listener: EventStation.Listener, exactMatch?: boolean): boolean {
+    public hasListener(listener: Listener, exactMatch?: boolean): boolean {
         return hasListener(this.stationMeta, listener, exactMatch);
     }
-}
-
-namespace EventStation {
 
     /** Initializes the given object */
-    export function init(obj: any, options?: Options) {
+    public static init(obj: any, options?: options.Options): typeof EventStation {
         obj.stationMeta = makeStationMeta(options);
-    }
-
-    /** Changes the default global configuration */
-    export function config(options: Options): typeof EventStation {
-
-        for (let optionName in globalOptions) {
-            globalOptions[optionName] = options[optionName];
-        }
 
         return EventStation;
     }
 
-    /**
-     * Injects or overrides an optional dependency.
-     *
-     * Use this method to provide EventStation with the `rx` namespace.
-     * Doing so enables the use of `Listeners.prototype.toObservable()`.
-     *
-     *     inject('rx', rx)
-     *
-     * EventStation will use the native Promise object by default.
-     * If a Promise object isn't globally available, one can be
-     * injected to be used in its place.
-     *
-     *     inject('Promise', YourPromiseObject)
-     *
-     * For example, Bluebird can be injected to override the Promise used
-     * within EventStation instances.
-     */
-    export function inject(name: 'rx', rx: any): typeof EventStation;
-    export function inject(name: 'Promise', Promise: any): typeof EventStation;
-    export function inject(name: string, obj: any): typeof EventStation;
-    export function inject(name: string, obj: any): typeof EventStation {
+    public static inject(name: string, obj: any): typeof EventStation {
+        injection.inject(name, obj);
 
-        if (name === 'rx') {
-            $RxObservable = obj.Observable;
-        } else if (name === 'Promise') {
-            $Promise = obj;
-        } else {
-            throw new Error('Invalid name');
-        }
+        return EventStation;
+    }
+
+    /** Modifies the global configuration */
+    public static config(opts: options.Options): typeof EventStation {
+        options.config(opts);
+
+        return EventStation;
+    }
+
+    /** Resets the global configuration and injected dependencies */
+    public static reset(): typeof EventStation {
+        options.reset();
+        injection.reset();
 
         return EventStation;
     }
@@ -499,8 +469,7 @@ namespace EventStation {
     /**
      * Extends an object with EventStation's public members
      */
-    export function extend(obj: any): any {
-
+    public static extend<T extends Emitter>(obj: any): T {
         const proto = EventStation.prototype;
 
         for (let propertyName in proto) {
@@ -520,778 +489,65 @@ namespace EventStation {
         return obj;
     }
 
-    /**
-     * A class for operations targeting a collection of listeners
-     */
-    export class Listeners {
+    public static make(): Emitter {
+        var station = EventStation.extend({});
 
-        /** @returns The number of listeners in the collection */
-        public get count(): number {
-            return this.listeners.length;
-        }
+        EventStation.init(station);
 
-        /** The station which the listeners originate from */
-        private originStation: Emitter;
-
-        /** An array of listeners */
-        private listeners: Listener[];
-
-        constructor(originStation: Emitter, listeners: Listener[]) {
-            this.originStation = originStation;
-            this.listeners = listeners;
-        }
-
-        /**
-         * Sets each listener's maximum occurrence
-         */
-        public occur(maxOccurrences: number): Listeners {
-
-            if (maxOccurrences < 1) {
-                throw new Error("The maximum occurrences must be greater than or equal to one.");
-            }
-
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                listeners[i].maxOccurrences = maxOccurrences;
-            }
-
-            return this;
-        }
-
-        /**
-         * Sets each listener's callback function
-         */
-        public calling(callback: Function): Listeners {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                const listener = listeners[i];
-                listener.callback = callback;
-                listener.matchCallback = callback;
-            }
-
-            return this;
-        }
-
-        /**
-         * Sets each listener's callback function, and maximum occurrence to one(1)
-         */
-        public once(callback: Function): Listeners {
-
-            return this.calling(callback).occur(1);
-        }
-
-        /**
-         * Removes the listeners from all stations
-         */
-        public off(): Listeners {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                removeListenerFromAll(listeners[i]);
-            }
-
-            return this;
-        }
-
-        /**
-         * Sets the context of each listener
-         */
-        public using(context: any): Listeners {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                const listener = listeners[i];
-                listener.context = context;
-                listener.matchContext = context;
-            }
-
-            return this;
-        }
-
-        /**
-         * Adds each listener to the given station
-         */
-        public addTo(station: EventStation): Listeners {
-
-            const listeners = this.listeners;
-            const stationMeta = station.stationMeta;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-
-                const listener = listeners[i];
-                const crossOrigin = listener.crossOrigin;
-
-                if (crossOrigin !== undefined && crossOrigin !== station) {
-                    throw new Error("Cross-emitter listeners can only be attached to their origin station.");
-                }
-
-                addListener(stationMeta, listener);
-            }
-
-            return this;
-        }
-
-        /**
-         * Removes each listener from the given station
-         */
-        public removeFrom(station: EventStation): Listeners {
-
-            const listeners = this.listeners;
-            const stationMeta = station.stationMeta;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                removeListener(stationMeta, listeners[i], true);
-            }
-
-            return this;
-        }
-
-        /**
-         * Moves the listeners to another station.
-         * This method changes the origin station.
-         */
-        public moveTo(station: Emitter): Listeners {
-
-            this.removeFrom(this.originStation);
-            this.originStation = station;
-            this.addTo(station);
-
-            return this;
-        }
-
-        /**
-         * Determines whether any listener in the collection matches the given listener.
-         * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-         */
-        public has(matchingListener: MatchListener, exactMatch?: boolean): boolean {
-            return matchListeners(matchingListener, this.listeners, exactMatch);
-        }
-
-        /**
-         * Adds the listeners to the origin station
-         */
-        public attach(): Listeners {
-            return this.addTo(this.originStation);
-        }
-
-        /**
-         * Removes the listeners from the origin station
-         */
-        public detach(): Listeners {
-            return this.removeFrom(this.originStation);
-        }
-
-        /**
-         * Determines whether any of the listeners are attached to the given station.
-         * If no station is given, the method determines whether any of the listeners
-         * are attached to *any* station.
-         */
-        public isAttachedTo(station?: EventStation): boolean {
-
-            if (station === undefined) {
-                return isListenersAttached(this.listeners);
-            }
-
-            return hasListeners(station.stationMeta, this.listeners, true);
-        }
-
-        /**
-         * Determines whether any of the listeners are attached to the origin station
-         */
-        public isAttached(): boolean {
-            return this.isAttachedTo(this.originStation);
-        }
-
-        /**
-         * Pauses each listener
-         */
-        public pause(): Listeners {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                listeners[i].isPaused = true;
-            }
-
-            return this;
-        }
-
-        /**
-         * Un-pauses each listener
-         */
-        public resume(): Listeners {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                listeners[i].isPaused = false;
-            }
-
-            return this;
-        }
-
-        /**
-         * Determines whether any of listeners are paused
-         */
-        public isPaused(): boolean {
-
-            const listeners = this.listeners;
-
-            for (var i = 0, c = listeners.length; i < c; i++) {
-                if (listeners[i].isPaused) return true;
-            }
-
-            return false;
-        }
-
-        /**
-         * @returns An iterable object (array) containing a promise
-         * for each listener that resolves when said listener is applied.
-         * This method is dependant on `Promise`.
-         * @see EventStation.inject()
-         */
-        public toPromises(): Array<Promise<Listener>> {
-
-            const promises: Array<Promise<Listener>> = [];
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                promises[i] = makePromise(listeners[i]);
-            }
-
-            return promises;
-        }
-
-        /**
-         * @returns A promise that resolves when all of the listeners
-         * have been applied at least once.
-         * This method is dependant on `Promise`.
-         * @see EventStation.inject()
-         */
-        public all(): Promise<Listener[]> {
-
-            return $Promise.all<Listener>(this.toPromises());
-        }
-
-        /**
-         * @returns A promise that resolves when one of the listeners is applied.
-         * This method is dependant on `Promise`.
-         * @see EventStation.inject()
-         */
-        public race(): Promise<Listener> {
-
-            return $Promise.race<Listener>(this.toPromises());
-        }
-
-        /**
-         * Un-pauses each listener, and resets each listener's occurrence count
-         */
-        public reset(): Listeners {
-
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                const listener = listeners[i];
-                listener.occurrences = undefined;
-                listener.isPaused = undefined;
-            }
-
-            return this;
-        }
-
-        /** Similar to Array.prototype.forEach() */
-        public forEach(func: EventStation.ForEachCallback): Listeners {
-
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                func(listeners[i], i, listeners);
-            }
-
-            return this;
-        }
-
-        /** Retrieves a listener located at the given index */
-        public get(index: number): Listener {
-            return this.listeners[index];
-        }
-
-        /** Retrieves the index of the given listener */
-        public index(listener: Listener): number {
-
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                if (listeners[i] === listener) return i;
-            }
-
-            return undefined;
-        }
-
-        /**
-         * @returns A new `Listeners` object containing a clone of each Listener
-         * The new object will not have an `originStation`.
-         */
-        public clone(): Listeners {
-
-            const clonedListeners: Listener[] = [];
-            const listeners = this.listeners;
-
-            for (let i = 0, c = listeners.length; i < c; i++) {
-                clonedListeners[i] = cloneListener(listeners[i]);
-            }
-
-            return new Listeners(this.originStation, clonedListeners);
-        }
+        return station;
     }
 }
 
-/** Iterator for generating unique station IDs */
-var stationIdIterator: number = 0;
+function parseEventNames(eventNames: string[], options: Meta): string[];
+function parseEventNames(eventName: string, options: Meta): string[];
+function parseEventNames(input: any, options: Meta): string[] {
+    var names: string[];
 
-/** Container for global configuration options */
-var globalOptions: EventStation.Options = Object.create(null);
+    if (typeof input === 'string') {
 
-/*
- * Global configuration defaults
- */
-globalOptions.emitAllEvent = true;
-globalOptions.enableRegExp = false;
-globalOptions.regExpMarker = '%';
-globalOptions.enableDelimiter = true;
-globalOptions.delimiter = ' ';
+        const delimiter = options.delimiter;
 
-/**
- * A reference to the injected Rx namespace.
- * @see EventStation.inject()
- */
-var $RxObservable: Rx.ObservableStatic;
+        if (options.enableDelimiter && delimiter) {
+            names = input.split(delimiter);
+        } else {
+            names = [input];
+        }
 
-/**
- * A reference to the Promise object, or an injected Promise-like object.
- * @see EventStation.inject()
- */
-var $Promise: typeof Promise = Promise;
+    } else if (Array.isArray(input)) {
+        names = input;
+    } else {
+        throw new Error("Invalid first argument");
+    }
 
-/** Generates a unique ID for EventStation instances */
-function makeStationId(): EventStation.StationId {
-    return String(++stationIdIterator);
+    return names;
 }
 
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(opts: EventStation.Options = {}): EventStation.Meta {
-
-    const glob = globalOptions;
-    var undef: any;
-
-    return {
-        stationId:            makeStationId(),
-        listenerCount:        0,
-        hearingCount:         0,
-        listenersMap:         Object.create(null),
-        heardStations:        Object.create(null),
+function makeStationMeta(config: options.Options = {}): Meta {
+    const state = {
+        heardStations: Object.create(null),
+        hearingCount: 0,
         isPropagationStopped: false,
-        emitAllEvent:         opts.emitAllEvent    === undef ? glob.emitAllEvent    : opts.emitAllEvent,
-        enableRegExp:         opts.enableRegExp    === undef ? glob.enableRegExp    : opts.enableRegExp,
-        regExpMarker:         opts.regExpMarker    === undef ? glob.regExpMarker    : opts.regExpMarker,
-        enableDelimiter:      opts.enableDelimiter === undef ? glob.enableDelimiter : opts.enableDelimiter,
-        delimiter:            opts.delimiter       === undef ? glob.delimiter       : opts.delimiter,
+        listenerCount: 0,
+        listenersMap: Object.create(null),
+        stationId: makeStationId(),
     };
-}
 
-/** Adds the given listener to the given station meta */
-function addListener(stationMeta: EventStation.Meta, listener: EventStation.Listener): void {
+    const meta = options.mergeOptions<Meta>(state, options.globalOptions, config);
 
-    const eventName = listener.eventName;
-    const listenersMap = stationMeta.listenersMap;
+    options.assertOptions(meta);
 
-    if (listenersMap[eventName] === undefined) {
-        listenersMap[eventName] = [];
-    }
-
-    const stationMetas = listener.stationMetas;
-
-    if (stationMetas === undefined) {
-        listener.stationMetas = [stationMeta];
-    } else {
-        stationMetas.push(stationMeta);
-    }
-
-    listenersMap[eventName].push(listener);
-    stationMeta.listenerCount++;
-
-    const hearer = listener.hearer;
-
-    if (hearer !== undefined) {
-        hearer.stationMeta.hearingCount++;
-    }
-}
-
-/**
- * Removes all listeners that match the given listener from the given station meta.
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
- */
-function removeListener(stationMeta: EventStation.Meta, listener: EventStation.Listener, exactMatch?: boolean): void {
-
-    if (stationMeta.listenerCount < 1) return;
-
-    const listenersMap = stationMeta.listenersMap;
-    const eventName = listener.eventName;
-    const attachedListeners = listenersMap[eventName];
-
-    if (attachedListeners === undefined) return;
-
-    let attachedListenersCount = attachedListeners.length;
-
-    if (attachedListenersCount === 1) {
-
-        if ( ! matchListener(listener, attachedListeners[0], exactMatch)) return;
-
-        delete listenersMap[eventName];
-        stationMeta.listenerCount--;
-        reduceHearerHearingCount(listener);
-        removeMetaFromStation(stationMeta, listener);
-
-        return;
-    }
-
-    for (let i = 0, c = attachedListenersCount; i < c; i++) {
-
-        let attachedListener = attachedListeners[i];
-
-        if ( ! matchListener(listener, attachedListener, exactMatch)) continue;
-
-        /* Remove the listener from the given EventStation.Meta */
-        attachedListeners.splice(i, 1);
-        stationMeta.listenerCount--;
-        i--;
-        c--;
-
-        reduceHearerHearingCount(listener);
-        removeMetaFromStation(stationMeta, listener);
-    }
-
-    if (attachedListeners.length < 1) {
-        delete listenersMap[eventName];
-    }
-}
-
-/**
- * Determines whether the given listener is attached to the given station meta.
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
- */
-function hasListener(stationMeta: EventStation.Meta, listener: EventStation.MatchListener, exactMatch?: boolean): boolean {
-
-    const listenersMap = stationMeta.listenersMap;
-    const eventName = listener.eventName;
-    var attachedListeners: EventStation.Listener[];
-
-    if (eventName === undefined) {
-        attachedListeners = getAllListeners(stationMeta);
-    } else {
-        attachedListeners = listenersMap[eventName];
-        if (attachedListeners === undefined) {
-            return false;
-        }
-    }
-
-    return matchListeners(listener, attachedListeners, exactMatch);
-}
-
-/**
- * Determines whether the given station meta has listeners that match the given listeners
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
- */
-function hasListeners(stationMeta: EventStation.Meta, listeners: EventStation.MatchListener[], exactMatch?: boolean): boolean {
-
-    for (let i = 0, c = listeners.length; i < c; i++) {
-        if (hasListener(stationMeta, listeners[i], exactMatch)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/** Determines whether the given listener is attached to any stations */
-function isListenerAttached(listener: EventStation.Listener): boolean {
-    return listener.stationMetas !== undefined;
-}
-
-/** Determines whether the given listeners are attached to any stations */
-function isListenersAttached(listeners: EventStation.Listener[]): boolean {
-
-    for (let i = 0, c = listeners.length; i < c; i++) {
-        if (isListenerAttached(listeners[i])) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Determines whether the given listeners match by performing an approximate match
- * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
- */
-function matchListener(matchingListener: EventStation.MatchListener, attachedListener: EventStation.MatchListener, exactMatch?: boolean): boolean {
-
-    if (exactMatch === true) {
-        return matchingListener == attachedListener;
-    }
-
-    const matchCallback = matchingListener.matchCallback;
-
-    if (
-        matchCallback !== undefined
-        && matchCallback !== attachedListener.matchCallback
-    ) {
-        return false
-    }
-
-    const matchContext = matchingListener.matchContext;
-
-    if (
-        matchContext !== undefined
-        && matchContext !== attachedListener.matchContext
-    ) {
-        return false
-    }
-
-    const hearer = matchingListener.hearer;
-
-    if (
-        hearer !== undefined
-        && hearer !== attachedListener.hearer
-    ) {
-        return false
-    }
-
-    const eventName = matchingListener.eventName;
-
-    if (
-        eventName !== undefined
-        && eventName !== attachedListener.eventName
-    ) {
-        return false
-    }
-
-    return true;
-}
-
-function matchListeners(matchingListener: EventStation.MatchListener, attachedListeners: EventStation.MatchListener[], exactMatch?: boolean): boolean {
-
-    const count = attachedListeners.length;
-
-    if (count < 1) return false;
-
-    for (let i = 0; i < count; i++) {
-
-        let attachedListener = attachedListeners[i];
-
-        if (matchListener(matchingListener, attachedListener, exactMatch)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/** Applies the given listeners with the given arguments */
-function applyListeners<P extends Promise<any>>(listeners: EventStation.Listener[], originStation: EventStation, enableAsync: boolean, args: EventStation.ListenerArguments): P[] {
-
-    const argsLength = args.length;
-    const stationMeta = originStation.stationMeta;
-
-    stationMeta.isPropagationStopped = false;
-
-    var promises: P[];
-
-    if (enableAsync) promises = [];
-
-    var result: any;
-
-    for (let i = 0, c = listeners.length; i < c; i++) {
-
-        if (stationMeta.isPropagationStopped) {
-            stationMeta.isPropagationStopped = false;
-            return;
-        }
-
-        const listener = listeners[i];
-
-        if (listener.isPaused) continue;
-
-        const callback = listener.callback;
-        const context = listener.context;
-
-        switch (argsLength) {
-            case 0:
-                result = callback.call(context);
-                break;
-            case 1:
-                result = callback.call(context, args[0]);
-                break;
-            case 2:
-                result = callback.call(context, args[0], args[1]);
-                break;
-            case 3:
-                result = callback.call(context, args[0], args[1], args[2]);
-                break;
-            default:
-                result = callback.apply(context, args);
-                break;
-        }
-
-        /*
-         * Is async enabled, and is the result a Promise-like object
-         */
-        if (
-            enableAsync
-            && result !== undefined
-            && typeof result.then === 'function'
-            && typeof result.catch === 'function'
-        ) {
-            promises.push(<P>result);
-        }
-
-        const resolves = listener.resolves;
-
-        if (resolves !== undefined) {
-
-            for (let i = 0, c = resolves.length; i < c; i++) {
-                resolves[i](listener);
-            }
-
-            listener.resolves = undefined;
-        }
-
-        const maxOccurrences = listener.maxOccurrences;
-        let occurrences = listener.occurrences;
-
-        if (maxOccurrences !== undefined) {
-
-            if (occurrences === undefined) {
-                occurrences = listener.occurrences = 1;
-            } else {
-                occurrences = ++listener.occurrences;
-            }
-
-            if (occurrences === maxOccurrences) {
-                removeListenerFromAll(listener);
-            }
-        }
-    }
-
-    return promises;
-}
-
-/** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
-function makePromise(listener: EventStation.Listener): Promise<EventStation.Listener> {
-
-    if ($Promise === undefined) {
-        throw new Error('No promises implementation available.');
-    }
-
-    return new $Promise<EventStation.Listener>(function (resolve) {
-
-        if (listener.resolves === undefined){
-            listener.resolves = [resolve];
-        } else {
-            listener.resolves.push(resolve);
-        }
-    });
-}
-
-/**
- * Clones the given listener
- * Does not clone the listener's `stationMetas` or `resolves` properties
- * @throws an `Error` if the listener is a cross-emitter listener
- */
-function cloneListener(listener: EventStation.Listener): EventStation.Listener {
-
-    if (listener.hearer !== undefined) {
-        throw new Error("Cross-emitter listeners can not be cloned.");
-    }
-
-    return {
-        eventName: listener.eventName,
-        callback: listener.callback,
-        context: listener.context,
-        matchCallback: listener.matchCallback,
-        matchContext: listener.matchContext,
-        isPaused: listener.isPaused,
-        occurrences: listener.occurrences,
-        maxOccurrences: listener.maxOccurrences,
-    };
-}
-
-/** Retrieves all listeners attached to the given EventStation.Meta */
-function getAllListeners(stationMeta: EventStation.Meta): EventStation.Listener[] {
-
-    if (stationMeta.listenerCount < 1) return [];
-
-    const listenersMap = stationMeta.listenersMap;
-    var listeners: EventStation.Listener[] = [];
-
-    for (let eventName in listenersMap) {
-        listeners = listeners.concat(listenersMap[eventName]);
-    }
-
-    return listeners;
-}
-
-/**
- * @returns the heard stations of a given station's meta as an array
- */
-function getHeardStations(stationMeta: EventStation.Meta): EventStation[] {
-
-    const stations: EventStation[] = [];
-    const heardStations = stationMeta.heardStations;
-
-    for (let stationId in heardStations) {
-        stations.push(heardStations[stationId]);
-    }
-
-    return stations;
-}
-
-/**
- * Retrieves the targeted stations from the given parameters
- * This function normalizes the the target station for
- * cross-emitter listening methods.
- */
-function getTargetedStations(stationMeta: EventStation.Meta, target?: EventStation | EventStation[]): EventStation[] {
-
-    if (target === undefined) {
-        return getHeardStations(stationMeta);
-    }
-
-    if (Array.isArray(target)) {
-        return <EventStation[]>target;
-    }
-
-    if ((<EventStation>target).stationMeta !== undefined) {
-        return [<EventStation>target];
-    }
-
-    throw new Error("Invalid target");
+    return meta;
 }
 
 /**
  * Makes an array of listeners from the given parameters
  * This function normalizes the four ways to make listeners.
  */
-function makeListeners(originStation: EventStation.Emitter, isMatching: boolean, listenerMap: EventStation.CallbackMap, context?: EventStation): EventStation.Listener[];
-function makeListeners(originStation: EventStation.Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: EventStation): EventStation.Listener[];
-function makeListeners(originStation: EventStation.Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: EventStation): EventStation.Listener[];
-function makeListeners(originStation: EventStation.Emitter, isMatching: boolean, q: any, r?: any, s?: any): EventStation.Listener[] {
+function makeListeners(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context?: EventStation): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: EventStation): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: EventStation): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, q: any, r?: any, s?: any): Listener[] {
 
     if (typeof q === 'string') {
 
@@ -1307,7 +563,7 @@ function makeListeners(originStation: EventStation.Emitter, isMatching: boolean,
         return [{
             eventName: q,
             callback: r,
-            context: ! isMatching && s === undefined ? originStation : s,
+            context: !isMatching && s === undefined ? originStation : s,
             matchCallback: r,
             matchContext: s,
         }];
@@ -1324,17 +580,18 @@ function makeListeners(originStation: EventStation.Emitter, isMatching: boolean,
     throw new Error("Invalid arguments");
 }
 
-/** Makes an array of listeners from the given listener map */
-function makeListenersFromMap(originStation: EventStation.Emitter, isMatching: boolean, listenerMap: EventStation.CallbackMap, context: any): EventStation.Listener[] {
 
-    const listeners: EventStation.Listener[] = [];
+/** Makes an array of listeners from the given listener map */
+function makeListenersFromMap(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context: any): Listener[] {
+
+    const listeners: Listener[] = [];
 
     for (let eventName in listenerMap) {
 
         listeners.push({
             eventName: eventName,
             callback: listenerMap[eventName],
-            context: ! isMatching && context === undefined ? originStation : context,
+            context: !isMatching && context === undefined ? originStation : context,
             matchCallback: listenerMap[eventName],
             matchContext: context,
         });
@@ -1344,16 +601,16 @@ function makeListenersFromMap(originStation: EventStation.Emitter, isMatching: b
 }
 
 /** Makes an array of listeners from the given event name array */
-function makeListenersFromArray(originStation: EventStation.Emitter, isMatching: boolean, eventNames: string[], callback: Function, context: any): EventStation.Listener[] {
+function makeListenersFromArray(originStation: Emitter, isMatching: boolean, eventNames: string[], callback: Function, context: any): Listener[] {
 
-    const listeners: EventStation.Listener[] = [];
+    const listeners: Listener[] = [];
 
     for (let i = 0, l = eventNames.length; i < l; i++) {
 
         listeners.push({
             eventName: eventNames[i],
             callback: callback,
-            context: ! isMatching && context === undefined ? originStation : context,
+            context: !isMatching && context === undefined ? originStation : context,
             matchContext: context,
             matchCallback: callback,
         });
@@ -1362,20 +619,62 @@ function makeListenersFromArray(originStation: EventStation.Emitter, isMatching:
     return listeners;
 }
 
+function emitEvent<P extends Promise<any>>(eventName: string, originStation: Emitter, enableAsync: boolean, args: any[]): P[] {
+
+    const stationMeta = originStation.stationMeta;
+    const listenersMap = stationMeta.listenersMap;
+
+    var listeners: Listener[];
+
+    if (stationMeta.enableRegExp) {
+        listeners = searchListeners(eventName, listenersMap, stationMeta.regExpMarker);
+    } else {
+        listeners = listenersMap[eventName];
+    }
+
+    var promises: P[] = [];
+
+    if (listeners) {
+
+        let result = applyListeners<P>(listeners, originStation, enableAsync, args);
+
+        if (enableAsync && result) {
+            promises = promises.concat(result);
+        }
+    }
+
+    const listenersMapAll = listenersMap['all'];
+
+    if (stationMeta.emitAllEvent && listenersMapAll) {
+
+        let argsAll = args.slice();
+
+        argsAll.splice(0, 0, eventName);
+
+        let result = applyListeners<P>(listenersMapAll, originStation, enableAsync, argsAll);
+
+        if (enableAsync && result) {
+            promises = promises.concat(result);
+        }
+    }
+
+    return promises;
+}
+
 /**
  * Retrieves listeners from the given listener map
  * that match the given event name. Specifically,
  * this function recognizes regular expression listeners.
  */
-function searchListeners(eventName: string, listenersMap: EventStation.ListenersMap, regExpMarker: string): EventStation.Listener[] {
+function searchListeners(eventName: string, listenersMap: ListenersMap, regExpMarker: string): Listener[] {
 
-    var listeners: EventStation.Listener[] = [];
+    var listeners: Listener[] = [];
 
     for (let expression in listenersMap) {
 
         if (expression.indexOf(regExpMarker) === 0) {
 
-            if (new RegExp(expression.substr(1)).test(eventName)) {
+            if (new RegExp(expression.substr(regExpMarker.length)).test(eventName)) {
                 listeners = listeners.concat(listenersMap[expression]);
             }
 
@@ -1388,68 +687,10 @@ function searchListeners(eventName: string, listenersMap: EventStation.Listeners
     return listeners;
 }
 
-/** Removes the given listener from all of the station meta it's attached to */
-function removeListenerFromAll(listener: EventStation.Listener): void {
-
-    const stationMetas = listener.stationMetas;
-
-    for (let i = 0, c = stationMetas.length; i < c; i++) {
-        removeListener(stationMetas[i], listener, true);
-    }
-}
-
-/** Removes all listeners for a particular event from the given station meta */
-function removeListeners(eventName: string, stationMeta: EventStation.Meta): void {
-
-    const listenersMap = stationMeta.listenersMap;
-    const listeners = listenersMap[eventName];
-
-    if (listeners === undefined) return;
-
-    const count = listeners.length;
-
-    for (let i = 0; i < count; i++) {
-
-        const listener = listeners[i];
-        const hearer = listener.hearer;
-
-        if (hearer !== undefined) {
-            hearer.stationMeta.hearingCount--;
-        }
-    }
-
-    stationMeta.listenerCount = stationMeta.listenerCount - count;
-    delete listenersMap[eventName];
-}
-
-/** Removes all listeners from then given station meta */
-function removeAllListeners(stationMeta: EventStation.Meta): void {
-
-    const listenersMap = stationMeta.listenersMap;
-
-    for (let eventName in listenersMap) {
-
-        const listeners = listenersMap[eventName];
-
-        for (let i = 0, c = listeners.length; i < c; i++) {
-
-            const listener = listeners[i];
-            const hearer = listener.hearer;
-
-            if (hearer !== undefined) {
-                hearer.stationMeta.hearingCount--;
-            }
-        }
-    }
-
-    stationMeta.listenerCount = 0;
-    stationMeta.listenersMap = Object.create(null);
-}
-
 /** Clean the `heardStations` property of the meta of the given station */
 function cleanHeardStations(station: EventStation): void {
 
-    const stationMap: EventStation.StationMap = Object.create(null);
+    const stationMap: StationMap = Object.create(null);
     const heardStations = station.stationMeta.heardStations;
 
     for (let stationId in heardStations) {
@@ -1464,318 +705,93 @@ function cleanHeardStations(station: EventStation): void {
     station.stationMeta.heardStations = stationMap;
 }
 
-function reduceHearerHearingCount(listener: EventStation.Listener): void {
+/** Removes all listeners from then given station meta */
+function removeAllListeners(stationMeta: Meta): void {
 
-    /*
-     * Update the hearingCount of given listener's hearer
-     */
-    const hearer = listener.hearer;
-
-    if (hearer !== undefined) {
-        hearer.stationMeta.hearingCount--;
-    }
-}
-
-function removeMetaFromStation(targetMeta: EventStation.Meta, listener: EventStation.Listener) {
-
-    const stationMetas = listener.stationMetas;
-
-    if (stationMetas === undefined) return;
-
-    let stationMetasCount = stationMetas.length;
-
-    if (stationMetasCount === 1) {
-        if (stationMetas[0] === targetMeta) {
-            listener.stationMetas = undefined;
-        }
-        return;
-    }
-
-    const newStationMetas: EventStation.Meta[] = [];
-
-    for (let i = 0; i < stationMetasCount; i++) {
-        const stationMeta = stationMetas[i];
-        if (stationMeta !== targetMeta) {
-            newStationMetas.push(stationMeta);
-        }
-    }
-
-    if (newStationMetas.length < 1) {
-        /*
-         * This line is necessary in the rare case that
-         * the exact same listener object has been added to
-         * a station multiple times, and is then removed from
-         * said station.
-         */
-        listener.stationMetas = undefined;
-    } else {
-        listener.stationMetas = newStationMetas;
-    }
-}
-
-interface GetNamesOptions {
-    enableDelimiter?: boolean;
-    delimiter?: string;
-}
-
-function parseEventNames(eventNames: string[], options?: GetNamesOptions): string[];
-function parseEventNames(eventName: string, options?: GetNamesOptions): string[];
-function parseEventNames(input: any, options: GetNamesOptions = {}): string[] {
-
-    var names: string[];
-
-    if (typeof input === 'string') {
-
-        const delimiter = options.delimiter;
-
-        if (options.enableDelimiter && input.indexOf(delimiter) >= 0) {
-            names = (<string>input).split(delimiter);
-        } else {
-            names = [input];
-        }
-
-    } else if (Array.isArray(input)) {
-
-        names = input;
-
-    } else {
-
-        throw new Error("Invalid first argument");
-    }
-
-    return names;
-}
-
-function emitEvent<P extends Promise<any>>(eventName: string, originStation: EventStation.Emitter, enableAsync: boolean, args: any[]): P[] {
-
-    const stationMeta = originStation.stationMeta;
     const listenersMap = stationMeta.listenersMap;
 
-    var listeners: EventStation.Listener[];
+    for (let eventName in listenersMap) {
 
-    if (stationMeta.enableRegExp) {
-        listeners = searchListeners(eventName, listenersMap, stationMeta.regExpMarker);
-    } else {
-        listeners = listenersMap[eventName];
-    }
+        const listeners = listenersMap[eventName];
 
-    var promises: P[];
+        for (let listener of listeners) {
+            const hearer = listener.hearer;
 
-    if (enableAsync) promises = [];
-
-    if (listeners !== undefined) {
-
-        let result = applyListeners<P>(listeners, originStation, enableAsync, args);
-
-        if (enableAsync && result !== undefined) {
-            promises = promises.concat(result);
+            if (hearer) {
+                hearer.stationMeta.hearingCount--;
+            }
         }
     }
 
-    var listenersAll: EventStation.Listener[];
+    stationMeta.listenerCount = 0;
+    stationMeta.listenersMap = Object.create(null);
+}
 
-    if (stationMeta.emitAllEvent) {
-        listenersAll = listenersMap.all;
-    }
+/** Removes all listeners for a particular event from the given station meta */
+function removeListeners(eventName: string, stationMeta: Meta): void {
 
-    if (listenersAll !== undefined) {
+    const listenersMap = stationMeta.listenersMap;
+    const listeners = listenersMap[eventName];
 
-        let argsAll = args.slice();
-        argsAll.splice(0, 0, eventName);
+    if (listeners === undefined) return;
 
-        let result = applyListeners<P>(listenersAll, originStation, enableAsync, argsAll);
+    const count = listeners.length;
 
-        if (enableAsync && result !== undefined) {
-            promises = promises.concat(result);
+    for (let i = 0; i < count; i++) {
+
+        const listener = listeners[i];
+        const hearer = listener.hearer;
+
+        if (hearer) {
+            hearer.stationMeta.hearingCount--;
         }
     }
 
-    return promises;
+    stationMeta.listenerCount = stationMeta.listenerCount - count;
+    delete listenersMap[eventName];
 }
 
-namespace EventStation {
-
-    /** A semantic alias */
-    export type StationId = string;
-
-    /** An interface to accommodate objects that extend EventStation */
-    export interface Emitter extends EventStation {}
-
-    /**
-     * A subset of the Listener interface used only for
-     * comparing two Listener objects.
-     * @see Listener
-     * @see matchListener()
-     */
-    export interface MatchListener {
-        /** @see Listener.eventName */
-        eventName?: string;
-        /** @see Listener.matchCallback */
-        matchCallback?: Function;
-        /** @see Listener.matchContext */
-        matchContext?: any;
-        /** @see Listener.hearer */
-        hearer?: EventStation.Emitter;
-    }
-
-    /**
-     * An object that holds the state of a listener.
-     * Listeners can can exist while separated from a station,
-     * and can be moved between stations freely.
-     */
-    export interface Listener {
-        /** An event or expression that the listener is listening to. */
-        eventName: string;
-        /** A function that is called when an event matching `eventName` is emitted. */
-        callback?: Function;
-        /** An object that is used as `this` when the `callback` is applied. */
-        context?: any;
-        /**
-         * A function that is used when matching listener callbacks.
-         * When matching, `matchCallback` is used instead of `callback`,
-         * because the `callback` property can be modified by listener modifiers.
-         */
-        matchCallback?: Function;
-        /**
-         * An object that is used when matching listener callbacks.
-         * When matching, `matchContext` is used instead of `context`,
-         * because the `context` property can be modified by listener modifiers.
-         */
-        matchContext?: any;
-        /**
-         * Use in cross-emitter listeners
-         * The station that attached the listener to it's origin station.
-         */
-        hearer?: EventStation.Emitter;
-        /**
-         * Use in cross-emitter listeners
-         * The origin station of the listener which was attached by `hearer`
-         */
-        crossOrigin?: EventStation.Emitter;
-        /**
-         * Determines whether the listener is paused.
-         * `undefined` by default.
-         */
-        isPaused?: boolean;
-        /**
-         * The number of times the listener has been applied.
-         * This property is `undefined` unless `maxOccurrences` is set.
-         */
-        occurrences?: number;
-        /**
-         * The maximum number of times the listener can be applied.
-         * When the listener's `occurrences` property equals `maxOccurrences`,
-         * The listener is removed from it's origin.
-         * `undefined` by default.
-         */
-        maxOccurrences?: number;
-        /**
-         * An array of Promise `resolve()` functions that are applied
-         * and removed the next time the listener's callback is applied.
-         */
-        resolves?: ListenerPromiseResolve[];
-        /**
-         * The `Meta` of stations which the listener is attached to
-         */
-        stationMetas?: Meta[];
-    }
-
-    /**
-     * A literal object with non-delimited event names
-     * as keys and callback functions as values.
-     */
-    export interface CallbackMap {
-        [eventName: string]: Function;
-    }
-
-    /**
-     * See the [configuration section](http://morrisallison.bitbucket.org/event-station/usage.html#configuration)
-     * of the usage documentation for general usage.
-     */
-    export interface Options {
-        /**
-         * Determines whether a station emits an `"all"` event for every event that is emitted.
-         * `true` by default.
-         */
-        emitAllEvent?: boolean;
-        /**
-         * Determines whether a station can use regular expression listeners.
-         * `false` by default.
-         */
-        enableRegExp?: boolean;
-        /**
-         * The character used to mark regular expression listeners.
-         * `"%"` by default.
-         */
-        regExpMarker?: string;
-        /**
-         * Determines whether a station can use delimited event names.
-         * `true` by default.
-         */
-        enableDelimiter?: boolean;
-        /**
-         * The character used to delimit event names in a string.
-         * `" "` (space) by default.
-         */
-        delimiter?: string;
-        [key: string]: any;
-        [key: number]: void;
-    }
-
-    /** An object of listener arrays with event names and expressions as keys */
-    export interface ListenersMap {
-        all: EventStation.Listener[];
-        [eventName: string]: EventStation.Listener[];
-    }
-
-    /** An object of station instances with unique station IDs as keys */
-    export interface StationMap {
-        [stationId: string]: EventStation.Emitter;
-    }
-
-    export interface Meta {
-        /** Unique ID */
-        stationId: StationId;
-        /** Number of listeners attached to this station */
-        listenerCount: number;
-        /** Number of listeners attached to other stations by this station */
-        hearingCount: number;
-        /** Listeners attached to the station */
-        listenersMap: ListenersMap;
-        /** Stations that have listeners that were attached by this station */
-        heardStations: StationMap;
-        /** Determines whether propagation has stopped for an emitted event */
-        isPropagationStopped: boolean;
-        /** @see Options.emitAllEvent */
-        emitAllEvent: boolean;
-        /** @see Options.enableRegExp */
-        enableRegExp: boolean;
-        /** @see Options.regExpMarker */
-        regExpMarker: string;
-        /** @see Options.enableDelimiter */
-        enableDelimiter: boolean;
-        /** @see Options.delimiter */
-        delimiter: string;
-    }
-
-    export interface ListenerArguments {
-        [index: number]: any;
-        length: number;
-    }
-
-    export interface ListenerPromiseResolve {
-        (value?: EventStation.Listener | Promise<EventStation.Listener>): void;
-    }
-
-    export interface ForEachCallback {
-        (listener: EventStation.Listener, index: number, listeners: EventStation.Listener[]): any;
-    }
-}
-
-/*
- * ES6 module support
+/**
+ * Retrieves the targeted stations from the given parameters
+ * This function normalizes the the target station for
+ * cross-emitter listening methods.
  */
-Object.defineProperty(EventStation, '__esModule', { value: true });
-(<any>EventStation).default = EventStation;
+function getTargetedStations(stationMeta: Meta, target?: EventStation | EventStation[]): EventStation[] {
 
-export = EventStation;
+    if (target === undefined) {
+        return getHeardStations(stationMeta);
+    }
+
+    if (Array.isArray(target)) {
+        return <EventStation[]>target;
+    }
+
+    if ((<EventStation>target).stationMeta) {
+        return [<EventStation>target];
+    }
+
+    throw new Error("Invalid target");
+}
+
+/**
+ * @returns the heard stations of a given station's meta as an array
+ */
+function getHeardStations(stationMeta: Meta): EventStation[] {
+
+    const stations: EventStation[] = [];
+    const heardStations = stationMeta.heardStations;
+
+    for (let stationId in heardStations) {
+        stations.push(heardStations[stationId]);
+    }
+
+    return stations;
+}
+
+/**
+ * A literal object with non-delimited event names
+ * as keys and callback functions as values.
+ */
+export interface CallbackMap {
+    [eventName: string]: Function;
+}

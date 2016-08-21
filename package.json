@@ -1,23 +1,21 @@
 {
   "name": "event-station",
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
-  "main": "./dist/event-station.js",
-  "typings": "./dist/event-station.d.ts",
   "license": "MIT",
-  "homepage": "http://morrisallison.bitbucket.org/event-station",
-  "bugs": "https://bitbucket.org/morrisallison/event-station/issues",
+  "homepage": "http://morrisallison.github.io/event-station",
+  "bugs": "https://github.com/morrisallison/event-station/issues",
   "repository": {
-    "type": "hg",
-    "url": "https://bitbucket.org/morrisallison/event-station/"
+    "type": "git",
+    "url": "https://github.com/morrisallison/event-station.git"
   },
   "keywords": [
-    "event",
-    "events",
-    "emitter",
     "class",
     "dispatcher",
+    "emitter",
+    "event",
+    "events",
     "typescript"
   ],
   "directories": {
@@ -25,41 +23,55 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "backbone": "^1.2.3",
-    "benchmark": "^1.0.0",
-    "blanket": "^1.1.9",
-    "bluebird": "^2.10.2",
-    "codecov.io": "^0.1.6",
-    "coffee-script": "^1.10.0",
-    "eventemitter2": "^0.4.14",
-    "eventemitter3": "^1.1.1",
-    "jake": "^8.0.12",
-    "mocha": "^2.3.3",
-    "mocha-lcov-reporter": "^1.0.0",
-    "must": "^0.13.1",
-    "rx": "^4.0.6",
-    "typescript": "^1.6.2",
-    "uglify-js": "^2.5.0",
-    "underscore": "^1.8.3"
+    "@types/node": "~6.0.51",
+    "benchmark": "~2.1.2",
+    "bluebird": "~3.4.6",
+    "codecov.io": "~0.1.6",
+    "istanbul": "~1.1.0-alpha.1",
+    "livescript": "~1.5.0",
+    "mkdirp": "~0.5.1",
+    "mocha": "~2.5.3",
+    "must": "~0.13.2",
+    "npm-install-version": "~5.1.0",
+    "rimraf": "~2.5.4",
+    "rollup": "~0.36.4",
+    "rollup-plugin-sourcemaps": "~0.4.1",
+    "rx": "~4.1.0",
+    "ts-node": "~1.2.2",
+    "typescript": "~2.0.10",
+    "uglify-js": "~2.7.4"
   },
   "scripts": {
-    "test": "node_modules/.bin/jake test"
+    "benchmark": "lsc benchmarks/event-callback.ls",
+    "build": "npm run compile && npm run bundle && npm run optimize",
+    "build:dts": "npm run compile:dts && npm run bundle:dts",
+    "build:es5": "npm run compile:es5 && npm run bundle:es5",
+    "build:es6": "npm run compile:es6 && npm run bundle:es6",
+    "bundle": "npm run bundle:dts && npm run bundle:es5 && npm run bundle:es6",
+    "bundle:dts": "node scripts/bundle-dts.js",
+    "bundle:es5": "rollup --sourcemap -c scripts/rollup.config.es5.js",
+    "bundle:es6": "rollup --sourcemap -c scripts/rollup.config.es6.js",
+    "clean": "rimraf dist build coverage",
+    "compile": "npm run compile:dts && npm run compile:es5 && npm run compile:es6",
+    "compile:dts": "tsc -p scripts/tsconfig.dts.json",
+    "compile:es5": "tsc -p scripts/tsconfig.es5.json",
+    "compile:es6": "tsc -p scripts/tsconfig.es6.json",
+    "cover": "istanbul cover -e .ts _mocha -- --compilers ts:ts-node/register,ls:livescript --recursive tests --reporter min",
+    "gamut": "npm run clean && npm run build && npm run test && npm run cover",
+    "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
+    "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests"
   },
-  "config": {
-    "blanket": {
-      "data-cover-only": [
-        "lib/EventStation.js"
-      ]
-    }
-  },
+  "main": "./dist/event-station.js",
+  "jsnext:main": "./dist/event-station.jsnext.js",
+  "typings": "./dist/event-station.d.ts",
   "jspm": {
     "main": "./dist/event-station.min.js"
   },
   "files": [
-    "dist",
-    "README.md",
     "CHANGELOG.md",
-    "USAGE.md",
-    "LICENSE"
+    "dist",
+    "LICENSE",
+    "README.md",
+    "USAGE.md"
   ]
 }

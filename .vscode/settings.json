@@ -1,5 +1,15 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-	"editor.insertSpaces": true,
-	"files.trimTrailingWhitespace": true
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "files.trimTrailingWhitespace": true,
+    "search.exclude": {
+        "**/build": true,
+        "**/benchmarks": true,
+        "**/coverage": true,
+        "**/dist": true,
+        "**/lib": true,
+        "**/reports": true
+    }
 }
