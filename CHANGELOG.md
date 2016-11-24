@@ -16,7 +16,7 @@
 * Add `emitAsync()`.
     * Works just like `emit()`, except it returns a `Promise` that resolves when all of the called listeners have completed.
     * Asynchronous listeners must return a Promise-like object.
-    * Please view the documentation for [asynchronous listeners](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md#asynchronous-listeners) for more details.
+    * Please view the documentation for [asynchronous listeners](./docs/Usage.md#asynchronous-listeners) for more details.
 
 ### v0.5.2
 
@@ -105,7 +105,7 @@
 
 * EventStation now uses a `constructor`
     * Direct prototypal inheritance and how literal objects are extended has changed
-        * Please view [USAGE.md](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md) to see how to do this in v0.2.0.
+        * Please view [USAGE.md](./docs/Usage.md) to see how to do this in v0.2.0.
     * More advanced forms of inheritance remain unchanged, e.g. TypeScript and CoffeeScript
 
 #### Non-breaking Changes

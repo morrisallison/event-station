@@ -2,10 +2,7 @@
 
 This guide will explain the general usage of Event-Station.
 
-More examples can be found in the [Examples document][], or in the [tests][].
-
-[Examples document]: https://github.com/morrisallison/event-station/blob/master/docs/Examples.md
-[tests]: https://github.com/morrisallison/event-station/blob/master/tests/
+More examples can be found in the [Examples document](./Examples.md), or in the [tests](../tests).
 
 ## Table of Contents
 

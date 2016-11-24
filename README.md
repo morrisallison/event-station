@@ -1,12 +1,12 @@
-# [![Event-Station](https://cldup.com/nNDX7LGO96.svg)](http://morrisallison.github.com/event-station)
+# [![Event-Station](https://cldup.com/nNDX7LGO96.svg)](https://github.com/morrisallison/event-station)
 
 A versatile and robust event emitter class.
 
 [![npm Version](https://img.shields.io/npm/v/event-station.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 [![Bower Version](https://img.shields.io/bower/v/event-station.svg?style=flat-square)](http://bower.io/search/?q=event-station)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/morrisallison/event-station/raw/default/LICENSE)
-[![Codeship Build Status](https://img.shields.io/codeship/4ade98f0-4121-0133-db1d-62bb193b9897.svg?style=flat-square)](https://codeship.com/)
-[![Codecov Coverage Status](https://img.shields.io/codecov/c/bitbucket/morrisallison/event-station/default.svg?style=flat-square)](https://codecov.io/bitbucket/morrisallison/event-station/commits)
+[![Travis CI Build Status](https://img.shields.io/travis/morrisallison/event-station.svg?style=flat-square)](https://codeship.com/)
+[![Codecov Coverage Status](https://img.shields.io/codecov/c/github/morrisallison/event-station.svg?style=flat-square)](https://codecov.io/bitbucket/morrisallison/event-station/commits)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 
 ## Features
@@ -29,7 +29,7 @@ A versatile and robust event emitter class.
 * Helpers like `stopPropagation()` and `listenerCount`
 * `extend()` any object
 * Global and per-instance `config()` options
-* Over 160 tests with 100% code coverage
+* 230 tests with 100% code coverage
 * Written in [TypeScript](http://www.typescriptlang.org/)
 
 ## Example
@@ -55,7 +55,7 @@ listeners.addTo(secondWorker);
 listeners.off();
 ```
 
-[More examples are available in the documentation.](https://github.com/morrisallison/event-station/blob/master/docs/Examples.md)
+[View more usage examples.](https://github.com/morrisallison/event-station/blob/master/docs/Examples.md)
 
 ## Installation
 
@@ -88,27 +88,31 @@ Web browser via `<script>`
 
 ### Latest Release
 
-* [Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.js)
-<br>Compatible with AMD and CommonJS module loaders
-<br>Assigns an `EventStation` global when not imported as a module
-* [Minified Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.min.js)
-<br>Build minified with [UglifyJS 2](https://github.com/mishoo/UglifyJS2)
+* [ES5 Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.js)
+    - Compatible with AMD and CommonJS module loaders
+    - Assigns an `EventStation` global when not imported as a module
+* [ES6 Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.es6.js)
+    - For use with an ES6 module loader
+* [jsnext Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.jsnext.js)
+    - ES5 compatible objects as an ES module. See the [Rollup Wiki](https://github.com/rollup/rollup/wiki/jsnext:main) for details.
+* [ES5 Minified Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.min.js)
+    - ES5 Build minified with [UglifyJS 2](https://github.com/mishoo/UglifyJS2)
 * [Source Map](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.min.js.map)
-<br>The source map for the minified build
+    - The source map for the minified build
 * [Definition](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.d.ts)
-<br>Generated TypeScript definition
+    - Generated TypeScript definition
 
 ## Documentation
 
 * [Usage documentation](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md)
-<br>This guide will explain the general usage of Event-Station.
+    - This guide will explain the general usage of Event-Station.
 * [Module definition](https://github.com/morrisallison/event-station/blob/master/dist/event-station.d.ts)
-<br>The associated definition file can be used as an API reference.
+    - The associated definition file can be used as an API reference.
 
 ## License
 
 Copyright &copy; 2016 [Morris Allison III](http://morris.xyz).
-<br>Released under the [MIT License](https://github.com/morrisallison/event-station/raw/default/LICENSE).
+<br>Released under the [MIT License](https://raw.githubusercontent.com/morrisallison/event-station/master/LICENSE).
 
 ## References
 
