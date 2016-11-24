@@ -1,5 +1,5 @@
 /*
- * event-station v1.0.0
+ * event-station v1.1.0-beta
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -275,7 +275,7 @@ var deps;
      */
     deps.$Promise = $DefaultPromise;
 })(deps || (deps = {}));
-;
+
 function inject(name, obj) {
     switch (name) {
         case 'rx':
@@ -672,7 +672,7 @@ function mergeOptions(target) {
 /**
  * Event emitter class and namespace
  */
-var EventStation = (function () {
+var EventStation$1 = (function () {
     function EventStation(options) {
         EventStation.init(this, options);
     }
@@ -986,6 +986,11 @@ var EventStation = (function () {
         }
         return obj;
     };
+    EventStation.make = function () {
+        var station = EventStation.extend({});
+        EventStation.init(station);
+        return station;
+    };
     return EventStation;
 }());
 function parseEventNames(input, options) {
@@ -1008,8 +1013,8 @@ function parseEventNames(input, options) {
     return names;
 }
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(config) {
-    if (config === void 0) { config = {}; }
+function makeStationMeta(config$$1) {
+    if (config$$1 === void 0) { config$$1 = {}; }
     var state = {
         heardStations: Object.create(null),
         hearingCount: 0,
@@ -1018,7 +1023,7 @@ function makeStationMeta(config) {
         listenersMap: Object.create(null),
         stationId: makeStationId(),
     };
-    var meta = mergeOptions(state, globalOptions, config);
+    var meta = mergeOptions(state, globalOptions, config$$1);
     assertOptions(meta);
     return meta;
 }
@@ -1196,5 +1201,5 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-export default EventStation;
+export default EventStation$1;
 //# sourceMappingURL=event-station.jsnext.js.map
