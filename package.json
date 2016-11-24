@@ -70,8 +70,8 @@
   "files": [
     "CHANGELOG.md",
     "dist",
+    "docs",
     "LICENSE",
-    "README.md",
-    "USAGE.md"
+    "README.md"
   ]
 }
