@@ -5,8 +5,8 @@ A versatile and robust event emitter class.
 [![npm Version](https://img.shields.io/npm/v/event-station.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 [![Bower Version](https://img.shields.io/bower/v/event-station.svg?style=flat-square)](http://bower.io/search/?q=event-station)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/morrisallison/event-station/raw/default/LICENSE)
-[![Travis CI Build Status](https://img.shields.io/travis/morrisallison/event-station.svg?style=flat-square)](https://codeship.com/)
-[![Codecov Coverage Status](https://img.shields.io/codecov/c/github/morrisallison/event-station.svg?style=flat-square)](https://codecov.io/bitbucket/morrisallison/event-station/commits)
+[![Travis CI Build Status](https://img.shields.io/travis/morrisallison/event-station.svg?style=flat-square)](https://travis-ci.org/morrisallison/event-station)
+[![Codecov Coverage Status](https://img.shields.io/codecov/c/github/morrisallison/event-station.svg?style=flat-square)](https://codecov.io/gh/morrisallison/event-station)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 
 ## Features
