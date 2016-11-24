@@ -1,15 +1,20 @@
 # Changelog
 
-### next version wip
+### DEV
 
-* init now returns EventStation
-* config now throws on empty delimiter string
-* regex markers can now be any length
-* add global reset
-* fix global promise
-* add make
+* Added `EventStation.reset()`
+    - Resets global configuration with affecting existing stations
+    - Resets injected dependencies
+* Added `EventStation.make()`
+    - Shorthand method to create, extend, and initialize an object literal
+* RegEx markers can now be any length
+* Fixed an issue where the global `Promise` object wouldn't be recognized
+* `EventStation.init()` now returns the given object
+* `EventStation.config()` now throws an error when given an empty string as a delimiter
 
 ### v1.0.0
+
+* Stable release
 
 ### v1.0.0-beta
 
