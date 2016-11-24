@@ -1,6 +1,6 @@
 # Changelog
 
-### DEV
+### v1.1.0-beta
 
 * Added `EventStation.reset()`
     - Resets global configuration with affecting existing stations
