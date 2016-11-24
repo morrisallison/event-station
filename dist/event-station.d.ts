@@ -1,5 +1,5 @@
 /*
- * event-station v1.0.0
+ * event-station v1.1.0-beta
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -577,7 +577,8 @@ declare module "__event-station#EventStation" {
         /**
          * Extends an object with EventStation's public members
          */
-        static extend(obj: any): any;
+        static extend<T extends Emitter>(obj: any): T;
+        static make(): Emitter;
     }
     /**
      * A literal object with non-delimited event names

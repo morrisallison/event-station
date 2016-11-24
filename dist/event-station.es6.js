@@ -1,5 +1,5 @@
 /*
- * event-station v1.0.0
+ * event-station v1.1.0-beta
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -270,7 +270,7 @@ var deps;
      */
     deps.$Promise = $DefaultPromise;
 })(deps || (deps = {}));
-;
+
 function inject(name, obj) {
     switch (name) {
         case 'rx':
@@ -646,9 +646,9 @@ function mergeOptions(target, ...sources) {
 /**
  * Event emitter class and namespace
  */
-class EventStation {
+class EventStation$1 {
     constructor(options) {
-        EventStation.init(this, options);
+        EventStation$1.init(this, options);
     }
     /** An ID unique to all stations */
     get stationId() {
@@ -890,28 +890,28 @@ class EventStation {
     /** Initializes the given object */
     static init(obj, options) {
         obj.stationMeta = makeStationMeta(options);
-        return EventStation;
+        return EventStation$1;
     }
     static inject(name, obj) {
         inject(name, obj);
-        return EventStation;
+        return EventStation$1;
     }
     /** Modifies the global configuration */
     static config(opts) {
         config(opts);
-        return EventStation;
+        return EventStation$1;
     }
     /** Resets the global configuration and injected dependencies */
     static reset() {
         reset$1();
         reset();
-        return EventStation;
+        return EventStation$1;
     }
     /**
      * Extends an object with EventStation's public members
      */
     static extend(obj) {
-        const proto = EventStation.prototype;
+        const proto = EventStation$1.prototype;
         for (let propertyName in proto) {
             const descriptor = Object.getOwnPropertyDescriptor(proto, propertyName);
             const newDescriptor = { configurable: true };
@@ -924,6 +924,11 @@ class EventStation {
             Object.defineProperty(obj, propertyName, newDescriptor);
         }
         return obj;
+    }
+    static make() {
+        var station = EventStation$1.extend({});
+        EventStation$1.init(station);
+        return station;
     }
 }
 function parseEventNames(input, options) {
@@ -946,7 +951,7 @@ function parseEventNames(input, options) {
     return names;
 }
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(config = {}) {
+function makeStationMeta(config$$1 = {}) {
     const state = {
         heardStations: Object.create(null),
         hearingCount: 0,
@@ -955,7 +960,7 @@ function makeStationMeta(config = {}) {
         listenersMap: Object.create(null),
         stationId: makeStationId(),
     };
-    const meta = mergeOptions(state, globalOptions, config);
+    const meta = mergeOptions(state, globalOptions, config$$1);
     assertOptions(meta);
     return meta;
 }
@@ -1132,5 +1137,5 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-export default EventStation;
+export default EventStation$1;
 //# sourceMappingURL=event-station.es6.js.map
