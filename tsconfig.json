@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "outDir": "build/default",
+        "strictNullChecks": true,
+        "target": "es5"
+    },
+    "files": [
+        "src/main.ts",
+        "typings/es6-promise/promise.d.ts",
+        "typings/rx/rx-lite.d.ts",
+        "typings/rx/rx.async-lite.d.ts"
+    ]
+}
