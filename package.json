@@ -54,6 +54,7 @@
     "bundle:es6": "rollup --sourcemap -c scripts/rollup.config.es6.js",
     "clean": "rimraf dist build coverage",
     "compile": "npm run compile:dts && npm run compile:es5 && npm run compile:es6",
+    "compile:default": "tsc",
     "compile:dts": "tsc -p scripts/tsconfig.dts.json",
     "compile:es5": "tsc -p scripts/tsconfig.es5.json",
     "compile:es6": "tsc -p scripts/tsconfig.es6.json",
