@@ -1,14 +1,14 @@
 /*
- * event-station v1.1.0-beta
+ * event-station v1.1.0-beta.2
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
  */
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('event-station', factory) :
-    (global.EventStation = factory());
-}(this, (function () { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define('event-station', ['exports'], factory) :
+    (factory((global.EventStation = global.EventStation || {})));
+}(this, (function (exports) { 'use strict';
 
 /** Adds the given listener to the given station meta */
 function addListener(stationMeta, listener) {
@@ -623,7 +623,7 @@ function makeStationId() {
 }
 
 /** Container for global configuration options */
-var defaultOptions = {
+/** Container for global configuration options */ var defaultOptions = {
     delimiter: ' ',
     emitAllEvent: true,
     enableDelimiter: true,
@@ -1207,7 +1207,10 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-return EventStation$1;
+exports.EventStation = EventStation$1;
+exports['default'] = EventStation$1;
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 //# sourceMappingURL=event-station.js.map
