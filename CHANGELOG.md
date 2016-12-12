@@ -1,6 +1,6 @@
 # Changelog
 
-### v1.1.0-beta.2
+### v1.1.0-beta.3
 
 * Fixed an issue with missing default exports in the UMD modules.
 
