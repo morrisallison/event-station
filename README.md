@@ -4,7 +4,7 @@ A versatile and robust event emitter class.
 
 [![npm Version](https://img.shields.io/npm/v/event-station.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
 [![Bower Version](https://img.shields.io/bower/v/event-station.svg?style=flat-square)](http://bower.io/search/?q=event-station)
-[![MIT/Expat License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/morrisallison/event-station/raw/default/LICENSE)
+[![MIT/Expat License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/morrisallison/event-station/raw/master/LICENSE)
 [![Travis CI Build Status](https://img.shields.io/travis/morrisallison/event-station.svg?style=flat-square)](https://travis-ci.org/morrisallison/event-station)
 [![Codecov Coverage Status](https://img.shields.io/codecov/c/github/morrisallison/event-station.svg?style=flat-square)](https://codecov.io/gh/morrisallison/event-station)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-none-brightgreen.svg?style=flat-square)](https://www.npmjs.com/package/event-station)
@@ -88,18 +88,18 @@ Web browser via `<script>`
 
 ### Latest Release
 
-* [ES5 Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.js)
+* [ES5 Build](https://github.com/morrisallison/event-station/raw/master/dist/event-station.js)
     - Compatible with AMD and CommonJS module loaders
     - Assigns an `EventStation` global when not imported as a module
-* [ES6 Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.es6.js)
+* [ES6 Build](https://github.com/morrisallison/event-station/raw/master/dist/event-station.es6.js)
     - For use with an ES6 module loader
-* [jsnext Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.jsnext.js)
+* [jsnext Build](https://github.com/morrisallison/event-station/raw/master/dist/event-station.jsnext.js)
     - ES5 compatible objects as an ES module. See the [Rollup Wiki](https://github.com/rollup/rollup/wiki/jsnext:main) for details.
-* [ES5 Minified Build](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.min.js)
+* [ES5 Minified Build](https://github.com/morrisallison/event-station/raw/master/dist/event-station.min.js)
     - ES5 Build minified with [UglifyJS 2](https://github.com/mishoo/UglifyJS2)
-* [Source Map](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.min.js.map)
+* [Source Map](https://github.com/morrisallison/event-station/raw/master/dist/event-station.min.js.map)
     - The source map for the minified build
-* [Definition](https://raw.githubusercontent.com/morrisallison/event-station/master/dist/event-station.d.ts)
+* [Definition](https://github.com/morrisallison/event-station/raw/master/dist/event-station.d.ts)
     - Generated TypeScript definition
 
 ## Documentation
@@ -112,7 +112,7 @@ Web browser via `<script>`
 ## License
 
 Copyright &copy; 2016 [Morris Allison III](http://morris.xyz).
-<br>Released under the [MIT/Expat license](https://raw.githubusercontent.com/morrisallison/event-station/master/LICENSE).
+<br>Released under the [MIT/Expat license](https://github.com/morrisallison/event-station/raw/master/LICENSE).
 
 ## References
 
