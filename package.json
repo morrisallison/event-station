@@ -24,6 +24,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "~6.0.51",
+    "@types/rx": "~2.5.34",
     "benchmark": "~2.1.2",
     "bluebird": "~3.4.6",
     "codecov.io": "~0.1.6",
@@ -38,7 +39,7 @@
     "rollup-plugin-sourcemaps": "~0.4.1",
     "rx": "~4.1.0",
     "ts-node": "~1.2.2",
-    "typescript": "~2.0.10",
+    "typescript": "~2.1.4",
     "uglify-js": "~2.7.4"
   },
   "scripts": {
