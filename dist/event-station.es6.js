@@ -1137,5 +1137,9 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-export { EventStation$1 as EventStation };export default EventStation$1;
+EventStation$1.EventStation = EventStation$1;
+EventStation$1.default = EventStation$1;
+Object.defineProperty(EventStation$1, '__esModule', { value: true });
+
+export default EventStation$1;
 //# sourceMappingURL=event-station.es6.js.map

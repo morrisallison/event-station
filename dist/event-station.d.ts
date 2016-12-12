@@ -590,6 +590,5 @@ declare module "__event-station#EventStation" {
 }
 declare module "event-station" {
     import { EventStation } from "__event-station#EventStation";
-    export { EventStation };
     export default EventStation;
 }
