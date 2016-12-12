@@ -6,11 +6,15 @@
         "noImplicitAny": true,
         "outDir": "../build/es6",
         "strictNullChecks": true,
-        "target": "es6"
+        "target": "es6",
+        "lib": [
+            "dom",
+            "es6",
+            "es2015.promise"
+        ]
     },
     "files": [
-        "../src/main.ts",
-        "../typings/rx/rx-lite.d.ts",
-        "../typings/rx/rx.async-lite.d.ts"
+        "../node_modules/@types/rx/rx.async.d.ts",
+        "../src/main.ts"
     ]
 }
