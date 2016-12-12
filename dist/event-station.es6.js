@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.0-beta
+ * event-station v1.1.0-beta.2
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -293,13 +293,13 @@ function reset() {
  * A class for operations targeting a collection of listeners
  */
 class Listeners {
-    constructor(originStation, listeners) {
-        this.originStation = originStation;
-        this.listeners = listeners;
-    }
     /** @returns The number of listeners in the collection */
     get count() {
         return this.listeners.length;
+    }
+    constructor(originStation, listeners) {
+        this.originStation = originStation;
+        this.listeners = listeners;
     }
     /**
      * Sets each listener's maximum occurrence
@@ -595,7 +595,7 @@ function makeStationId() {
 }
 
 /** Container for global configuration options */
-const defaultOptions = {
+/** Container for global configuration options */ const defaultOptions = {
     delimiter: ' ',
     emitAllEvent: true,
     enableDelimiter: true,
@@ -1137,5 +1137,5 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-export default EventStation$1;
+export { EventStation$1 as EventStation };export default EventStation$1;
 //# sourceMappingURL=event-station.es6.js.map

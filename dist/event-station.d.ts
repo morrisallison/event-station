@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.0-beta
+ * event-station v1.1.0-beta.2
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -590,5 +590,6 @@ declare module "__event-station#EventStation" {
 }
 declare module "event-station" {
     import { EventStation } from "__event-station#EventStation";
+    export { EventStation };
     export default EventStation;
 }

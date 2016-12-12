@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.0-beta
+ * event-station v1.1.0-beta.2
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -617,7 +617,7 @@ function makeStationId() {
 }
 
 /** Container for global configuration options */
-var defaultOptions = {
+/** Container for global configuration options */ var defaultOptions = {
     delimiter: ' ',
     emitAllEvent: true,
     enableDelimiter: true,
@@ -1201,5 +1201,5 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
-export default EventStation$1;
+export { EventStation$1 as EventStation };export default EventStation$1;
 //# sourceMappingURL=event-station.jsnext.js.map
