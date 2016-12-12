@@ -7,7 +7,7 @@
 ### v1.1.0-beta
 
 * Added `EventStation.reset()`
-    - Resets global configuration with affecting existing stations
+    - Resets global configuration without affecting existing stations
     - Resets injected dependencies
 * Added `EventStation.make()`
     - Shorthand method to create, extend, and initialize an object literal
