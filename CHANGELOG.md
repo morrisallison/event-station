@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.1.0-beta.2
+
+* Fixed an issue with missing default exports in the UMD modules.
+
 ### v1.1.0-beta
 
 * Added `EventStation.reset()`
