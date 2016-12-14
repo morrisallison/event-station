@@ -1,7 +1,6 @@
 import {addListener} from '../actions/addListener';
 import {deps} from '../injector';
 import {Emitter} from '../types/Emitter';
-import {EventStation} from './EventStation';
 import {hasListener} from '../actions/hasListener';
 import {Listener} from '../types/Listener';
 import {MatchingListener} from '../types/MatchingListener';
@@ -104,7 +103,7 @@ export class Listeners {
     /**
      * Adds each listener to the given station
      */
-    public addTo(station: EventStation): Listeners {
+    public addTo(station: Emitter): Listeners {
 
         const listeners = this.listeners;
         const stationMeta = station.stationMeta;
@@ -126,7 +125,7 @@ export class Listeners {
     /**
      * Removes each listener from the given station
      */
-    public removeFrom(station: EventStation): Listeners {
+    public removeFrom(station: Emitter): Listeners {
 
         const listeners = this.listeners;
         const stationMeta = station.stationMeta;
@@ -178,7 +177,7 @@ export class Listeners {
      * If no station is given, the method determines whether any of the listeners
      * are attached to *any* station.
      */
-    public isAttachedTo(station?: EventStation): boolean {
+    public isAttachedTo(station?: Emitter): boolean {
 
         if (!station) {
             return isListenersAttached(this.listeners);
