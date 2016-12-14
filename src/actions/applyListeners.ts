@@ -1,9 +1,9 @@
-import {EventStation} from '../models/EventStation';
+import {Emitter} from '../types/Emitter';
 import {Listener} from '../types/Listener';
 import {removeListenerFromAll} from './removeListenerFromAll';
 
 /** Applies the given listeners with the given arguments */
-export function applyListeners<P extends Promise<any>>(listeners: Listener[], originStation: EventStation, enableAsync: boolean, args: ListenerArguments): P[] | void {
+export function applyListeners<P extends Promise<any>>(listeners: Listener[], originStation: Emitter, enableAsync: boolean, args: ListenerArguments): P[] | void {
 
     const argsLength = args.length;
     const stationMeta = originStation.stationMeta;

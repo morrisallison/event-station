@@ -159,10 +159,10 @@ export class EventStation {
      * that were attached to other stations are removed.
      */
     public disregard(): void;
-    public disregard(target: EventStation | EventStation[]): void;
-    public disregard(target: EventStation | EventStation[], listenerMap: CallbackMap, context?: any): void;
-    public disregard(target: EventStation | EventStation[], eventNames: string[], callback?: Function, context?: any): void;
-    public disregard(target: EventStation | EventStation[], eventName: string, callback?: Function, context?: any): void;
+    public disregard(target: Emitter | Emitter[]): void;
+    public disregard(target: Emitter | Emitter[], listenerMap: CallbackMap, context?: any): void;
+    public disregard(target: Emitter | Emitter[], eventNames: string[], callback?: Function, context?: any): void;
+    public disregard(target: Emitter | Emitter[], eventName: string, callback?: Function, context?: any): void;
     public disregard(target?: any, q?: any, r?: any, s?: any): void {
 
         const stationMeta = this.stationMeta;
@@ -241,10 +241,10 @@ export class EventStation {
      * have any listeners attached by the station via `hear()` and `hearOnce()`.
      */
     public isHearing(): boolean;
-    public isHearing(target: EventStation | EventStation[]): boolean;
-    public isHearing(target: EventStation | EventStation[], listenerMap: CallbackMap): boolean;
-    public isHearing(target: EventStation | EventStation[], eventNames: string[], callback?: Function): boolean;
-    public isHearing(target: EventStation | EventStation[], eventName: string, callback?: Function): boolean;
+    public isHearing(target: Emitter | Emitter[]): boolean;
+    public isHearing(target: Emitter | Emitter[], listenerMap: CallbackMap): boolean;
+    public isHearing(target: Emitter | Emitter[], eventNames: string[], callback?: Function): boolean;
+    public isHearing(target: Emitter | Emitter[], eventName: string, callback?: Function): boolean;
     public isHearing(target?: any, q?: any, r?: any, s?: any): boolean {
 
         const stationMeta = this.stationMeta;
@@ -546,9 +546,9 @@ function makeStationMeta(options: Options = {}): Meta {
  * Makes an array of listeners from the given parameters
  * This function normalizes the four ways to make listeners.
  */
-function makeListeners(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context?: EventStation): Listener[];
-function makeListeners(originStation: Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: EventStation): Listener[];
-function makeListeners(originStation: Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: EventStation): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context?: Emitter): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: Emitter): Listener[];
+function makeListeners(originStation: Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: Emitter): Listener[];
 function makeListeners(originStation: Emitter, isMatching: boolean, q: any, r?: any, s?: any): Listener[] {
 
     if (typeof q === 'string') {
@@ -690,7 +690,7 @@ function searchListeners(eventName: string, listenersMap: ListenersMap, regExpMa
 }
 
 /** Clean the `heardStations` property of the meta of the given station */
-function cleanHeardStations(station: EventStation): void {
+function cleanHeardStations(station: Emitter): void {
 
     const stationMap: StationMap = Object.create(null);
     const heardStations = station.stationMeta.heardStations;
@@ -758,18 +758,18 @@ function removeListeners(eventName: string, stationMeta: Meta): void {
  * This function normalizes the the target station for
  * cross-emitter listening methods.
  */
-function getTargetedStations(stationMeta: Meta, target?: EventStation | EventStation[]): EventStation[] {
+function getTargetedStations(stationMeta: Meta, target?: Emitter | Emitter[]): Emitter[] {
 
     if (target === undefined) {
         return getHeardStations(stationMeta);
     }
 
     if (Array.isArray(target)) {
-        return <EventStation[]>target;
+        return target;
     }
 
-    if ((<EventStation>target).stationMeta) {
-        return [<EventStation>target];
+    if (target.stationMeta) {
+        return [target];
     }
 
     throw new Error("Invalid target");
@@ -778,9 +778,9 @@ function getTargetedStations(stationMeta: Meta, target?: EventStation | EventSta
 /**
  * @returns the heard stations of a given station's meta as an array
  */
-function getHeardStations(stationMeta: Meta): EventStation[] {
+function getHeardStations(stationMeta: Meta): Emitter[] {
 
-    const stations: EventStation[] = [];
+    const stations: Emitter[] = [];
     const heardStations = stationMeta.heardStations;
 
     for (let stationId in heardStations) {
