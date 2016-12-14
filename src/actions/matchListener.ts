@@ -1,4 +1,4 @@
-import {MatchingListener} from './MatchingListener';
+import {MatchingListener} from '../types/MatchingListener';
 
 /**
  * Determines whether the given listeners match by performing an approximate match

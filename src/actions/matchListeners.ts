@@ -1,4 +1,4 @@
-import {MatchingListener} from './MatchingListener';
+import {MatchingListener} from '../types/MatchingListener';
 import {matchListener} from './matchListener';
 
 export function matchListeners(matchingListener: MatchingListener, attachedListeners: MatchingListener[], exactMatch?: boolean): boolean {

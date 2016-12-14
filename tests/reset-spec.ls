@@ -1,7 +1,7 @@
 expect = require 'must'
 Promise = require 'bluebird'
 rx = require 'rx'
-EventStation = require '../src/EventStation' .EventStation
+EventStation = require '../src/main' .default
 
 describe 'EventStation.config()', (,) !->
     beforeEach !->

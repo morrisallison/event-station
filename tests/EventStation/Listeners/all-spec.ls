@@ -1,7 +1,7 @@
 expect = require 'must'
 Promise = require 'bluebird'
 
-EventStation = require '../../../src/EventStation' .EventStation
+EventStation = require '../../../src/main' .default
 
 describe 'Listeners#all()', (,) !->
 

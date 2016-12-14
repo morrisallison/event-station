@@ -1,4 +1,4 @@
-import {EventStation} from './EventStation';
+import {EventStation} from './models/EventStation';
 
 (<any>EventStation).EventStation = EventStation;
 (<any>EventStation).default = EventStation;

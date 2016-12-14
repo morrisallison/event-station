@@ -1,5 +1,5 @@
-import {EventStation} from './EventStation';
-import {Listener} from './Listener';
+import {EventStation} from '../models/EventStation';
+import {Listener} from '../types/Listener';
 import {removeListenerFromAll} from './removeListenerFromAll';
 
 /** Applies the given listeners with the given arguments */

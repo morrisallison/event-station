@@ -1,5 +1,5 @@
 expect = require 'must'
-EventStation = require '../../src/EventStation' .EventStation
+EventStation = require '../../src/main' .default
 
 describe 'EventStation#hear()', (,) !->
     student = undefined

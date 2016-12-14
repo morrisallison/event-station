@@ -1,6 +1,6 @@
 expect = require 'must'
 rx = require 'rx'
-EventStation = require '../../src/EventStation' .EventStation
+EventStation = require '../../src/main' .default
 
 describe 'EventStation#toObservable()', (,) !->
 
