@@ -13,7 +13,6 @@
         ]
     },
     "files": [
-        "../node_modules/@types/rx/rx.async.d.ts",
         "../src/main.ts"
     ]
 }

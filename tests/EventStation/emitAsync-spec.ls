@@ -1,6 +1,6 @@
 expect = require 'must'
 Promise = require 'bluebird'
-EventStation = require '../../src/EventStation' .EventStation
+EventStation = require '../../src/main' .default
 
 describe 'EventStation#emitAsync()', (,) !->
     allDone = undefined

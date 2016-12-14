@@ -1,4 +1,4 @@
-EventStation = require '../../src/EventStation' .EventStation
+EventStation = require '../../src/main' .default
 expect = require 'must'
 
 properties = [

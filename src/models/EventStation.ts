@@ -1,18 +1,20 @@
-import {addListener} from './addListener';
-import {applyListeners} from './applyListeners';
-import {Emitter} from './Emitter';
-import {getAllListeners} from './getAllListeners';
-import {hasListener} from './hasListener';
-import {Listener} from './Listener';
+import {addListener} from '../actions/addListener';
+import {applyListeners} from '../actions/applyListeners';
+import {Emitter} from '../types/Emitter';
+import {getAllListeners} from '../actions/getAllListeners';
+import {hasListener} from '../actions/hasListener';
+import {Listener} from '../types/Listener';
 import {Listeners} from './Listeners';
-import {ListenersMap} from './ListenersMap';
-import {makeStationId} from './makeStationId';
-import {matchListener} from './matchListener';
-import {Meta} from './Meta';
-import {removeListener} from './removeListener';
-import {StationMap} from './StationMap';
-import * as injection from './injection';
-import * as options from './options';
+import {ListenersMap} from '../types/ListenersMap';
+import {makeStationId} from '../actions/makeStationId';
+import {matchListener} from '../actions/matchListener';
+import {Meta} from '../types/Meta';
+import {Options} from '../types/Options';
+import {removeListener} from '../actions/removeListener';
+import {Rx} from '../types/Rx';
+import {StationMap} from '../types/StationMap';
+import * as config from '../config';
+import * as injector from '../injector';
 
 /**
  * Event emitter class and namespace
@@ -22,7 +24,7 @@ export class EventStation {
     /** Container for the station's context */
     public stationMeta: Meta;
 
-    constructor(options?: options.Options) {
+    constructor(options?: Options) {
         EventStation.init(this, options);
     }
 
@@ -309,14 +311,14 @@ export class EventStation {
     public emitAsync<R extends any>(eventName: string, ...args: any[]): Promise<R[]>;
     public emitAsync<R extends any>(input: any, ...args: any[]): Promise<R[]> {
 
-        if (!injection.deps.$Promise) {
+        if (!injector.deps.$Promise) {
             throw new Error('No promises implementation available.');
         }
 
         const stationMeta = this.stationMeta;
 
         if (stationMeta.listenerCount < 1) {
-            return injection.deps.$Promise.resolve([]);
+            return injector.deps.$Promise.resolve([]);
         }
 
         const eventNames = parseEventNames(input, stationMeta);
@@ -330,9 +332,9 @@ export class EventStation {
         }
 
         if (promises.length > 0) {
-            return injection.deps.$Promise.all<R>(promises);
+            return injector.deps.$Promise.all<R>(promises);
         } else {
-            return injection.deps.$Promise.resolve([]);
+            return injector.deps.$Promise.resolve([]);
         }
     }
 
@@ -392,15 +394,15 @@ export class EventStation {
      * This method is dependant on `rx`.
      * @see inject()
      */
-    public toObservable<T>(eventNames: string[], context?: any, selector?: (args: any[]) => T): Rx.Observable<T>;
-    public toObservable<T>(eventName: string, context?: any, selector?: (args: any[]) => T): Rx.Observable<T>;
-    public toObservable<T>(q: any, s?: any, selector?: (args: any[]) => T): Rx.Observable<T> {
+    public toObservable<T>(eventNames: string[], context?: any, selector?: (args: any[]) => T): Rx.Observable;
+    public toObservable<T>(eventName: string, context?: any, selector?: (args: any[]) => T): Rx.Observable;
+    public toObservable<T>(q: any, s?: any, selector?: (args: any[]) => T): Rx.Observable {
 
-        if (!injection.deps.$RxObservable) {
+        if (!injector.deps.$RxObservable) {
             throw new Error('Rx has not been injected. See documentation for details.');
         }
 
-        return injection.deps.$RxObservable.fromEventPattern<T>((r) => {
+        return injector.deps.$RxObservable.fromEventPattern<T>((r) => {
             this.on(q, r, s);
         }, (r) => {
             this.off(q, r, s);
@@ -439,29 +441,29 @@ export class EventStation {
     }
 
     /** Initializes the given object */
-    public static init(obj: any, options?: options.Options): typeof EventStation {
+    public static init(obj: any, options?: Options): typeof EventStation {
         obj.stationMeta = makeStationMeta(options);
 
         return EventStation;
     }
 
     public static inject(name: string, obj: any): typeof EventStation {
-        injection.inject(name, obj);
+        injector.inject(name, obj);
 
         return EventStation;
     }
 
     /** Modifies the global configuration */
-    public static config(opts: options.Options): typeof EventStation {
-        options.config(opts);
+    public static config(opts: Options): typeof EventStation {
+        config.config(opts);
 
         return EventStation;
     }
 
     /** Resets the global configuration and injected dependencies */
     public static reset(): typeof EventStation {
-        options.reset();
-        injection.reset();
+        config.reset();
+        injector.reset();
 
         return EventStation;
     }
@@ -523,7 +525,7 @@ function parseEventNames(input: any, options: Meta): string[] {
 }
 
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(config: options.Options = {}): Meta {
+function makeStationMeta(options: Options = {}): Meta {
     const state = {
         heardStations: Object.create(null),
         hearingCount: 0,
@@ -533,9 +535,9 @@ function makeStationMeta(config: options.Options = {}): Meta {
         stationId: makeStationId(),
     };
 
-    const meta = options.mergeOptions<Meta>(state, options.globalOptions, config);
+    const meta = config.mergeOptions<Meta>(state, config.globalOptions, options);
 
-    options.assertOptions(meta);
+    config.assertOptions(meta);
 
     return meta;
 }

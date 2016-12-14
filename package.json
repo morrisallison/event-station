@@ -21,7 +21,6 @@
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^6.0.51",
-    "@types/rx": "^2.5.34",
     "benchmark": "^2.1.2",
     "bluebird": "^3.4.6",
     "codecov.io": "^0.1.6",
