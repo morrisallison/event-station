@@ -3,9 +3,6 @@ import {Rx} from './types/Rx';
 declare const global: any;
 declare const window: any;
 
-const glob = typeof window !== 'undefined' ? window : global;
-const $DefaultPromise: typeof Promise = glob.Promise;
-
 export namespace deps {
     /**
      * A reference to the injected Rx namespace.
@@ -17,7 +14,7 @@ export namespace deps {
      * A reference to the Promise object, or an injected Promise-like object.
      * @see inject()
      */
-    export let $Promise: typeof Promise | void = $DefaultPromise;
+    export let $Promise: typeof Promise | void = getGlobalPromise();
 };
 
 /**
@@ -60,5 +57,11 @@ export function inject(name: string, obj: any): void {
 /** Reset injected dependencies */
 export function reset(): void {
     deps.$RxObservable = undefined;
-    deps.$Promise = $DefaultPromise;
+    deps.$Promise = getGlobalPromise();
+}
+
+function getGlobalPromise(): typeof Promise {
+    const glob = typeof window === 'object' ? window : global;
+
+    return glob.Promise;
 }
