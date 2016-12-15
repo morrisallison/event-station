@@ -37,22 +37,32 @@ A versatile and robust event emitter class.
 ```javascript
 import EventStation from 'event-station';
 
-class MyWorker extends EventStation {}
+class Spaceship extends EventStation {
+    launch(destination) {
+        this.emit('launch', destination);
+    }
+}
 
-var firstWorker = new MyWorker();
-var secondWorker = new MyWorker();
+let Normandy = new Spaceship();
+let Tempest = new Spaceship();
 
-var listeners = firstWorker.on({
-    start: () => console.log("Worker started!"),
-    stop: () => console.log("Worker stopped!"),
+// Add two listeners via a listener map
+let listeners = Normandy.on({
+    launch: (dest) => console.log(`Spaceship launched! En route to ${dest}.`),
+    dock: () => console.log('Spaceship docking.'),
 });
 
-// Add the same listeners to the second worker
-listeners.addTo(secondWorker);
+// Attach the same listeners to Tempest that are on Normandy
+listeners.addTo(Tempest);
 
-firstWorker.emit('start');
+// Launch Tempest when Normandy launches
+Tempest.hear(Normandy, 'launch')
+    .once((dest) => Tempest.launch(dest));
 
-// Remove the listeners from both workers
+// Launch both ships to the Andromeda Galaxy
+Normandy.launch('Messier 31');
+
+// Stop listening to both ships
 listeners.off();
 ```
 
