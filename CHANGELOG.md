@@ -1,5 +1,11 @@
 # Changelog
 
+### DEV
+
+* The package definition is now standalone
+  - It no longer requires a Rx definition
+* Replaced emitter types to accommodate extended objects
+
 ### v1.1.0-beta.3
 
 * Fixed an issue with missing default exports in the UMD modules.
