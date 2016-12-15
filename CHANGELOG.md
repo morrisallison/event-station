@@ -1,6 +1,6 @@
 # Changelog
 
-### DEV
+### 1.1.0
 
 * The package definition is now standalone
   - It no longer requires a Rx definition
