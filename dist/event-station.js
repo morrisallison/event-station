@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.0-beta.2
+ * event-station v1.1.0
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -266,8 +266,6 @@ function hasListener(stationMeta, listener, exactMatch) {
     return matchListeners(listener, attachedListeners, exactMatch);
 }
 
-var glob = typeof window !== 'undefined' ? window : global;
-var $DefaultPromise = glob.Promise;
 var deps;
 (function (deps) {
     /**
@@ -279,7 +277,7 @@ var deps;
      * A reference to the Promise object, or an injected Promise-like object.
      * @see inject()
      */
-    deps.$Promise = $DefaultPromise;
+    deps.$Promise = getGlobalPromise();
 })(deps || (deps = {}));
 
 function inject(name, obj) {
@@ -297,7 +295,11 @@ function inject(name, obj) {
 /** Reset injected dependencies */
 function reset() {
     deps.$RxObservable = undefined;
-    deps.$Promise = $DefaultPromise;
+    deps.$Promise = getGlobalPromise();
+}
+function getGlobalPromise() {
+    var glob = typeof window === 'object' ? window : global;
+    return glob.Promise;
 }
 
 /**
@@ -623,7 +625,7 @@ function makeStationId() {
 }
 
 /** Container for global configuration options */
-/** Container for global configuration options */ var defaultOptions = {
+var defaultOptions = {
     delimiter: ' ',
     emitAllEvent: true,
     enableDelimiter: true,
@@ -1019,8 +1021,8 @@ function parseEventNames(input, options) {
     return names;
 }
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(config$$1) {
-    if (config$$1 === void 0) { config$$1 = {}; }
+function makeStationMeta(options) {
+    if (options === void 0) { options = {}; }
     var state = {
         heardStations: Object.create(null),
         hearingCount: 0,
@@ -1029,7 +1031,7 @@ function makeStationMeta(config$$1) {
         listenersMap: Object.create(null),
         stationId: makeStationId(),
     };
-    var meta = mergeOptions(state, globalOptions, config$$1);
+    var meta = mergeOptions(state, globalOptions, options);
     assertOptions(meta);
     return meta;
 }
