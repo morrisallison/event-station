@@ -11,7 +11,7 @@ A versatile and robust event emitter class.
 
 ## Features
 
-* [Versatile API](https://github.com/morrisallison/event-station/blob/master/dist/event-station.d.ts) that's flexible and consistent
+* [Versatile API](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md) that's flexible and consistent
 * [Cross-emitter listening](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md#cross-emitter-listening), allowing for easier management of many listeners
 * [Regular expression listeners](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md#regular-expression-listeners)
 * [Asynchronous Listeners](https://github.com/morrisallison/event-station/blob/master/docs/Usage.md#asynchronous-listeners) with `emitAsync()`
