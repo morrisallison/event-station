@@ -5,8 +5,8 @@ Examples of the many ways Event-Station can be used.
 ### Using cross-emitter listening with a given context
 
 ```javascript
-var student = new EventStation();
-var teacher = new EventStation();
+var student = EventStation.make();
+var teacher = EventStation.make();
 
 var book = "Harry Potter";
 
@@ -23,16 +23,15 @@ teacher.emit('read', 42);
 ```javascript
 class MyWorker extends EventStation {}
 
-var worker = new MyWorker();
+var firstWorker = new MyWorker();
 var secondWorker = new MyWorker();
 
-// Add two listeners to the worker
-var listeners = worker.on({
+var listeners = firstWorker.on({
     start: () => console.log("Worker started!"),
-    stop:  () => console.log("Worker stopped!"),
+    stop: () => console.log("Worker stopped!"),
 });
 
-// Add the exact same listeners to the second worker
+// Add the same listeners to the second worker
 listeners.addTo(secondWorker);
 
 // Remove the listeners from both workers
@@ -42,7 +41,7 @@ listeners.off();
 ### Chaining listener modifiers
 
 ```javascript
-new EventStation()
+EventStation.make()
     // Create two listeners
     .on('boom pow')
     // That can occur only twice
@@ -61,10 +60,10 @@ new EventStation()
 ### Asynchronous Listeners
 
 ```javascript
-var station = new EventStation();
+var emitter = new EventStation();
 
-// Attach a listener that writes a message to file
-station.on('message', function (message) {
+// Attach a listener that writes a message to a file
+emitter.on('message', function (message) {
     return new Promise(function (resolve, reject) {
         fs.appendFile('log.txt', message, function (err) {
             if (err) return reject(err);
