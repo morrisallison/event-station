@@ -35,14 +35,13 @@ A versatile and robust event emitter class.
 ## Example
 
 ```javascript
-import {EventStation} from 'event-station';
+import EventStation from 'event-station';
 
 class MyWorker extends EventStation {}
 
 var firstWorker = new MyWorker();
 var secondWorker = new MyWorker();
 
-// Add two listeners to the worker
 var listeners = firstWorker.on({
     start: () => console.log("Worker started!"),
     stop: () => console.log("Worker stopped!"),
@@ -50,6 +49,8 @@ var listeners = firstWorker.on({
 
 // Add the same listeners to the second worker
 listeners.addTo(secondWorker);
+
+firstWorker.emit('start');
 
 // Remove the listeners from both workers
 listeners.off();
@@ -80,7 +81,7 @@ $ bower install event-station
 Web browser via `<script>`
 
 ```html
-<script src="event-station.js"></script>
+<script src="dist/event-station.min.js"></script>
 <script>new EventStation();</script>
 ```
 
