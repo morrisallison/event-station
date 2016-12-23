@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.1
+
+* Removed unnecessary module declarations from the module definition.
+
 ### 1.1.0
 
 * The package definition is now standalone
