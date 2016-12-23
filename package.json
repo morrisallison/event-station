@@ -4,7 +4,7 @@
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
   "license": "MIT",
-  "homepage": "http://github.com/morrisallison/event-station",
+  "homepage": "https://github.com/morrisallison/event-station",
   "bugs": "https://github.com/morrisallison/event-station/issues",
   "repository": "github:morrisallison/event-station",
   "keywords": [
