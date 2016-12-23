@@ -41,7 +41,7 @@
   "scripts": {
     "benchmark": "lsc benchmarks/event-callback.ls",
     "build": "npm run compile && npm run bundle && npm run optimize",
-    "build:dts": "npm run compile:dts && npm run bundle:dts",
+    "build:dts": "npm run compile:dts && npm run bundle:dts && npm run validate:dts",
     "build:es5": "npm run compile:es5 && npm run bundle:es5",
     "build:es6": "npm run compile:es6 && npm run bundle:es6",
     "bundle": "npm run bundle:dts && npm run bundle:es5 && npm run bundle:es6",
@@ -57,7 +57,8 @@
     "cover": "istanbul cover -e .ts _mocha -- --compilers ts:ts-node/register,ls:livescript --recursive tests --reporter min",
     "gamut": "npm run clean && npm run build && npm run test && npm run cover",
     "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
-    "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests"
+    "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
+    "validate:dts": "tsc --lib 'es5','es2015.promise' dist/event-station.d.ts"
   },
   "main": "./dist/event-station.js",
   "jsnext:main": "./dist/event-station.jsnext.js",
