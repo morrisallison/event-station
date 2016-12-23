@@ -14,10 +14,11 @@ mkdirp(dist, function () {
     fs.readFile(src, function (err, buf) {
         if (err) throw err;
 
-        var output = banner + '\n' + buf.toString()
-            .replace(/declare module "/g, 'declare module "__event-station#')
-            .replace(/from "/g, 'from "__event-station#')
-            .replace(/"__event-station#main"/g, '"event-station"');
+        var declaration = '\ndeclare module "event-station" {';
+        var definition = buf.toString()
+            .replace(/(}\n)?declare module "([^"]*)" {/g, '')
+            .replace(/\n\s+import ([^"]+) from "([^"]+)";/g, '');
+        var output = banner + declaration + definition;
 
         fs.writeFile(dest, output, function (err) {
             if (err) throw err;
