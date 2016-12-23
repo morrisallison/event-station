@@ -4,29 +4,18 @@
  * Released under the MIT/Expat license
  * @preserve
  */
-declare module "__event-station#types/Emitter" {
-    import { EventStation } from "__event-station#models/EventStation";
+declare module "event-station" {
     /** An interface to accommodate objects that extend EventStation */
     export interface Emitter extends EventStation {
     }
-}
-declare module "__event-station#types/ListenersMap" {
-    import { Listener } from "__event-station#types/Listener";
     /** An object of listener arrays with event names and expressions as keys */
     export interface ListenersMap {
         [eventName: string]: Listener[];
     }
-}
-declare module "__event-station#types/StationMap" {
-    import { Emitter } from "__event-station#types/Emitter";
     /** An object of station instances with unique station IDs as keys */
     export interface StationMap {
         [stationId: string]: Emitter;
     }
-}
-declare module "__event-station#types/Meta" {
-    import { ListenersMap } from "__event-station#types/ListenersMap";
-    import { StationMap } from "__event-station#types/StationMap";
     export interface Meta {
         /** @see Options.delimiter */
         delimiter: string;
@@ -51,10 +40,6 @@ declare module "__event-station#types/Meta" {
         /** Unique ID */
         stationId: string;
     }
-}
-declare module "__event-station#types/Listener" {
-    import { Emitter } from "__event-station#types/Emitter";
-    import { Meta } from "__event-station#types/Meta";
     /**
      * An object that holds the state of a listener.
      * Listeners can can exist while separated from a station,
@@ -118,15 +103,8 @@ declare module "__event-station#types/Listener" {
          */
         stationMetas?: Meta[];
     }
-}
-declare module "__event-station#actions/addListener" {
-    import { Listener } from "__event-station#types/Listener";
-    import { Meta } from "__event-station#types/Meta";
     /** Adds the given listener to the given station meta */
     export function addListener(stationMeta: Meta, listener: Listener): void;
-}
-declare module "__event-station#types/MatchingListener" {
-    import { Emitter } from "__event-station#types/Emitter";
     /**
      * A subset of the Listener interface used only for
      * comparing two Listener objects.
@@ -143,69 +121,40 @@ declare module "__event-station#types/MatchingListener" {
         /** @see Listener.hearer */
         hearer?: Emitter;
     }
-}
-declare module "__event-station#actions/matchListener" {
-    import { MatchingListener } from "__event-station#types/MatchingListener";
     /**
      * Determines whether the given listeners match by performing an approximate match
      * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
      * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
     export function matchListener(matchingListener: MatchingListener, attachedListener: MatchingListener, exactMatch?: boolean): boolean;
-}
-declare module "__event-station#actions/removeListener" {
-    import { Listener } from "__event-station#types/Listener";
-    import { Meta } from "__event-station#types/Meta";
     /**
      * Removes all listeners that match the given listener from the given station meta.
      * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
     export function removeListener(stationMeta: Meta, listener: Listener, exactMatch?: boolean): void;
-}
-declare module "__event-station#actions/removeListenerFromAll" {
-    import { Listener } from "__event-station#types/Listener";
     /** Removes the given listener from all of the station meta it's attached to */
     export function removeListenerFromAll(listener: Listener): void;
-}
-declare module "__event-station#actions/applyListeners" {
-    import { Emitter } from "__event-station#types/Emitter";
-    import { Listener } from "__event-station#types/Listener";
     /** Applies the given listeners with the given arguments */
     export function applyListeners<P extends Promise<any>>(listeners: Listener[], originStation: Emitter, enableAsync: boolean, args: ListenerArguments): P[] | void;
     export interface ListenerArguments {
         [index: number]: any;
         length: number;
     }
-}
-declare module "__event-station#actions/getAllListeners" {
-    import { Listener } from "__event-station#types/Listener";
-    import { Meta } from "__event-station#types/Meta";
     /** Retrieves all listeners attached to the given Meta */
     export function getAllListeners(stationMeta: Meta): Listener[];
-}
-declare module "__event-station#actions/matchListeners" {
-    import { MatchingListener } from "__event-station#types/MatchingListener";
     export function matchListeners(matchingListener: MatchingListener, attachedListeners: MatchingListener[], exactMatch?: boolean): boolean;
-}
-declare module "__event-station#actions/hasListener" {
-    import { MatchingListener } from "__event-station#types/MatchingListener";
-    import { Meta } from "__event-station#types/Meta";
     /**
      * Determines whether the given listener is attached to the given station meta.
      * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
      */
     export function hasListener(stationMeta: Meta, listener: MatchingListener, exactMatch?: boolean): boolean;
-}
-declare module "__event-station#types/Rx" {
+
     export namespace Rx {
         type Observable = any;
         interface ObservableStatic {
             fromEventPattern<T>(addHandler: (handler: Function) => void, removeHandler: (handler: Function) => void, selector?: (args: any[]) => T): Observable;
         }
     }
-}
-declare module "__event-station#injector" {
-    import { Rx } from "__event-station#types/Rx";
     export namespace deps {
         /**
          * A reference to the injected Rx namespace.
@@ -240,11 +189,6 @@ declare module "__event-station#injector" {
     export function inject(name: string, obj: any): void;
     /** Reset injected dependencies */
     export function reset(): void;
-}
-declare module "__event-station#models/Listeners" {
-    import { Emitter } from "__event-station#types/Emitter";
-    import { Listener } from "__event-station#types/Listener";
-    import { MatchingListener } from "__event-station#types/MatchingListener";
     /**
      * A class for operations targeting a collection of listeners
      */
@@ -366,12 +310,10 @@ declare module "__event-station#models/Listeners" {
     export interface ForEachCallback {
         (listener: Listener, index: number, listeners: Listener[]): any;
     }
-}
-declare module "__event-station#actions/makeStationId" {
+
     /** Generates a unique ID for EventStation instances */
     export function makeStationId(): string;
-}
-declare module "__event-station#types/Options" {
+
     /**
      * See the [configuration section](http://morrisallison.github.io/event-station/usage.html#configuration)
      * of the usage documentation for general usage.
@@ -405,9 +347,6 @@ declare module "__event-station#types/Options" {
         [key: string]: string | boolean | void;
         [key: number]: void;
     }
-}
-declare module "__event-station#config" {
-    import { Options } from "__event-station#types/Options";
     /** Container for global configuration options */
     export const defaultOptions: {
         delimiter: string;
@@ -434,14 +373,6 @@ declare module "__event-station#config" {
      */
     export function assertOptions<T extends typeof defaultOptions>(opts: T): void;
     export function mergeOptions<T extends typeof defaultOptions>(target: any, ...sources: any[]): T;
-}
-declare module "__event-station#models/EventStation" {
-    import { Emitter } from "__event-station#types/Emitter";
-    import { Listener } from "__event-station#types/Listener";
-    import { Listeners } from "__event-station#models/Listeners";
-    import { Meta } from "__event-station#types/Meta";
-    import { Options } from "__event-station#types/Options";
-    import { Rx } from "__event-station#types/Rx";
     /**
      * Event emitter class and namespace
      */
@@ -599,8 +530,5 @@ declare module "__event-station#models/EventStation" {
     export interface CallbackMap {
         [eventName: string]: Function;
     }
-}
-declare module "event-station" {
-    import { EventStation } from "__event-station#models/EventStation";
     export default EventStation;
 }
