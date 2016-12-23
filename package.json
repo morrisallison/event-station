@@ -23,7 +23,6 @@
     "@types/node": "^6.0.51",
     "benchmark": "^2.1.2",
     "bluebird": "^3.4.6",
-    "codecov.io": "^0.1.6",
     "istanbul": "~1.1.0-alpha.1",
     "livescript": "^1.5.0",
     "mkdirp": "^0.5.1",
