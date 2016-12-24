@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.2
+
+* Fixed compatibility issues with jspm.
+
 ### 1.1.1
 
 * Removed unnecessary module declarations from the module definition.

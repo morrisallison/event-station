@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.1
+ * event-station v1.1.2
  * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
  * Released under the MIT/Expat license
  * @preserve
@@ -1209,9 +1209,9 @@ function getHeardStations(stationMeta) {
     return stations;
 }
 
+/* Set properties for module loader compatibility */
 EventStation$1.EventStation = EventStation$1;
 EventStation$1.default = EventStation$1;
-Object.defineProperty(EventStation$1, '__esModule', { value: true });
 
 return EventStation$1;
 

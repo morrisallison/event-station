@@ -1,6 +1,6 @@
 {
   "name": "event-station",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
   "license": "MIT",
@@ -51,7 +51,7 @@
   "scripts": {
     "benchmark": "lsc benchmarks/event-callback.ls",
     "build": "npm run compile && npm run bundle && npm run optimize",
-    "build:dts": "npm run compile:dts && npm run bundle:dts && npm run validate:dts",
+    "build:dts": "npm run compile:dts && npm run bundle:dts",
     "build:es5": "npm run compile:es5 && npm run bundle:es5",
     "build:es6": "npm run compile:es6 && npm run bundle:es6",
     "bundle": "npm run bundle:dts && npm run bundle:es5 && npm run bundle:es6",
@@ -65,16 +65,19 @@
     "compile:es5": "tsc -p scripts/tsconfig.es5.json",
     "compile:es6": "tsc -p scripts/tsconfig.es6.json",
     "cover": "istanbul cover -e .ts _mocha -- --compilers ts:ts-node/register,ls:livescript --recursive tests --reporter min",
-    "gamut": "npm run clean && npm run build && npm run test && npm run cover",
+    "gamut": "npm run clean && npm run build && npm run validate && npm run test && npm run cover",
     "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
     "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
+    "validate": "npm run validate:dts",
     "validate:dts": "tsc --lib 'es5','es2015.promise' dist/event-station.d.ts"
   },
   "main": "./dist/event-station.js",
   "jsnext:main": "./dist/event-station.jsnext.js",
   "typings": "./dist/event-station.d.ts",
   "jspm": {
-    "main": "./dist/event-station.min.js"
+    "format": "esm",
+    "jspmNodeConversion": false,
+    "main": "./dist/event-station.jsnext.js"
   },
   "files": [
     "CHANGELOG.md",
