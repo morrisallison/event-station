@@ -75,7 +75,9 @@
   "jsnext:main": "./dist/event-station.jsnext.js",
   "typings": "./dist/event-station.d.ts",
   "jspm": {
-    "main": "./dist/event-station.min.js"
+    "format": "esm",
+    "jspmNodeConversion": false,
+    "main": "./dist/event-station.jsnext.js"
   },
   "files": [
     "CHANGELOG.md",
