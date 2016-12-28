@@ -1,0 +1,6 @@
+syntax: glob
+.nyc_output
+build
+coverage
+node_modules
+npm-debug.log
