@@ -11,11 +11,22 @@
     "url": "git://github.com/morrisallison/event-station.git"
   },
   "keywords": [
+    "async",
+    "asynchronous",
     "class",
     "dispatcher",
     "emitter",
+    "es6",
     "event",
+    "eventemitter",
     "events",
+    "fluent",
+    "mixin",
+    "promise",
+    "promisified",
+    "regexp",
+    "rx",
+    "standalone",
     "typescript"
   ],
   "main": "./dist/event-station.min.js",
