@@ -7,8 +7,6 @@ node_js:
     - '6'
     - stable
 
-install: 'yarn'
-
 script: 'yarn run gamut'
 
 notifications:
