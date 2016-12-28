@@ -1,19 +1,10 @@
 {
+    "extends": "../tsconfig.json",
     "compilerOptions": {
+        "module": "es2015",
+        "outDir": "../build/es5",
         "inlineSourceMap": true,
         "inlineSources": true,
-        "module": "es2015",
-        "noImplicitAny": true,
-        "outDir": "../build/es5",
-        "strictNullChecks": true,
-        "target": "es5",
-        "lib": [
-            "dom",
-            "es5",
-            "es2015.promise"
-        ]
-    },
-    "files": [
-        "../src/main.ts"
-    ]
+        "declaration": false
+    }
 }

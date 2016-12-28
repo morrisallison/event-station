@@ -1,18 +1,14 @@
 {
+    "extends": "../tsconfig.json",
     "compilerOptions": {
-        "declaration": true,
-        "module": "system",
-        "noImplicitAny": true,
-        "outFile": "../build/dts/main.js",
-        "strictNullChecks": true,
         "target": "es6",
+        "module": "system",
+        "outFile": "../build/dts/main.js",
+        "declaration": true,
         "lib": [
             "dom",
             "es6",
             "es2015.promise"
         ]
-    },
-    "files": [
-        "../src/main.ts"
-    ]
+    }
 }

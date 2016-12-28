@@ -1,19 +1,16 @@
 {
+    "extends": "../tsconfig.json",
     "compilerOptions": {
+        "target": "es6",
+        "module": "es2015",
+        "outDir": "../build/es6",
         "inlineSourceMap": true,
         "inlineSources": true,
-        "module": "es2015",
-        "noImplicitAny": true,
-        "outDir": "../build/es6",
-        "strictNullChecks": true,
-        "target": "es6",
+        "declaration": false,
         "lib": [
             "dom",
             "es6",
             "es2015.promise"
         ]
-    },
-    "files": [
-        "../src/main.ts"
-    ]
+    }
 }
