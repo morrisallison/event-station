@@ -1,13 +1,13 @@
 language: node_js
 
+cache: yarn
+
 node_js:
     - '4'
     - '6'
     - stable
 
-install: 'npm install'
-
-script: 'npm run gamut'
+script: 'yarn run gamut'
 
 notifications:
     email: false
