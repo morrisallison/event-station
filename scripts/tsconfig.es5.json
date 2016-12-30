@@ -5,6 +5,7 @@
         "outDir": "../build/es5",
         "inlineSourceMap": true,
         "inlineSources": true,
-        "declaration": false
+        "declaration": false,
+        "noEmit": false
     }
 }
