@@ -48,3 +48,9 @@ describe 'EventStation.config()', (,) !->
             EventStation.config { regExpMarker: 'this has spaces' }
 
         check.must.throw Error
+
+    it "must not set invalid options", !->
+        EventStation.config config
+        station = new EventStation { foo: 'bar' }
+
+        expect(station.stationMeta.foo).to.not.exist()
