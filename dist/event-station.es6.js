@@ -631,10 +631,11 @@ function assertOptions(opts) {
         throw new Error("Invalid option: RegExp markers can't contain the delimiter string.");
     }
 }
-function mergeOptions(target, ...sources) {
+function mergeOptions() {
+    let target = arguments[0];
     for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
-        for (let option in defaultOptions) {
+        let source = arguments[i];
+        for (let option in source) {
             let isValidOption = defaultOptions.hasOwnProperty(option);
             let value = source[option];
             if (isValidOption && value != null) {
