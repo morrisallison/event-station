@@ -44,12 +44,14 @@ export function assertOptions<T extends typeof defaultOptions>(opts: T) {
     }
 }
 
-export function mergeOptions<T extends typeof defaultOptions>(target: any, ...sources: any[]): T {
+export function mergeOptions<T extends typeof defaultOptions>(target: any, ...sources: any[]): T;
+export function mergeOptions() {
+    let target = arguments[0];
 
     for (var i = 1; i < arguments.length; i++) {
-        var source = arguments[i];
+        let source = arguments[i];
 
-        for (let option in defaultOptions) {
+        for (let option in source) {
             let isValidOption = defaultOptions.hasOwnProperty(option);
             let value = source[option];
 
