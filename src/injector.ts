@@ -35,7 +35,7 @@ export namespace deps {
  * within EventStation instances.
  */
 export function inject(name: 'rx', rx: any): void;
-export function inject<P extends typeof Promise>(name: 'Promise', promise: P): void;
+export function inject(name: 'Promise', promise: any): void;
 export function inject(name: string, obj: any): void;
 export function inject(name: string, obj: any): void {
 
