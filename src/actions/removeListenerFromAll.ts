@@ -8,7 +8,7 @@ export function removeListenerFromAll(listener: Listener): void {
 
     if (!stationMetas) return;
 
-    for (let stationMeta of stationMetas) {
+    for (const stationMeta of stationMetas) {
         removeListener(stationMeta, listener, true);
     }
 }

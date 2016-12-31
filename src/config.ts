@@ -1,5 +1,7 @@
 import {Options} from './types/Options';
 
+export const allEvent = 'all';
+
 /** Container for global configuration options */
 export const defaultOptions = {
     delimiter: ' ',
@@ -14,15 +16,14 @@ export const globalOptions = mergeOptions({}, defaultOptions);
 
 /** Resets the global configuration to defaults */
 export function reset(): void {
-    mergeOptions(globalOptions, defaultOptions)
+    mergeOptions(globalOptions, defaultOptions);
 }
 
 /** Modifies the default global configuration */
 export function config(opts: Options): void {
-    let testOptions = mergeOptions({}, globalOptions, opts);
+    const testOptions = mergeOptions({}, globalOptions, opts);
 
     assertOptions(testOptions);
-
     mergeOptions(globalOptions, opts);
 }
 
@@ -32,28 +33,27 @@ export function config(opts: Options): void {
  */
 export function assertOptions<T extends typeof defaultOptions>(opts: T) {
     if (opts.delimiter === '') {
-        throw new Error("Invalid option: Delimiters can't be empty strings.");
+        throw new Error(`Invalid option: Delimiters can't be empty strings.`);
     }
 
     if (opts.regExpMarker === '') {
-        throw new Error("Invalid option: RegExp markers can't be empty strings.");
+        throw new Error(`Invalid option: RegExp markers can't be empty strings.`);
     }
 
     if (opts.regExpMarker && opts.delimiter && opts.regExpMarker.indexOf(opts.delimiter) >= 0) {
-        throw new Error("Invalid option: RegExp markers can't contain the delimiter string.");
+        throw new Error(`Invalid option: RegExp markers can't contain the delimiter string.`);
     }
 }
 
 export function mergeOptions<T extends typeof defaultOptions>(target: any, ...sources: any[]): T;
-export function mergeOptions() {
-    let target = arguments[0];
+export function mergeOptions(target: any) {
 
-    for (var i = 1; i < arguments.length; i++) {
-        let source = arguments[i];
+    for (let i = 1; i < arguments.length; i++) {
+        const source = arguments[i];
 
-        for (let option in source) {
-            let isValidOption = defaultOptions.hasOwnProperty(option);
-            let value = source[option];
+        for (const option in source) {
+            const isValidOption = defaultOptions.hasOwnProperty(option);
+            const value = source[option];
 
             if (isValidOption && value != null) {
                 target[option] = value;

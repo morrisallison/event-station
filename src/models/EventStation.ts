@@ -62,7 +62,7 @@ export class EventStation {
         const stationMeta = this.stationMeta;
         const listeners = makeListeners(this, false, q, r, s);
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             addListener(stationMeta, listener);
         }
 
@@ -113,7 +113,7 @@ export class EventStation {
 
         const listeners = makeListeners(this, true, q, r, s);
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             removeListener(stationMeta, listener);
         }
     }
@@ -131,7 +131,7 @@ export class EventStation {
         const listeners = makeListeners(this, false, q, r, s);
         const targetStationMeta = station.stationMeta;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.hearer = this;
             listener.crossOrigin = station;
             addListener(targetStationMeta, listener);
@@ -169,8 +169,8 @@ export class EventStation {
 
         if (stationMeta.hearingCount < 1) return;
 
-        var isRemovingAll = false;
-        var listeners: Listener[] = [];
+        let isRemovingAll = false;
+        let listeners: Listener[] = [];
 
         // If no listener targets were given
         if (q === undefined) {
@@ -180,18 +180,19 @@ export class EventStation {
         }
 
         const stations = getTargetedStations(stationMeta, target);
+        const count = stations.length;
 
-        for (let x = 0, y = stations.length; x < y; x++) {
+        for (let x = 0; x < count; x++) {
 
-            let station = stations[x];
-            let targetStationMeta = station.stationMeta;
+            const station = stations[x];
+            const targetStationMeta = station.stationMeta;
 
             if (isRemovingAll) {
                 q = station.listenerEventNames;
                 listeners = makeListeners(this, true, q, r, s);
             }
 
-            for (let listener of listeners) {
+            for (const listener of listeners) {
                 listener.hearer = this;
                 removeListener(targetStationMeta, listener);
             }
@@ -227,7 +228,7 @@ export class EventStation {
 
         const listeners = makeListeners(this, true, q, r, s);
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             if (hasListener(stationMeta, listener)) return true;
         }
 
@@ -252,9 +253,8 @@ export class EventStation {
         if (stationMeta.hearingCount < 1) return false;
 
         const stations = getTargetedStations(stationMeta, target);
-        var matchAllListeners: boolean = false;
-
-        var listeners: Listener[] = [];
+        let matchAllListeners: boolean = false;
+        let listeners: Listener[] = [];
 
         // If no listener targets were given
         if (q) {
@@ -263,17 +263,18 @@ export class EventStation {
             matchAllListeners = true;
         }
 
-        for (let x = 0, y = stations.length; x < y; x++) {
+        const count = stations.length;
 
-            let station = stations[x];
-            let targetStationMeta = station.stationMeta;
+        for (let x = 0; x < count; x++) {
+            const station = stations[x];
+            const targetStationMeta = station.stationMeta;
 
             if (matchAllListeners) {
                 q = station.listenerEventNames;
                 listeners = makeListeners(this, true, q, r, s);
             }
 
-            for (let listener of listeners) {
+            for (const listener of listeners) {
                 listener.hearer = this;
 
                 if (hasListener(targetStationMeta, listener)) return true;
@@ -297,7 +298,7 @@ export class EventStation {
 
         const eventNames = parseEventNames(input, stationMeta);
 
-        for (let eventName of eventNames) {
+        for (const eventName of eventNames) {
             emitEvent(eventName, this, false, args);
         }
     }
@@ -312,7 +313,7 @@ export class EventStation {
     public emitAsync<R extends any>(input: any, ...args: any[]): Promise<R[]> {
 
         if (!injector.deps.$Promise) {
-            throw new Error('No promises implementation available.');
+            throw new Error(`No promises implementation available.`);
         }
 
         const stationMeta = this.stationMeta;
@@ -323,9 +324,9 @@ export class EventStation {
 
         const eventNames = parseEventNames(input, stationMeta);
 
-        var promises: Promise<R>[] = [];
+        let promises: Promise<R>[] = [];
 
-        for (let eventName of eventNames) {
+        for (const eventName of eventNames) {
             promises = promises.concat(
                 emitEvent<Promise<R>>(eventName, this, true, args)
             );
@@ -374,8 +375,8 @@ export class EventStation {
         const matchingListeners = makeListeners(this, true, q, r, s);
         const listeners: Listener[] = [];
 
-        for (let attachedListener of attachedListeners) {
-            for (let matchingListener of matchingListeners) {
+        for (const attachedListener of attachedListeners) {
+            for (const matchingListener of matchingListeners) {
                 if (matchListener(matchingListener, attachedListener)) {
                     listeners.push(attachedListener);
                     break;
@@ -399,14 +400,18 @@ export class EventStation {
     public toObservable<T>(q: any, s?: any, selector?: (args: any[]) => T): Rx.Observable {
 
         if (!injector.deps.$RxObservable) {
-            throw new Error('Rx has not been injected. See documentation for details.');
+            throw new Error(`Rx has not been injected. See documentation for details.`);
         }
 
-        return injector.deps.$RxObservable.fromEventPattern<T>((r) => {
+        const addHandler = (r: Function) => {
             this.on(q, r, s);
-        }, (r) => {
+        };
+
+        const removeHandler = (r: Function) => {
             this.off(q, r, s);
-        }, selector);
+        };
+
+        return injector.deps.$RxObservable.fromEventPattern<T>(addHandler, removeHandler, selector);
     }
 
     /**
@@ -425,17 +430,17 @@ export class EventStation {
     }
 
     /**
-    * Removes all listeners that match the given listener from the station
-    * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-    */
+     * Removes all listeners that match the given listener from the station
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+     */
     public removeListener(listener: Listener, exactMatch?: boolean): void {
         removeListener(this.stationMeta, listener, exactMatch);
     }
 
     /**
-    * Determines whether any listener attached to the station matches the given listener.
-    * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-    */
+     * Determines whether any listener attached to the station matches the given listener.
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+     */
     public hasListener(listener: Listener, exactMatch?: boolean): boolean {
         return hasListener(this.stationMeta, listener, exactMatch);
     }
@@ -474,7 +479,9 @@ export class EventStation {
     public static extend<T extends Emitter>(obj: any): T {
         const proto = EventStation.prototype;
 
-        for (let propertyName in proto) {
+        for (const propertyName in proto) {
+
+            if (!proto.hasOwnProperty(propertyName)) continue;
 
             const descriptor = Object.getOwnPropertyDescriptor(proto, propertyName);
             const newDescriptor: PropertyDescriptor = { configurable: true };
@@ -492,7 +499,7 @@ export class EventStation {
     }
 
     public static make(): Emitter {
-        var station = EventStation.extend({});
+        const station = EventStation.extend({});
 
         EventStation.init(station);
 
@@ -503,7 +510,7 @@ export class EventStation {
 function parseEventNames(eventNames: string[], options: Meta): string[];
 function parseEventNames(eventName: string, options: Meta): string[];
 function parseEventNames(input: any, options: Meta): string[] {
-    var names: string[];
+    let names: string[];
 
     if (typeof input === 'string') {
 
@@ -518,7 +525,7 @@ function parseEventNames(input: any, options: Meta): string[] {
     } else if (Array.isArray(input)) {
         names = input;
     } else {
-        throw new Error("Invalid first argument");
+        throw new Error(`Invalid first argument`);
     }
 
     return names;
@@ -546,49 +553,48 @@ function makeStationMeta(options: Options = {}): Meta {
  * Makes an array of listeners from the given parameters
  * This function normalizes the four ways to make listeners.
  */
-function makeListeners(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context?: Emitter): Listener[];
-function makeListeners(originStation: Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: Emitter): Listener[];
-function makeListeners(originStation: Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: Emitter): Listener[];
-function makeListeners(originStation: Emitter, isMatching: boolean, q: any, r?: any, s?: any): Listener[] {
+function makeListeners(origin: Emitter, isMatching: boolean, listenerMap: CallbackMap, context?: Emitter): Listener[];
+function makeListeners(origin: Emitter, isMatching: boolean, eventNames: string[], callback?: Function, context?: Emitter): Listener[];
+function makeListeners(origin: Emitter, isMatching: boolean, eventName: string, callback?: Function, context?: Emitter): Listener[];
+function makeListeners(origin: Emitter, isMatching: boolean, q: any, r?: any, s?: any): Listener[] {
 
     if (typeof q === 'string') {
 
-        const stationMeta = originStation.stationMeta;
+        const stationMeta = origin.stationMeta;
         const enableDelimiter = stationMeta.enableDelimiter;
         const delimiter = stationMeta.delimiter;
 
         if (enableDelimiter && q.indexOf(delimiter) >= 0) {
             q = (<string>q).split(delimiter);
-            return makeListenersFromArray(originStation, isMatching, q, r, s);
+            return makeListenersFromArray(origin, isMatching, q, r, s);
         }
 
         return [{
             eventName: q,
             callback: r,
-            context: !isMatching && s === undefined ? originStation : s,
+            context: !isMatching && s === undefined ? origin : s,
             matchCallback: r,
             matchContext: s,
         }];
     }
 
     if (Array.isArray(q)) {
-        return makeListenersFromArray(originStation, isMatching, q, r, s);
+        return makeListenersFromArray(origin, isMatching, q, r, s);
     }
 
     if (typeof q === 'object') {
-        return makeListenersFromMap(originStation, isMatching, q, r);
+        return makeListenersFromMap(origin, isMatching, q, r);
     }
 
-    throw new Error("Invalid arguments");
+    throw new Error(`Invalid arguments`);
 }
-
 
 /** Makes an array of listeners from the given listener map */
 function makeListenersFromMap(originStation: Emitter, isMatching: boolean, listenerMap: CallbackMap, context: any): Listener[] {
 
     const listeners: Listener[] = [];
 
-    for (let eventName in listenerMap) {
+    for (const eventName in listenerMap) {
 
         listeners.push({
             eventName: eventName,
@@ -603,16 +609,17 @@ function makeListenersFromMap(originStation: Emitter, isMatching: boolean, liste
 }
 
 /** Makes an array of listeners from the given event name array */
-function makeListenersFromArray(originStation: Emitter, isMatching: boolean, eventNames: string[], callback: Function, context: any): Listener[] {
+function makeListenersFromArray(origin: Emitter, isMatching: boolean, eventNames: string[], callback: Function, context: any): Listener[] {
 
     const listeners: Listener[] = [];
+    const count = eventNames.length;
 
-    for (let i = 0, l = eventNames.length; i < l; i++) {
+    for (let i = 0; i < count; i++) {
 
         listeners.push({
             eventName: eventNames[i],
             callback: callback,
-            context: !isMatching && context === undefined ? originStation : context,
+            context: !isMatching && context === undefined ? origin : context,
             matchContext: context,
             matchCallback: callback,
         });
@@ -626,7 +633,7 @@ function emitEvent<P extends Promise<any>>(eventName: string, originStation: Emi
     const stationMeta = originStation.stationMeta;
     const listenersMap = stationMeta.listenersMap;
 
-    var listeners: Listener[];
+    let listeners: Listener[] | void;
 
     if (stationMeta.enableRegExp) {
         listeners = searchListeners(eventName, listenersMap, stationMeta.regExpMarker);
@@ -634,26 +641,26 @@ function emitEvent<P extends Promise<any>>(eventName: string, originStation: Emi
         listeners = listenersMap[eventName];
     }
 
-    var promises: P[] = [];
+    let promises: P[] = [];
 
     if (listeners) {
 
-        let result = applyListeners<P>(listeners, originStation, enableAsync, args);
+        const result = applyListeners<P>(listeners, originStation, enableAsync, args);
 
         if (enableAsync && result) {
             promises = promises.concat(result);
         }
     }
 
-    const listenersMapAll = listenersMap['all'];
+    const listenersMapAll: Listener[] | void = listenersMap[config.allEvent];
 
     if (stationMeta.emitAllEvent && listenersMapAll) {
 
-        let argsAll = args.slice();
+        const argsAll = args.slice();
 
         argsAll.splice(0, 0, eventName);
 
-        let result = applyListeners<P>(listenersMapAll, originStation, enableAsync, argsAll);
+        const result = applyListeners<P>(listenersMapAll, originStation, enableAsync, argsAll);
 
         if (enableAsync && result) {
             promises = promises.concat(result);
@@ -670,9 +677,9 @@ function emitEvent<P extends Promise<any>>(eventName: string, originStation: Emi
  */
 function searchListeners(eventName: string, listenersMap: ListenersMap, regExpMarker: string): Listener[] {
 
-    var listeners: Listener[] = [];
+    let listeners: Listener[] = [];
 
-    for (let expression in listenersMap) {
+    for (const expression in listenersMap) {
 
         if (expression.indexOf(regExpMarker) === 0) {
 
@@ -695,7 +702,7 @@ function cleanHeardStations(station: Emitter): void {
     const stationMap: StationMap = Object.create(null);
     const heardStations = station.stationMeta.heardStations;
 
-    for (let stationId in heardStations) {
+    for (const stationId in heardStations) {
 
         const heardStation = heardStations[stationId];
 
@@ -712,11 +719,11 @@ function removeAllListeners(stationMeta: Meta): void {
 
     const listenersMap = stationMeta.listenersMap;
 
-    for (let eventName in listenersMap) {
+    for (const eventName in listenersMap) {
 
         const listeners = listenersMap[eventName];
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             const hearer = listener.hearer;
 
             if (hearer) {
@@ -772,7 +779,7 @@ function getTargetedStations(stationMeta: Meta, target?: Emitter | Emitter[]): E
         return [target];
     }
 
-    throw new Error("Invalid target");
+    throw new Error(`Invalid target`);
 }
 
 /**
@@ -783,7 +790,7 @@ function getHeardStations(stationMeta: Meta): Emitter[] {
     const stations: Emitter[] = [];
     const heardStations = stationMeta.heardStations;
 
-    for (let stationId in heardStations) {
+    for (const stationId in heardStations) {
         stations.push(heardStations[stationId]);
     }
 

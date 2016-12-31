@@ -12,7 +12,7 @@ export function hasListener(stationMeta: Meta, listener: MatchingListener, exact
 
     const listenersMap = stationMeta.listenersMap;
     const eventName = listener.eventName;
-    var attachedListeners: Listener[];
+    let attachedListeners: Listener[];
 
     if (eventName === undefined) {
 

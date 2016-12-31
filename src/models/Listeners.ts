@@ -36,12 +36,12 @@ export class Listeners {
     public occur(maxOccurrences: number): Listeners {
 
         if (maxOccurrences < 1) {
-            throw new Error("The maximum occurrences must be greater than or equal to one.");
+            throw new Error(`The maximum occurrences must be greater than or equal to one.`);
         }
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.maxOccurrences = maxOccurrences;
         }
 
@@ -55,7 +55,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.callback = callback;
             listener.matchCallback = callback;
         }
@@ -78,7 +78,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             removeListenerFromAll(listener);
         }
 
@@ -92,7 +92,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.context = context;
             listener.matchContext = context;
         }
@@ -108,12 +108,12 @@ export class Listeners {
         const listeners = this.listeners;
         const stationMeta = station.stationMeta;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
 
             const crossOrigin = listener.crossOrigin;
 
             if (crossOrigin && crossOrigin !== station) {
-                throw new Error("Cross-emitter listeners can only be attached to their origin station.");
+                throw new Error(`Cross-emitter listeners can only be attached to their origin station.`);
             }
 
             addListener(stationMeta, listener);
@@ -130,7 +130,7 @@ export class Listeners {
         const listeners = this.listeners;
         const stationMeta = station.stationMeta;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             removeListener(stationMeta, listener, true);
         }
 
@@ -200,7 +200,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.isPaused = true;
         }
 
@@ -214,7 +214,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.isPaused = false;
         }
 
@@ -228,7 +228,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             if (listener.isPaused) return true;
         }
 
@@ -245,9 +245,10 @@ export class Listeners {
 
         const promises: Array<Promise<Listener>> = [];
         const listeners = this.listeners;
+        const count = listeners.length;
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            let listener = listeners[i];
+        for (let i = 0; i < count; i++) {
+            const listener = listeners[i];
 
             promises[i] = makePromise(listener);
         }
@@ -283,7 +284,7 @@ export class Listeners {
 
         const listeners = this.listeners;
 
-        for (let listener of listeners) {
+        for (const listener of listeners) {
             listener.occurrences = undefined;
             listener.isPaused = undefined;
         }
@@ -295,9 +296,10 @@ export class Listeners {
     public forEach(func: ForEachCallback): Listeners {
 
         const listeners = this.listeners;
+        const count = listeners.length;
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
-            let listener = listeners[i];
+        for (let i = 0; i < count; i++) {
+            const listener = listeners[i];
 
             func(listener, i, listeners);
         }
@@ -306,6 +308,7 @@ export class Listeners {
     }
 
     /** Retrieves a listener located at the given index */
+    // tslint:disable-next-line:no-reserved-keywords
     public get(index: number): Listener {
         return this.listeners[index];
     }
@@ -314,8 +317,9 @@ export class Listeners {
     public index(listener: Listener): number | void {
 
         const listeners = this.listeners;
+        const count = listeners.length;
 
-        for (let i = 0, c = listeners.length; i < c; i++) {
+        for (let i = 0; i < count; i++) {
             if (listener === listeners[i]) return i;
         }
     }
@@ -334,11 +338,10 @@ export class Listeners {
 function makePromise(listener: Listener): Promise<Listener> {
 
     if (!deps.$Promise) {
-        throw new Error('No promises implementation available.');
+        throw new Error(`No promises implementation available.`);
     }
 
-    return new deps.$Promise<Listener>(function (resolve) {
-
+    return new deps.$Promise<Listener>((resolve) => {
         if (!listener.resolves) {
             listener.resolves = [resolve];
         } else {
@@ -355,7 +358,7 @@ function makePromise(listener: Listener): Promise<Listener> {
 function cloneListener(listener: Listener): Listener {
 
     if (listener.hearer) {
-        throw new Error("Cross-emitter listeners can not be cloned.");
+        throw new Error(`Cross-emitter listeners can't be cloned.`);
     }
 
     return {
@@ -372,7 +375,7 @@ function cloneListener(listener: Listener): Listener {
 
 /** Determines whether the given listeners are attached to any stations */
 export function isListenersAttached(listeners: Listener[]) {
-    for (let listener of listeners) {
+    for (const listener of listeners) {
         if (isListenerAttached(listener)) {
             return true;
         }
@@ -391,7 +394,7 @@ export function isListenerAttached(listener: Listener): boolean {
  * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
  */
 function hasListeners(stationMeta: Meta, listeners: Listener[], exactMatch?: boolean) {
-    for (let listener of listeners) {
+    for (const listener of listeners) {
         if (hasListener(stationMeta, listener, exactMatch)) {
             return true;
         }

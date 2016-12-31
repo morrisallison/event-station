@@ -4,4 +4,5 @@ import {EventStation} from './models/EventStation';
 (<any>EventStation).EventStation = EventStation;
 (<any>EventStation).default = EventStation;
 
+// tslint:disable-next-line:no-default-export export-name
 export default EventStation;

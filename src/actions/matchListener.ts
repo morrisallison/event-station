@@ -8,7 +8,7 @@ import {MatchingListener} from '../types/MatchingListener';
 export function matchListener(matchingListener: MatchingListener, attachedListener: MatchingListener, exactMatch?: boolean): boolean {
 
     if (exactMatch === true) {
-        return matchingListener == attachedListener;
+        return matchingListener === attachedListener;
     }
 
     const matchCallback = matchingListener.matchCallback;
@@ -17,7 +17,7 @@ export function matchListener(matchingListener: MatchingListener, attachedListen
         matchCallback
         && matchCallback !== attachedListener.matchCallback
     ) {
-        return false
+        return false;
     }
 
     const matchContext = matchingListener.matchContext;
@@ -26,7 +26,7 @@ export function matchListener(matchingListener: MatchingListener, attachedListen
         matchContext !== undefined
         && matchContext !== attachedListener.matchContext
     ) {
-        return false
+        return false;
     }
 
     const hearer = matchingListener.hearer;
@@ -35,7 +35,7 @@ export function matchListener(matchingListener: MatchingListener, attachedListen
         hearer
         && hearer !== attachedListener.hearer
     ) {
-        return false
+        return false;
     }
 
     const eventName = matchingListener.eventName;
@@ -44,7 +44,7 @@ export function matchListener(matchingListener: MatchingListener, attachedListen
         eventName !== undefined
         && eventName !== attachedListener.eventName
     ) {
-        return false
+        return false;
     }
 
     return true;
