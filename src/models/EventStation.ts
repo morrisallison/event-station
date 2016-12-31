@@ -478,12 +478,10 @@ export class EventStation {
      */
     public static extend<T extends Emitter>(obj: any): T {
         const proto = EventStation.prototype;
+        const properties = Object.keys(proto);
 
-        for (const propertyName in proto) {
-
-            if (!proto.hasOwnProperty(propertyName)) continue;
-
-            const descriptor = Object.getOwnPropertyDescriptor(proto, propertyName);
+        for (const property of properties) {
+            const descriptor = Object.getOwnPropertyDescriptor(proto, property);
             const newDescriptor: PropertyDescriptor = { configurable: true };
 
             if (descriptor.get !== undefined) {
@@ -492,7 +490,7 @@ export class EventStation {
                 newDescriptor.value = descriptor.value;
             }
 
-            Object.defineProperty(obj, propertyName, newDescriptor);
+            Object.defineProperty(obj, property, newDescriptor);
         }
 
         return obj;
