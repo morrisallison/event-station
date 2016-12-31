@@ -592,6 +592,8 @@ function makeListenersFromMap(originStation: Emitter, isMatching: boolean, liste
 
     const listeners: Listener[] = [];
 
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const eventName in listenerMap) {
 
         listeners.push({
@@ -677,6 +679,8 @@ function searchListeners(eventName: string, listenersMap: ListenersMap, regExpMa
 
     let listeners: Listener[] = [];
 
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const expression in listenersMap) {
 
         if (expression.indexOf(regExpMarker) === 0) {
@@ -700,6 +704,8 @@ function cleanHeardStations(station: Emitter): void {
     const stationMap: StationMap = Object.create(null);
     const heardStations = station.stationMeta.heardStations;
 
+    // `heardStations` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const stationId in heardStations) {
 
         const heardStation = heardStations[stationId];
@@ -717,6 +723,8 @@ function removeAllListeners(stationMeta: Meta): void {
 
     const listenersMap = stationMeta.listenersMap;
 
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const eventName in listenersMap) {
 
         const listeners = listenersMap[eventName];
@@ -788,6 +796,8 @@ function getHeardStations(stationMeta: Meta): Emitter[] {
     const stations: Emitter[] = [];
     const heardStations = stationMeta.heardStations;
 
+    // `heardStations` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const stationId in heardStations) {
         stations.push(heardStations[stationId]);
     }

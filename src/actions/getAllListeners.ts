@@ -9,6 +9,8 @@ export function getAllListeners(stationMeta: Meta): Listener[] {
     const listenersMap = stationMeta.listenersMap;
     let listeners: Listener[] = [];
 
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in
     for (const eventName in listenersMap) {
         listeners = listeners.concat(listenersMap[eventName]);
     }
