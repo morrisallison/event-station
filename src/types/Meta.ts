@@ -11,9 +11,8 @@ export interface Meta {
     /** @see Options.enableRegExp */
     enableRegExp: boolean;
     /**
-     * Stations that have listeners that were attached by this station
-     *
-     * The object shouldn't have a prototype, to allow for usage with `for...in` loops without `if` statements.
+     * Stations that have listeners that were attached by this station.
+     * The object must not have a prototype.
      */
     heardStations: StationMap;
     /** Number of listeners attached to other stations by this station */
@@ -23,9 +22,8 @@ export interface Meta {
     /** Number of listeners attached to this station */
     listenerCount: number;
     /**
-     * Listeners attached to the station
-     *
-     * The object shouldn't have a prototype, to allow for usage with `for...in` loops without `if` statements.
+     * Listeners attached to the station.
+     * The object must not have a prototype.
      */
     listenersMap: ListenersMap;
     /** @see Options.regExpMarker */
