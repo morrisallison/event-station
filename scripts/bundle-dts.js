@@ -4,7 +4,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var path = require('path');
 
-var banner = require('./banner');
+var banner = require('../config/banner');
 
 var dest = path.resolve(__dirname, '../dist/event-station.d.ts');
 var dist = path.resolve(__dirname, '../dist');
