@@ -10,7 +10,7 @@ export function getAllListeners(stationMeta: Meta): Listener[] {
     let listeners: Listener[] = [];
 
     // `listenersMap` has no prototype
-    // tslint:disable-next-line:no-for-in
+    // tslint:disable-next-line:no-for-in forin
     for (const eventName in listenersMap) {
         listeners = listeners.concat(listenersMap[eventName]);
     }

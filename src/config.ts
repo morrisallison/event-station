@@ -51,7 +51,7 @@ export function mergeOptions(target: any) {
     for (let i = 1; i < arguments.length; i++) {
         const source = arguments[i];
 
-        // tslint:disable-next-line:no-for-in
+        // tslint:disable-next-line:no-for-in forin
         for (const option in source) {
             const isValidOption = defaultOptions.hasOwnProperty(option);
             const value = source[option];
