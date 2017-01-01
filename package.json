@@ -56,20 +56,20 @@
     "build:es6": "yarn run compile:es6 && yarn run bundle:es6",
     "bundle": "yarn run bundle:dts && yarn run bundle:es5 && yarn run bundle:es6",
     "bundle:dts": "node scripts/bundle-dts.js",
-    "bundle:es5": "rollup --sourcemap -c scripts/rollup.config.es5.js",
-    "bundle:es6": "rollup --sourcemap -c scripts/rollup.config.es6.js",
+    "bundle:es5": "rollup --sourcemap -c config/rollup.config.es5.js",
+    "bundle:es6": "rollup --sourcemap -c config/rollup.config.es6.js",
     "clean": "rimraf dist build coverage",
     "compile": "yarn run compile:dts && yarn run compile:es5 && yarn run compile:es6",
     "compile:default": "tsc",
-    "compile:dts": "tsc -p scripts/tsconfig.dts.json",
-    "compile:es5": "tsc -p scripts/tsconfig.es5.json",
-    "compile:es6": "tsc -p scripts/tsconfig.es6.json",
+    "compile:dts": "tsc -p config/tsconfig.dts.json",
+    "compile:es5": "tsc -p config/tsconfig.es5.json",
+    "compile:es6": "tsc -p config/tsconfig.es6.json",
     "cover": "nyc --reporter lcov --reporter text --reporter html --extension .ts mocha --compilers ts:ts-node/register,ls:livescript -R min --recursive tests",
     "gamut": "yarn run clean && yarn run build && yarn run validate && yarn run test && yarn run cover",
     "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
     "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
     "validate": "yarn run validate:dts",
-    "validate:dts": "tsc --lib 'es5','es2015.promise' dist/event-station.d.ts"
+    "validate:dts": "tsc --lib 'es5','es2015.promise' --noEmit dist/event-station.d.ts"
   },
   "main": "./dist/event-station.js",
   "jsnext:main": "./dist/event-station.jsnext.js",
@@ -78,6 +78,9 @@
     "format": "esm",
     "jspmNodeConversion": false,
     "main": "./dist/event-station.jsnext.js"
+  },
+  "_rollup": {
+    "moduleName": "EventStation"
   },
   "files": [
     "CHANGELOG.md",
