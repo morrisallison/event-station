@@ -7,8 +7,7 @@ export function matchListeners(matchingListener: MatchingListener, attachedListe
 
     if (count < 1) return false;
 
-    for (let attachedListener of attachedListeners) {
-
+    for (const attachedListener of attachedListeners) {
         if (matchListener(matchingListener, attachedListener, exactMatch)) {
             return true;
         }

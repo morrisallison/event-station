@@ -3,17 +3,22 @@ import {Listener} from '../types/Listener';
 import {removeListenerFromAll} from './removeListenerFromAll';
 
 /** Applies the given listeners with the given arguments */
-export function applyListeners<P extends Promise<any>>(listeners: Listener[], originStation: Emitter, enableAsync: boolean, args: ListenerArguments): P[] | void {
+export function applyListeners<P extends Promise<any>>(
+    listeners: Listener[],
+    originStation: Emitter,
+    enableAsync: boolean,
+    args: ListenerArguments
+): P[] | void {
 
     const argsLength = args.length;
     const stationMeta = originStation.stationMeta;
 
     stationMeta.isPropagationStopped = false;
 
-    var promises: P[] = [];
-    var result: any;
+    const promises: P[] = [];
+    let result: P | void;
 
-    for (let listener of listeners) {
+    for (const listener of listeners) {
 
         if (stationMeta.isPropagationStopped) {
             stationMeta.isPropagationStopped = false;
@@ -54,14 +59,14 @@ export function applyListeners<P extends Promise<any>>(listeners: Listener[], or
             && typeof result.then === 'function'
             && typeof result.catch === 'function'
         ) {
-            promises.push(<P>result);
+            promises.push(result);
         }
 
         const resolves = listener.resolves;
 
         if (resolves) {
 
-            for (let resolve of resolves) {
+            for (const resolve of resolves) {
                 resolve(listener);
             }
 

@@ -10,7 +10,10 @@ export interface Meta {
     enableDelimiter: boolean;
     /** @see Options.enableRegExp */
     enableRegExp: boolean;
-    /** Stations that have listeners that were attached by this station */
+    /**
+     * Stations that have listeners that were attached by this station.
+     * The object must not have a prototype.
+     */
     heardStations: StationMap;
     /** Number of listeners attached to other stations by this station */
     hearingCount: number;
@@ -18,7 +21,10 @@ export interface Meta {
     isPropagationStopped: boolean;
     /** Number of listeners attached to this station */
     listenerCount: number;
-    /** Listeners attached to the station */
+    /**
+     * Listeners attached to the station.
+     * The object must not have a prototype.
+     */
     listenersMap: ListenersMap;
     /** @see Options.regExpMarker */
     regExpMarker: string;

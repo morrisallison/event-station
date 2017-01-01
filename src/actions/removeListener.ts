@@ -16,7 +16,7 @@ export function removeListener(stationMeta: Meta, listener: Listener, exactMatch
 
     if (!attachedListeners) return;
 
-    let attachedListenersCount = attachedListeners.length;
+    const attachedListenersCount = attachedListeners.length;
 
     if (attachedListenersCount === 1) {
 
@@ -32,7 +32,7 @@ export function removeListener(stationMeta: Meta, listener: Listener, exactMatch
 
     for (let i = 0, c = attachedListenersCount; i < c; i++) {
 
-        let attachedListener = attachedListeners[i];
+        const attachedListener = attachedListeners[i];
 
         if (!matchListener(listener, attachedListener, exactMatch)) continue;
 
@@ -64,7 +64,7 @@ function removeMetaFromStation(targetMeta: Meta, listener: Listener) {
 
     const newStationMetas: Meta[] = [];
 
-    for (let stationMeta of stationMetas) {
+    for (const stationMeta of stationMetas) {
         if (stationMeta !== targetMeta) {
             newStationMetas.push(stationMeta);
         }

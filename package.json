@@ -45,6 +45,8 @@
     "rollup-plugin-sourcemaps": "^0.4.1",
     "rx": "^4.1.0",
     "ts-node": "^2.0.0",
+    "tslint": "^4.2.0",
+    "tslint-microsoft-contrib": "^4.0.0",
     "typescript": "^2.1.4",
     "uglify-js": "^2.7.5"
   },
@@ -65,7 +67,8 @@
     "compile:es5": "tsc -p scripts/tsconfig.es5.json",
     "compile:es6": "tsc -p scripts/tsconfig.es6.json",
     "cover": "nyc --reporter lcov --reporter text --reporter html --extension .ts mocha --compilers ts:ts-node/register,ls:livescript -R min --recursive tests",
-    "gamut": "yarn run clean && yarn run build && yarn run validate && yarn run test && yarn run cover",
+    "gamut": "yarn run clean && yarn run build && yarn run validate && yarn run test && yarn run lint && yarn run cover",
+    "lint": "tslint --project tsconfig.json",
     "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
     "test": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
     "validate": "yarn run validate:dts",

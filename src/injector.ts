@@ -15,7 +15,7 @@ export namespace deps {
      * @see inject()
      */
     export let $Promise: typeof Promise | void = getGlobalPromise();
-};
+}
 
 /**
  * Injects or overrides an optional dependency.
@@ -35,7 +35,7 @@ export namespace deps {
  * within EventStation instances.
  */
 export function inject(name: 'rx', rx: any): void;
-export function inject(name: 'Promise', Promise: any): void;
+export function inject(name: 'Promise', promise: any): void;
 export function inject(name: string, obj: any): void;
 export function inject(name: string, obj: any): void {
 
