@@ -1,9 +1,8 @@
 var pkg = require('../package');
 
-var year = new Date().getFullYear();
 var banner = `/*
  * ${pkg.name} v${pkg.version}
- * Copyright (c) ${year} ${pkg.author}
+ * Copyright (c) ${pkg.author}. All rights reserved.
  * Released under the ${pkg.license} license
  * @preserve
  */`;
