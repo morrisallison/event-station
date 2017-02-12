@@ -1,7 +1,5 @@
 # [![Event-Station][logo]][homepage]
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/morrisallison/event-station.svg)](https://greenkeeper.io/)
-
 [logo]: https://cldup.com/nNDX7LGO96.svg
 [homepage]: https://github.com/morrisallison/event-station
 
