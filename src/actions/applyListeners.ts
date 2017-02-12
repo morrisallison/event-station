@@ -18,6 +18,9 @@ export function applyListeners<P extends Promise<any>>(
     const promises: P[] = [];
     let result: P | void;
 
+    /* Clone array to prevent mutation */
+    listeners = listeners.slice();
+
     for (const listener of listeners) {
 
         if (stationMeta.isPropagationStopped) {
