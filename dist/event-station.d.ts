@@ -1,7 +1,7 @@
 /*
- * event-station v1.1.2
- * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
- * Released under the MIT/Expat license
+ * event-station v1.1.3
+ * Copyright (c) Morris Allison III <author@morris.xyz> (http://morris.xyz). All rights reserved.
+ * Released under the MIT license
  * @preserve
  */
 declare module "event-station" {
@@ -25,7 +25,10 @@ declare module "event-station" {
         enableDelimiter: boolean;
         /** @see Options.enableRegExp */
         enableRegExp: boolean;
-        /** Stations that have listeners that were attached by this station */
+        /**
+         * Stations that have listeners that were attached by this station.
+         * The object must not have a prototype.
+         */
         heardStations: StationMap;
         /** Number of listeners attached to other stations by this station */
         hearingCount: number;
@@ -33,7 +36,10 @@ declare module "event-station" {
         isPropagationStopped: boolean;
         /** Number of listeners attached to this station */
         listenerCount: number;
-        /** Listeners attached to the station */
+        /**
+         * Listeners attached to the station.
+         * The object must not have a prototype.
+         */
         listenersMap: ListenersMap;
         /** @see Options.regExpMarker */
         regExpMarker: string;
@@ -185,7 +191,7 @@ declare module "event-station" {
      * within EventStation instances.
      */
     export function inject(name: 'rx', rx: any): void;
-    export function inject(name: 'Promise', Promise: any): void;
+    export function inject(name: 'Promise', promise: any): void;
     export function inject(name: string, obj: any): void;
     /** Reset injected dependencies */
     export function reset(): void;
@@ -347,6 +353,7 @@ declare module "event-station" {
         [key: string]: string | boolean | void;
         [key: number]: void;
     }
+    export const allEvent = "all";
     /** Container for global configuration options */
     export const defaultOptions: {
         delimiter: string;
@@ -501,14 +508,14 @@ declare module "event-station" {
          */
         addListener(listener: Listener): void;
         /**
-        * Removes all listeners that match the given listener from the station
-        * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-        */
+         * Removes all listeners that match the given listener from the station
+         * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+         */
         removeListener(listener: Listener, exactMatch?: boolean): void;
         /**
-        * Determines whether any listener attached to the station matches the given listener.
-        * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-        */
+         * Determines whether any listener attached to the station matches the given listener.
+         * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+         */
         hasListener(listener: Listener, exactMatch?: boolean): boolean;
         /** Initializes the given object */
         static init(obj: any, options?: Options): typeof EventStation;
