@@ -1,7 +1,7 @@
 /*
- * event-station v1.1.2
- * Copyright (c) 2016 Morris Allison III <author@morris.xyz> (http://morris.xyz)
- * Released under the MIT/Expat license
+ * event-station v1.1.3
+ * Copyright (c) Morris Allison III <author@morris.xyz> (http://morris.xyz). All rights reserved.
+ * Released under the MIT license
  * @preserve
  */
 /** Adds the given listener to the given station meta */
@@ -33,7 +33,7 @@ function addListener(stationMeta, listener) {
  */
 function matchListener(matchingListener, attachedListener, exactMatch) {
     if (exactMatch === true) {
-        return matchingListener == attachedListener;
+        return matchingListener === attachedListener;
     }
     var matchCallback = matchingListener.matchCallback;
     if (matchCallback
@@ -152,6 +152,8 @@ function applyListeners(listeners, originStation, enableAsync, args) {
     stationMeta.isPropagationStopped = false;
     var promises = [];
     var result;
+    /* Clone array to prevent mutation */
+    listeners = listeners.slice();
     for (var _i = 0, listeners_1 = listeners; _i < listeners_1.length; _i++) {
         var listener = listeners_1[_i];
         if (stationMeta.isPropagationStopped) {
@@ -221,6 +223,8 @@ function getAllListeners(stationMeta) {
         return [];
     var listenersMap = stationMeta.listenersMap;
     var listeners = [];
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var eventName in listenersMap) {
         listeners = listeners.concat(listenersMap[eventName]);
     }
@@ -273,7 +277,6 @@ var deps;
      */
     deps.$Promise = getGlobalPromise();
 })(deps || (deps = {}));
-
 function inject(name, obj) {
     switch (name) {
         case 'rx':
@@ -484,7 +487,8 @@ var Listeners = (function () {
     Listeners.prototype.toPromises = function () {
         var promises = [];
         var listeners = this.listeners;
-        for (var i = 0, c = listeners.length; i < c; i++) {
+        var count = listeners.length;
+        for (var i = 0; i < count; i++) {
             var listener = listeners[i];
             promises[i] = makePromise(listener);
         }
@@ -522,20 +526,23 @@ var Listeners = (function () {
     /** Similar to Array.prototype.forEach() */
     Listeners.prototype.forEach = function (func) {
         var listeners = this.listeners;
-        for (var i = 0, c = listeners.length; i < c; i++) {
+        var count = listeners.length;
+        for (var i = 0; i < count; i++) {
             var listener = listeners[i];
             func(listener, i, listeners);
         }
         return this;
     };
     /** Retrieves a listener located at the given index */
+    // tslint:disable-next-line:no-reserved-keywords
     Listeners.prototype.get = function (index) {
         return this.listeners[index];
     };
     /** Retrieves the index of the given listener */
     Listeners.prototype.index = function (listener) {
         var listeners = this.listeners;
-        for (var i = 0, c = listeners.length; i < c; i++) {
+        var count = listeners.length;
+        for (var i = 0; i < count; i++) {
             if (listener === listeners[i])
                 return i;
         }
@@ -552,7 +559,7 @@ var Listeners = (function () {
 /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
 function makePromise(listener) {
     if (!deps.$Promise) {
-        throw new Error('No promises implementation available.');
+        throw new Error("No promises implementation available.");
     }
     return new deps.$Promise(function (resolve) {
         if (!listener.resolves) {
@@ -570,7 +577,7 @@ function makePromise(listener) {
  */
 function cloneListener(listener) {
     if (listener.hearer) {
-        throw new Error("Cross-emitter listeners can not be cloned.");
+        throw new Error("Cross-emitter listeners can't be cloned.");
     }
     return {
         eventName: listener.eventName,
@@ -618,6 +625,7 @@ function makeStationId() {
     return String(++stationIdIterator);
 }
 
+var allEvent = 'all';
 /** Container for global configuration options */
 var defaultOptions = {
     delimiter: ' ',
@@ -653,10 +661,10 @@ function assertOptions(opts) {
         throw new Error("Invalid option: RegExp markers can't contain the delimiter string.");
     }
 }
-function mergeOptions() {
-    var target = arguments[0];
+function mergeOptions(target) {
     for (var i = 1; i < arguments.length; i++) {
         var source = arguments[i];
+        // tslint:disable-next-line:no-for-in forin
         for (var option in source) {
             var isValidOption = defaultOptions.hasOwnProperty(option);
             var value = source[option];
@@ -774,7 +782,8 @@ var EventStation$1 = (function () {
             listeners = makeListeners(this, true, q, r, s);
         }
         var stations = getTargetedStations(stationMeta, target);
-        for (var x = 0, y = stations.length; x < y; x++) {
+        var count = stations.length;
+        for (var x = 0; x < count; x++) {
             var station = stations[x];
             var targetStationMeta = station.stationMeta;
             if (isRemovingAll) {
@@ -825,7 +834,8 @@ var EventStation$1 = (function () {
         else {
             matchAllListeners = true;
         }
-        for (var x = 0, y = stations.length; x < y; x++) {
+        var count = stations.length;
+        for (var x = 0; x < count; x++) {
             var station = stations[x];
             var targetStationMeta = station.stationMeta;
             if (matchAllListeners) {
@@ -861,7 +871,7 @@ var EventStation$1 = (function () {
             args[_i - 1] = arguments[_i];
         }
         if (!deps.$Promise) {
-            throw new Error('No promises implementation available.');
+            throw new Error("No promises implementation available.");
         }
         var stationMeta = this.stationMeta;
         if (stationMeta.listenerCount < 1) {
@@ -912,13 +922,15 @@ var EventStation$1 = (function () {
     EventStation.prototype.toObservable = function (q, s, selector) {
         var _this = this;
         if (!deps.$RxObservable) {
-            throw new Error('Rx has not been injected. See documentation for details.');
+            throw new Error("Rx has not been injected. See documentation for details.");
         }
-        return deps.$RxObservable.fromEventPattern(function (r) {
+        var addHandler = function (r) {
             _this.on(q, r, s);
-        }, function (r) {
+        };
+        var removeHandler = function (r) {
             _this.off(q, r, s);
-        }, selector);
+        };
+        return deps.$RxObservable.fromEventPattern(addHandler, removeHandler, selector);
     };
     /**
      * Stops the propagation of an emitted event. When called, this method effectively does
@@ -934,16 +946,16 @@ var EventStation$1 = (function () {
         addListener(this.stationMeta, listener);
     };
     /**
-    * Removes all listeners that match the given listener from the station
-    * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-    */
+     * Removes all listeners that match the given listener from the station
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+     */
     EventStation.prototype.removeListener = function (listener, exactMatch) {
         removeListener(this.stationMeta, listener, exactMatch);
     };
     /**
-    * Determines whether any listener attached to the station matches the given listener.
-    * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
-    */
+     * Determines whether any listener attached to the station matches the given listener.
+     * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+     */
     EventStation.prototype.hasListener = function (listener, exactMatch) {
         return hasListener(this.stationMeta, listener, exactMatch);
     };
@@ -972,8 +984,10 @@ var EventStation$1 = (function () {
      */
     EventStation.extend = function (obj) {
         var proto = EventStation.prototype;
-        for (var propertyName in proto) {
-            var descriptor = Object.getOwnPropertyDescriptor(proto, propertyName);
+        var properties = Object.keys(proto);
+        for (var _i = 0, properties_1 = properties; _i < properties_1.length; _i++) {
+            var property = properties_1[_i];
+            var descriptor = Object.getOwnPropertyDescriptor(proto, property);
             var newDescriptor = { configurable: true };
             if (descriptor.get !== undefined) {
                 newDescriptor.get = descriptor.get;
@@ -981,7 +995,7 @@ var EventStation$1 = (function () {
             else {
                 newDescriptor.value = descriptor.value;
             }
-            Object.defineProperty(obj, propertyName, newDescriptor);
+            Object.defineProperty(obj, property, newDescriptor);
         }
         return obj;
     };
@@ -1026,34 +1040,36 @@ function makeStationMeta(options) {
     assertOptions(meta);
     return meta;
 }
-function makeListeners(originStation, isMatching, q, r, s) {
+function makeListeners(origin, isMatching, q, r, s) {
     if (typeof q === 'string') {
-        var stationMeta = originStation.stationMeta;
+        var stationMeta = origin.stationMeta;
         var enableDelimiter = stationMeta.enableDelimiter;
         var delimiter = stationMeta.delimiter;
         if (enableDelimiter && q.indexOf(delimiter) >= 0) {
             q = q.split(delimiter);
-            return makeListenersFromArray(originStation, isMatching, q, r, s);
+            return makeListenersFromArray(origin, isMatching, q, r, s);
         }
         return [{
                 eventName: q,
                 callback: r,
-                context: !isMatching && s === undefined ? originStation : s,
+                context: !isMatching && s === undefined ? origin : s,
                 matchCallback: r,
                 matchContext: s,
             }];
     }
     if (Array.isArray(q)) {
-        return makeListenersFromArray(originStation, isMatching, q, r, s);
+        return makeListenersFromArray(origin, isMatching, q, r, s);
     }
     if (typeof q === 'object') {
-        return makeListenersFromMap(originStation, isMatching, q, r);
+        return makeListenersFromMap(origin, isMatching, q, r);
     }
     throw new Error("Invalid arguments");
 }
 /** Makes an array of listeners from the given listener map */
 function makeListenersFromMap(originStation, isMatching, listenerMap, context) {
     var listeners = [];
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var eventName in listenerMap) {
         listeners.push({
             eventName: eventName,
@@ -1066,13 +1082,14 @@ function makeListenersFromMap(originStation, isMatching, listenerMap, context) {
     return listeners;
 }
 /** Makes an array of listeners from the given event name array */
-function makeListenersFromArray(originStation, isMatching, eventNames, callback, context) {
+function makeListenersFromArray(origin, isMatching, eventNames, callback, context) {
     var listeners = [];
-    for (var i = 0, l = eventNames.length; i < l; i++) {
+    var count = eventNames.length;
+    for (var i = 0; i < count; i++) {
         listeners.push({
             eventName: eventNames[i],
             callback: callback,
-            context: !isMatching && context === undefined ? originStation : context,
+            context: !isMatching && context === undefined ? origin : context,
             matchContext: context,
             matchCallback: callback,
         });
@@ -1096,7 +1113,7 @@ function emitEvent(eventName, originStation, enableAsync, args) {
             promises = promises.concat(result);
         }
     }
-    var listenersMapAll = listenersMap['all'];
+    var listenersMapAll = listenersMap[allEvent];
     if (stationMeta.emitAllEvent && listenersMapAll) {
         var argsAll = args.slice();
         argsAll.splice(0, 0, eventName);
@@ -1114,6 +1131,8 @@ function emitEvent(eventName, originStation, enableAsync, args) {
  */
 function searchListeners(eventName, listenersMap, regExpMarker) {
     var listeners = [];
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var expression in listenersMap) {
         if (expression.indexOf(regExpMarker) === 0) {
             if (new RegExp(expression.substr(regExpMarker.length)).test(eventName)) {
@@ -1130,6 +1149,8 @@ function searchListeners(eventName, listenersMap, regExpMarker) {
 function cleanHeardStations(station) {
     var stationMap = Object.create(null);
     var heardStations = station.stationMeta.heardStations;
+    // `heardStations` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var stationId in heardStations) {
         var heardStation = heardStations[stationId];
         if (hasListener(heardStation.stationMeta, { hearer: station })) {
@@ -1141,6 +1162,8 @@ function cleanHeardStations(station) {
 /** Removes all listeners from then given station meta */
 function removeAllListeners(stationMeta) {
     var listenersMap = stationMeta.listenersMap;
+    // `listenersMap` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var eventName in listenersMap) {
         var listeners = listenersMap[eventName];
         for (var _i = 0, listeners_7 = listeners; _i < listeners_7.length; _i++) {
@@ -1194,6 +1217,8 @@ function getTargetedStations(stationMeta, target) {
 function getHeardStations(stationMeta) {
     var stations = [];
     var heardStations = stationMeta.heardStations;
+    // `heardStations` has no prototype
+    // tslint:disable-next-line:no-for-in forin
     for (var stationId in heardStations) {
         stations.push(heardStations[stationId]);
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.3
+
+* Fixed an issue where listeners wouldn't be called.
+
 ### 1.1.2
 
 * Fixed compatibility issues with jspm.
