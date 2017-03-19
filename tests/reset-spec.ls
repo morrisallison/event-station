@@ -1,8 +1,8 @@
 expect = require 'must'
 Promise = require 'bluebird'
 rx = require 'rx'
-deps = require '../src/injector' .deps
 EventStation = require '../src/main' .default
+injector = require '../src/injector'
 
 describe 'EventStation.config()', (,) !->
     beforeEach !->
@@ -44,9 +44,9 @@ describe 'EventStation.config()', (,) !->
 
     after !->
         delete global.window
-        deps.$Promise = Promise
+        injector.inject('Promise', Promise)
 
     it "must inject the window promise if available", !->
         EventStation.reset()
 
-        deps.$Promise.must.equal window.Promise
+        injector.getPromise().must.equal window.Promise

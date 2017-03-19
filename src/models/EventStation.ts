@@ -312,14 +312,11 @@ export class EventStation {
     public emitAsync<R extends any>(eventName: string, ...args: any[]): Promise<R[]>;
     public emitAsync<R extends any>(input: any, ...args: any[]): Promise<R[]> {
 
-        if (!injector.deps.$Promise) {
-            throw new Error(`No promises implementation available.`);
-        }
-
+        const promiseConstructor = injector.getPromise();
         const stationMeta = this.stationMeta;
 
         if (stationMeta.listenerCount < 1) {
-            return injector.deps.$Promise.resolve([]);
+            return promiseConstructor.resolve([]);
         }
 
         const eventNames = parseEventNames(input, stationMeta);
@@ -333,9 +330,9 @@ export class EventStation {
         }
 
         if (promises.length > 0) {
-            return injector.deps.$Promise.all<R>(promises);
+            return promiseConstructor.all<R>(promises);
         } else {
-            return injector.deps.$Promise.resolve([]);
+            return promiseConstructor.resolve([]);
         }
     }
 
@@ -398,11 +395,6 @@ export class EventStation {
     public toObservable<T>(eventNames: string[], context?: any, selector?: (args: any[]) => T): Rx.Observable;
     public toObservable<T>(eventName: string, context?: any, selector?: (args: any[]) => T): Rx.Observable;
     public toObservable<T>(q: any, s?: any, selector?: (args: any[]) => T): Rx.Observable {
-
-        if (!injector.deps.$RxObservable) {
-            throw new Error(`Rx has not been injected. See documentation for details.`);
-        }
-
         const addHandler = (r: Function) => {
             this.on(q, r, s);
         };
@@ -411,7 +403,7 @@ export class EventStation {
             this.off(q, r, s);
         };
 
-        return injector.deps.$RxObservable.fromEventPattern<T>(addHandler, removeHandler, selector);
+        return injector.getRx().fromEventPattern<T>(addHandler, removeHandler, selector);
     }
 
     /**
