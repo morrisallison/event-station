@@ -48,7 +48,7 @@
     "ts-node": "^2.0.0",
     "tslint": "^4.2.0",
     "typescript": "^2.1.4",
-    "uglify-js": "^2.8.13"
+    "uglify-js": "^3.0.0"
   },
   "scripts": {
     "benchmark": "lsc benchmarks/event-callback.ls",
