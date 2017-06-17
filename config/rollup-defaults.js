@@ -6,7 +6,7 @@ var pkg = require('../package.json');
 export default {
     banner: banner,
     moduleId: pkg.name,
-    moduleName: pkg._rollup.moduleName,
+    moduleName: pkg.config.rollup.moduleName,
     plugins: [
         sourcemaps()
     ],

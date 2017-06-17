@@ -82,8 +82,10 @@
     "jspmNodeConversion": false,
     "main": "./dist/event-station.jsnext.js"
   },
-  "_rollup": {
-    "moduleName": "EventStation"
+  "config": {
+    "rollup": {
+      "moduleName": "EventStation"
+    }
   },
   "engines": {
     "node": "^8.0.0",
