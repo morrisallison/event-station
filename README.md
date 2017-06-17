@@ -47,7 +47,7 @@ A versatile and robust event emitter class.
 * Helpers like `stopPropagation()` and `listenerCount`
 * `extend()` any object
 * Global and per-instance `config()` options
-* 230 tests with 100% code coverage
+* Over 200 tests with 100% code coverage
 * Written in [TypeScript][]
 
 [Versatile API]: https://github.com/morrisallison/event-station/blob/master/docs/Usage.md
