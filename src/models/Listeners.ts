@@ -9,6 +9,10 @@ import { Meta } from '../types/Meta';
 import { removeListener } from '../actions/removeListener';
 import { removeListenerFromAll } from '../actions/removeListenerFromAll';
 
+const errors = {
+    NO_PROMISE: 'No promises implementation available.'
+};
+
 /**
  * A class for operations targeting a collection of listeners
  */
@@ -263,6 +267,9 @@ export class Listeners {
      * @see inject()
      */
     public all(): Promise<Listener[]> {
+        if (!deps.$Promise) {
+            throw new Error(errors.NO_PROMISE);
+        }
 
         return deps.$Promise.all<Listener>(this.toPromises());
     }
@@ -273,6 +280,9 @@ export class Listeners {
      * @see inject()
      */
     public race(): Promise<Listener> {
+        if (!deps.$Promise) {
+            throw new Error(errors.NO_PROMISE);
+        }
 
         return deps.$Promise.race<Listener>(this.toPromises());
     }
@@ -336,9 +346,8 @@ export class Listeners {
 
 /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
 function makePromise(listener: Listener): Promise<Listener> {
-
     if (!deps.$Promise) {
-        throw new Error(`No promises implementation available.`);
+        throw new Error(errors.NO_PROMISE);
     }
 
     return new deps.$Promise<Listener>((resolve) => {

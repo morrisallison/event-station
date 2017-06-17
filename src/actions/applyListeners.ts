@@ -76,16 +76,16 @@ export function applyListeners<P extends Promise<any>>(
             listener.resolves = undefined;
         }
 
-        const maxOccurrences = listener.maxOccurrences;
-        let occurrences = listener.occurrences;
+        const { maxOccurrences } = listener;
+        let { occurrences } = listener;
 
         if (maxOccurrences !== undefined) {
 
             if (occurrences === undefined) {
-                occurrences = listener.occurrences = 1;
-            } else {
-                occurrences = ++listener.occurrences;
+                occurrences = 0;
             }
+
+            listener.occurrences = ++occurrences;
 
             if (occurrences === maxOccurrences) {
                 removeListenerFromAll(listener);
