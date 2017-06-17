@@ -1,5 +1,5 @@
-import {Listener} from '../types/Listener';
-import {Meta} from '../types/Meta';
+import { Listener } from '../types/Listener';
+import { Meta } from '../types/Meta';
 
 /** Adds the given listener to the given station meta */
 export function addListener(stationMeta: Meta, listener: Listener): void {

@@ -1,6 +1,6 @@
-import {Emitter} from '../types/Emitter';
-import {Listener} from '../types/Listener';
-import {removeListenerFromAll} from './removeListenerFromAll';
+import { Emitter } from '../types/Emitter';
+import { Listener } from '../types/Listener';
+import { removeListenerFromAll } from './removeListenerFromAll';
 
 /** Applies the given listeners with the given arguments */
 export function applyListeners<P extends Promise<any>>(

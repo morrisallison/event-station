@@ -1,13 +1,13 @@
-import {addListener} from '../actions/addListener';
-import {deps} from '../injector';
-import {Emitter} from '../types/Emitter';
-import {hasListener} from '../actions/hasListener';
-import {Listener} from '../types/Listener';
-import {MatchingListener} from '../types/MatchingListener';
-import {matchListeners} from '../actions/matchListeners';
-import {Meta} from '../types/Meta';
-import {removeListener} from '../actions/removeListener';
-import {removeListenerFromAll} from '../actions/removeListenerFromAll';
+import { addListener } from '../actions/addListener';
+import { deps } from '../injector';
+import { Emitter } from '../types/Emitter';
+import { hasListener } from '../actions/hasListener';
+import { Listener } from '../types/Listener';
+import { MatchingListener } from '../types/MatchingListener';
+import { matchListeners } from '../actions/matchListeners';
+import { Meta } from '../types/Meta';
+import { removeListener } from '../actions/removeListener';
+import { removeListenerFromAll } from '../actions/removeListenerFromAll';
 
 /**
  * A class for operations targeting a collection of listeners

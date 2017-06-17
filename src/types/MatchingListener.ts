@@ -1,4 +1,4 @@
-import {Emitter} from './Emitter';
+import { Emitter } from './Emitter';
 
 /**
  * A subset of the Listener interface used only for
