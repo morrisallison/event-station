@@ -62,7 +62,7 @@
     "compile:dts": "tsc -p config/tsconfig.dts.json",
     "compile:es5": "tsc -p config/tsconfig.es5.json",
     "compile:es6": "tsc -p config/tsconfig.es6.json",
-    "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
+    "optimize": "uglifyjs -c -m --comments -o dist/event-station.min.js --source-map filename=dist/event-station.min.js.map dist/event-station.js",
     "test": "run-s clean build validate unit:cover",
     "unit": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
     "unit:cover": "nyc --reporter lcov --reporter text --reporter html --extension .ts npm run unit",
