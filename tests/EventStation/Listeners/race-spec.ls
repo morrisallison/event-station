@@ -16,6 +16,14 @@ describe 'Listeners#race()', (,) !->
     afterEach !->
         EventStation.reset()
 
+    it 'must throw an error if promises are not available', !->
+        EventStation.inject 'Promise', undefined
+
+        check = !->
+            listeners.race()
+
+        check.must.throw Error
+
     it 'make a promise that resolves as soon as one of the listeners is applied', (,) !->
         race = listeners.race()
         listener = listeners.get 0

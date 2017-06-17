@@ -16,6 +16,14 @@ describe 'Listeners#all()', (,) !->
     afterEach !->
         EventStation.reset()
 
+    it 'must throw an error if promises are not available', !->
+        EventStation.inject 'Promise', undefined
+
+        check = !->
+            listeners.all()
+
+        check.must.throw Error
+
     it 'must make a promise that resolves when all of the listeners have been applied at least once', (,) !->
         all = listeners.all()
 
