@@ -31,7 +31,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@morrisallison/tslint-config": "^0.1.2",
     "@types/node": "^7.0.31",
     "benchmark": "^2.1.4",
     "bluebird": "^3.5.0",
@@ -47,7 +46,6 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rx": "^4.1.0",
     "ts-node": "^3.0.6",
-    "tslint": "^5.4.3",
     "typescript": "^2.3.4",
     "uglify-js": "^3.0.17"
   },
@@ -64,9 +62,8 @@
     "compile:dts": "tsc -p config/tsconfig.dts.json",
     "compile:es5": "tsc -p config/tsconfig.es5.json",
     "compile:es6": "tsc -p config/tsconfig.es6.json",
-    "lint": "tslint --project tsconfig.json",
     "optimize": "uglifyjs --screw-ie8 --comments -c -m -o dist/event-station.min.js --source-map dist/event-station.min.js.map -p relative dist/event-station.js",
-    "test": "run-s lint clean build validate unit:cover",
+    "test": "run-s clean build validate unit:cover",
     "unit": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
     "unit:cover": "nyc --reporter lcov --reporter text --reporter html --extension .ts npm run unit",
     "validate": "tsc --lib 'es5','es2015.promise' --noEmit dist/event-station.d.ts"
