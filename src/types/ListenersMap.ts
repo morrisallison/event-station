@@ -1,4 +1,4 @@
-import {Listener} from './Listener';
+import { Listener } from './Listener';
 
 /** An object of listener arrays with event names and expressions as keys */
 export interface ListenersMap {

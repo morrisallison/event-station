@@ -196,15 +196,13 @@ function applyListeners(listeners, originStation, enableAsync, args) {
             }
             listener.resolves = undefined;
         }
-        const maxOccurrences = listener.maxOccurrences;
-        let occurrences = listener.occurrences;
+        const { maxOccurrences } = listener;
+        let { occurrences } = listener;
         if (maxOccurrences !== undefined) {
             if (occurrences === undefined) {
-                occurrences = listener.occurrences = 1;
+                occurrences = 0;
             }
-            else {
-                occurrences = ++listener.occurrences;
-            }
+            listener.occurrences = ++occurrences;
             if (occurrences === maxOccurrences) {
                 removeListenerFromAll(listener);
             }
@@ -294,6 +292,9 @@ function getGlobalPromise() {
     return glob.Promise;
 }
 
+const errors = {
+    NO_PROMISE: 'No promises implementation available.'
+};
 /**
  * A class for operations targeting a collection of listeners
  */
@@ -483,6 +484,9 @@ class Listeners {
      * @see inject()
      */
     all() {
+        if (!deps.$Promise) {
+            throw new Error(errors.NO_PROMISE);
+        }
         return deps.$Promise.all(this.toPromises());
     }
     /**
@@ -491,6 +495,9 @@ class Listeners {
      * @see inject()
      */
     race() {
+        if (!deps.$Promise) {
+            throw new Error(errors.NO_PROMISE);
+        }
         return deps.$Promise.race(this.toPromises());
     }
     /**
@@ -539,7 +546,7 @@ class Listeners {
 /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
 function makePromise(listener) {
     if (!deps.$Promise) {
-        throw new Error(`No promises implementation available.`);
+        throw new Error(errors.NO_PROMISE);
     }
     return new deps.$Promise((resolve) => {
         if (!listener.resolves) {
