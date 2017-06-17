@@ -43,6 +43,7 @@ export interface Listener {
     /**
      * The number of times the listener has been applied.
      * This property is `undefined` unless `maxOccurrences` is set.
+     * A positive integer.
      */
     occurrences?: number;
     /**
@@ -50,6 +51,7 @@ export interface Listener {
      * When the listener's `occurrences` property equals `maxOccurrences`,
      * The listener is removed from it's origin.
      * `undefined` by default.
+     * A positive integer.
      */
     maxOccurrences?: number;
     /**

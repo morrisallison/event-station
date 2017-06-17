@@ -3,7 +3,7 @@ import {Rx} from './types/Rx';
 declare const global: any;
 declare const window: any;
 
-export namespace deps {
+namespace deps {
     /**
      * A reference to the injected Rx namespace.
      * @see inject()
@@ -15,6 +15,22 @@ export namespace deps {
      * @see inject()
      */
     export let $Promise: typeof Promise | void = getGlobalPromise();
+}
+
+export function getRx(): Rx.ObservableStatic {
+    if (!deps.$RxObservable) {
+        throw new Error('Rx dependency has not been injected.');
+    }
+
+    return deps.$RxObservable;
+}
+
+export function getPromise(): typeof Promise {
+    if (!deps.$Promise) {
+        throw new Error('No promise implementation is available.');
+    }
+
+    return deps.$Promise;
 }
 
 /**

@@ -1,6 +1,6 @@
 import {addListener} from '../actions/addListener';
-import {deps} from '../injector';
 import {Emitter} from '../types/Emitter';
+import {getPromise} from '../injector';
 import {hasListener} from '../actions/hasListener';
 import {Listener} from '../types/Listener';
 import {MatchingListener} from '../types/MatchingListener';
@@ -264,7 +264,7 @@ export class Listeners {
      */
     public all(): Promise<Listener[]> {
 
-        return deps.$Promise.all<Listener>(this.toPromises());
+        return getPromise().all<Listener>(this.toPromises());
     }
 
     /**
@@ -274,7 +274,7 @@ export class Listeners {
      */
     public race(): Promise<Listener> {
 
-        return deps.$Promise.race<Listener>(this.toPromises());
+        return getPromise().race<Listener>(this.toPromises());
     }
 
     /**
@@ -336,12 +336,9 @@ export class Listeners {
 
 /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
 function makePromise(listener: Listener): Promise<Listener> {
+    const promiseConstructor = getPromise();
 
-    if (!deps.$Promise) {
-        throw new Error(`No promises implementation available.`);
-    }
-
-    return new deps.$Promise<Listener>((resolve) => {
+    return new promiseConstructor<Listener>((resolve) => {
         if (!listener.resolves) {
             listener.resolves = [resolve];
         } else {
