@@ -1,5 +1,5 @@
 /*
- * event-station v1.1.3
+ * event-station v1.1.4
  * Copyright (c) Morris Allison III <author@morris.xyz> (http://morris.xyz). All rights reserved.
  * Released under the MIT license
  * @preserve
