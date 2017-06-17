@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.4
+
+* Appropriate errors are now thrown in `Listeners.all()` and `Listeners.race()` when a Promise implementation isn't available.
+
 ### 1.1.3
 
 * Fixed an issue where listeners wouldn't be called.
