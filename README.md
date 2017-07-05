@@ -3,7 +3,7 @@
 [logo]: https://cldup.com/nNDX7LGO96.svg
 [homepage]: https://github.com/morrisallison/event-station
 
-A versatile and robust event emitter class.
+> A versatile and robust event emitter class.
 
 [![npm Version][badge-npm]][npm]
 [![Bower Version][badge-bower]][bower]
