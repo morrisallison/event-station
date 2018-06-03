@@ -45,7 +45,7 @@
     "rollup": "^0.50.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rx": "^4.1.0",
-    "ts-node": "^3.0.6",
+    "ts-node": "^6.1.0",
     "typescript": "^2.3.4",
     "uglify-js": "^3.0.17"
   },
