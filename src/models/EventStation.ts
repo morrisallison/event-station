@@ -357,11 +357,11 @@ export class EventStation {
      * If no arguments are given, all listeners will be returned;
      * including listeners that were attached via `hear()` or `hearOnce()`.
      */
-    public getListeners(): Listeners;
-    public getListeners(listenerMap: CallbackMap, context?: any): Listeners;
-    public getListeners(eventNames: string[], callback?: Function, context?: any): Listeners;
-    public getListeners(eventName: string, callback?: Function, context?: any): Listeners;
-    public getListeners(q?: any, r?: any, s?: any): Listeners | void {
+    public getListeners(): Listeners | undefined;
+    public getListeners(listenerMap: CallbackMap, context?: any): Listeners | undefined;
+    public getListeners(eventNames: string[], callback?: Function, context?: any): Listeners | undefined;
+    public getListeners(eventName: string, callback?: Function, context?: any): Listeners | undefined;
+    public getListeners(q?: any, r?: any, s?: any): Listeners | undefined {
 
         const attachedListeners = getAllListeners(this.stationMeta);
 
@@ -483,6 +483,8 @@ export class EventStation {
         for (const property of properties) {
             const descriptor = Object.getOwnPropertyDescriptor(proto, property);
             const newDescriptor: PropertyDescriptor = { configurable: true };
+
+            if (!descriptor) continue;
 
             if (descriptor.get !== undefined) {
                 newDescriptor.get = descriptor.get;
