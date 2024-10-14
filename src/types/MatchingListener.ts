@@ -1,4 +1,4 @@
-import { Emitter } from './Emitter';
+import { Emitter } from "./Emitter";
 
 /**
  * A subset of the Listener interface used only for
@@ -7,12 +7,12 @@ import { Emitter } from './Emitter';
  * @see matchListener()
  */
 export interface MatchingListener {
-    /** @see Listener.eventName */
-    eventName?: string;
-    /** @see Listener.matchCallback */
-    matchCallback?: Function;
-    /** @see Listener.matchContext */
-    matchContext?: any;
-    /** @see Listener.hearer */
-    hearer?: Emitter;
+  /** @see Listener.eventName */
+  eventName?: string;
+  /** @see Listener.matchCallback */
+  matchCallback?: Function;
+  /** @see Listener.matchContext */
+  matchContext?: any;
+  /** @see Listener.hearer */
+  hearer?: Emitter;
 }

@@ -1,4 +1,4 @@
-import { EventStation } from './models/EventStation';
+import { EventStation } from "./models/EventStation";
 
 /* Set properties for module loader compatibility */
 (<any>EventStation).EventStation = EventStation;

@@ -1,96 +1,95 @@
-import { Listener } from '../types/Listener';
-import { matchListener } from './matchListener';
-import { Meta } from '../types/Meta';
+import { Listener } from "../types/Listener";
+import { matchListener } from "./matchListener";
+import { Meta } from "../types/Meta";
 
 /**
  * Removes all listeners that match the given listener from the given station meta.
  * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
  */
-export function removeListener(stationMeta: Meta, listener: Listener, exactMatch?: boolean): void {
+export function removeListener(
+  stationMeta: Meta,
+  listener: Listener,
+  exactMatch?: boolean
+): void {
+  if (stationMeta.listenerCount < 1) return;
 
-    if (stationMeta.listenerCount < 1) return;
+  const listenersMap = stationMeta.listenersMap;
+  const eventName = listener.eventName;
+  const attachedListeners = listenersMap[eventName];
 
-    const listenersMap = stationMeta.listenersMap;
-    const eventName = listener.eventName;
-    const attachedListeners = listenersMap[eventName];
+  if (!attachedListeners) return;
 
-    if (!attachedListeners) return;
+  const attachedListenersCount = attachedListeners.length;
 
-    const attachedListenersCount = attachedListeners.length;
+  if (attachedListenersCount === 1) {
+    if (!matchListener(listener, attachedListeners[0], exactMatch)) return;
 
-    if (attachedListenersCount === 1) {
+    delete listenersMap[eventName];
+    stationMeta.listenerCount--;
+    reduceHearerHearingCount(listener);
+    removeMetaFromStation(stationMeta, listener);
 
-        if (!matchListener(listener, attachedListeners[0], exactMatch)) return;
+    return;
+  }
 
-        delete listenersMap[eventName];
-        stationMeta.listenerCount--;
-        reduceHearerHearingCount(listener);
-        removeMetaFromStation(stationMeta, listener);
+  for (let i = 0, c = attachedListenersCount; i < c; i++) {
+    const attachedListener = attachedListeners[i];
 
-        return;
-    }
+    if (!matchListener(listener, attachedListener, exactMatch)) continue;
 
-    for (let i = 0, c = attachedListenersCount; i < c; i++) {
+    /* Remove the listener from the given Meta */
+    attachedListeners.splice(i, 1);
+    stationMeta.listenerCount--;
+    i--;
+    c--;
 
-        const attachedListener = attachedListeners[i];
+    reduceHearerHearingCount(listener);
+    removeMetaFromStation(stationMeta, listener);
+  }
 
-        if (!matchListener(listener, attachedListener, exactMatch)) continue;
-
-        /* Remove the listener from the given Meta */
-        attachedListeners.splice(i, 1);
-        stationMeta.listenerCount--;
-        i--;
-        c--;
-
-        reduceHearerHearingCount(listener);
-        removeMetaFromStation(stationMeta, listener);
-    }
-
-    if (attachedListeners.length < 1) {
-        delete listenersMap[eventName];
-    }
+  if (attachedListeners.length < 1) {
+    delete listenersMap[eventName];
+  }
 }
 
 function removeMetaFromStation(targetMeta: Meta, listener: Listener) {
+  const stationMetas = listener.stationMetas;
 
-    const stationMetas = listener.stationMetas;
+  if (!stationMetas) return;
 
-    if (!stationMetas) return;
+  if (stationMetas.length === 1) {
+    listener.stationMetas = undefined;
+    return;
+  }
 
-    if (stationMetas.length === 1) {
-        listener.stationMetas = undefined;
-        return;
+  const newStationMetas: Meta[] = [];
+
+  for (const stationMeta of stationMetas) {
+    if (stationMeta !== targetMeta) {
+      newStationMetas.push(stationMeta);
     }
+  }
 
-    const newStationMetas: Meta[] = [];
-
-    for (const stationMeta of stationMetas) {
-        if (stationMeta !== targetMeta) {
-            newStationMetas.push(stationMeta);
-        }
-    }
-
-    if (newStationMetas.length < 1) {
-        /*
-         * This line is necessary in the rare case that
-         * the exact same listener object has been added to
-         * a station multiple times, and is then removed from
-         * said station.
-         */
-        listener.stationMetas = undefined;
-    } else {
-        listener.stationMetas = newStationMetas;
-    }
+  if (newStationMetas.length < 1) {
+    /*
+     * This line is necessary in the rare case that
+     * the exact same listener object has been added to
+     * a station multiple times, and is then removed from
+     * said station.
+     */
+    listener.stationMetas = undefined;
+  } else {
+    listener.stationMetas = newStationMetas;
+  }
 }
 
 function reduceHearerHearingCount(listener: Listener): void {
+  /*
+   * Update the hearingCount of given listener's hearer
+   */
+  const hearer = listener.hearer;
 
-    /*
-     * Update the hearingCount of given listener's hearer
-     */
-    const hearer = listener.hearer;
-
-    if (hearer) {
-        hearer.stationMeta.hearingCount--;
-    }
+  if (hearer) {
+    hearer.stationMeta.hearingCount--;
+  }
 }
