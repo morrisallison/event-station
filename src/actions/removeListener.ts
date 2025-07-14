@@ -1,6 +1,6 @@
-import { Listener } from "../types/Listener";
+import type { Listener } from "../types/Listener";
 import { matchListener } from "./matchListener";
-import { Meta } from "../types/Meta";
+import type { Meta } from "../types/Meta";
 
 /**
  * Removes all listeners that match the given listener from the given station meta.

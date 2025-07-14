@@ -1,5 +1,5 @@
-import { Emitter } from "../types/Emitter";
-import { Listener } from "../types/Listener";
+import type { Emitter } from "../types/Emitter";
+import type { Listener } from "../types/Listener";
 import { removeListenerFromAll } from "./removeListenerFromAll";
 
 /** Applies the given listeners with the given arguments */

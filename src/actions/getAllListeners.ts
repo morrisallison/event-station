@@ -1,5 +1,5 @@
-import { Listener } from "../types/Listener";
-import { Meta } from "../types/Meta";
+import type { Listener } from "../types/Listener";
+import type { Meta } from "../types/Meta";
 
 /** Retrieves all listeners attached to the given Meta */
 export function getAllListeners(stationMeta: Meta): Listener[] {

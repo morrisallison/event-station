@@ -1,5 +1,5 @@
-import { ListenersMap } from "./ListenersMap";
-import { StationMap } from "./StationMap";
+import type { ListenersMap } from "./ListenersMap";
+import type { StationMap } from "./StationMap";
 
 export interface Meta {
   /** @see Options.delimiter */

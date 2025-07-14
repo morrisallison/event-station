@@ -1,4 +1,4 @@
-import { MatchingListener } from "../types/MatchingListener";
+import type { MatchingListener } from "../types/MatchingListener";
 import { matchListener } from "./matchListener";
 
 export function matchListeners(
