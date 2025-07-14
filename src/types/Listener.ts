@@ -1,5 +1,5 @@
-import { Emitter } from "./Emitter";
-import { Meta } from "./Meta";
+import type { Emitter } from "./Emitter";
+import type { Meta } from "./Meta";
 
 /**
  * An object that holds the state of a listener.

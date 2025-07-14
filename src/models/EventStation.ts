@@ -1,18 +1,18 @@
 import { addListener } from "../actions/addListener";
 import { applyListeners } from "../actions/applyListeners";
-import { Emitter } from "../types/Emitter";
+import type { Emitter } from "../types/Emitter";
 import { getAllListeners } from "../actions/getAllListeners";
 import { hasListener } from "../actions/hasListener";
-import { Listener } from "../types/Listener";
+import type { Listener } from "../types/Listener";
 import { Listeners } from "./Listeners";
-import { ListenersMap } from "../types/ListenersMap";
+import type { ListenersMap } from "../types/ListenersMap";
 import { makeStationId } from "../actions/makeStationId";
 import { matchListener } from "../actions/matchListener";
-import { Meta } from "../types/Meta";
-import { Options } from "../types/Options";
+import type { Meta } from "../types/Meta";
+import type { Options } from "../types/Options";
 import { removeListener } from "../actions/removeListener";
-import { Rx } from "../types/Rx";
-import { StationMap } from "../types/StationMap";
+import type { Rx } from "../types/Rx";
+import type { StationMap } from "../types/StationMap";
 import * as config from "../config";
 import * as injector from "../injector";
 
@@ -21,7 +21,7 @@ import * as injector from "../injector";
  */
 export class EventStation {
   /** Container for the station's context */
-  public stationMeta: Meta;
+  public stationMeta!: Meta;
 
   constructor(options?: Options) {
     EventStation.init(this, options);

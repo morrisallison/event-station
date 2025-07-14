@@ -1,4 +1,4 @@
-import { Options } from "./types/Options";
+import type { Options } from "./types/Options";
 
 export const allEvent = "all";
 

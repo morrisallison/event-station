@@ -1,4 +1,4 @@
-import { Rx } from "./types/Rx";
+import type { Rx } from "./types/Rx";
 
 declare const global: any;
 declare const window: any;

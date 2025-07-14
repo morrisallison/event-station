@@ -1,24 +1,35 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "newLine": "LF",
-        "noEmit": true,
-        "declaration": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "strictNullChecks": true,
-        "lib": [
-            "dom",
-            "es5",
-            "es2015.promise"
-        ]
-    },
-    "files": [
-        "src/main.ts"
-    ]
+  "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "allowJs": false,
+    "lib": ["ESNext", "DOM"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "stripInternal": false,
+    "target": "ESNext",
+    "verbatimModuleSyntax": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "isolatedModules": false,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/__tests__/*",
+    "__mocks__",
+    "__snapshots__",
+    "dist",
+    "node_modules"
+  ]
 }

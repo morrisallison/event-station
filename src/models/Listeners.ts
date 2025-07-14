@@ -1,11 +1,11 @@
 import { addListener } from "../actions/addListener";
 import { deps } from "../injector";
-import { Emitter } from "../types/Emitter";
+import type { Emitter } from "../types/Emitter";
 import { hasListener } from "../actions/hasListener";
-import { Listener } from "../types/Listener";
-import { MatchingListener } from "../types/MatchingListener";
+import type { Listener } from "../types/Listener";
+import type { MatchingListener } from "../types/MatchingListener";
 import { matchListeners } from "../actions/matchListeners";
-import { Meta } from "../types/Meta";
+import type { Meta } from "../types/Meta";
 import { removeListener } from "../actions/removeListener";
 import { removeListenerFromAll } from "../actions/removeListenerFromAll";
 
