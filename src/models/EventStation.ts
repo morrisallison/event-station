@@ -570,38 +570,9 @@ export class EventStation {
     return EventStation;
   }
 
-  /**
-   * Extends an object with EventStation's public members
-   */
-  public static extend<T extends Emitter>(obj: any): T {
-    const proto = EventStation.prototype;
-    const properties = Object.keys(proto);
-
-    for (const property of properties) {
-      const descriptor = Object.getOwnPropertyDescriptor(proto, property);
-
-      if (!descriptor) continue;
-
-      const newDescriptor: PropertyDescriptor = { configurable: true };
-
-      if (descriptor.get !== undefined) {
-        newDescriptor.get = descriptor.get;
-      } else {
-        newDescriptor.value = descriptor.value;
-      }
-
-      Object.defineProperty(obj, property, newDescriptor);
-    }
-
-    return obj;
-  }
-
-  public static make(): Emitter {
-    const station = EventStation.extend({});
-
-    EventStation.init(station);
-
-    return station;
+  /** Creates a new station with the given options */
+  public static create(options?: Options): Emitter {
+    return new EventStation(options);
   }
 }
 
