@@ -3,7 +3,7 @@ import type { MatchingListener } from "../types/MatchingListener";
 /**
  * Determines whether the given listeners match by performing an approximate match
  * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+ * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
 export function matchListener(
   matchingListener: MatchingListener,

@@ -528,7 +528,7 @@ export class EventStation {
 
   /**
    * Removes all listeners that match the given listener from the station
-   * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+   * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
   public removeListener(listener: Listener, exactMatch?: boolean): void {
     removeListener(this.stationMeta, listener, exactMatch);
@@ -536,7 +536,7 @@ export class EventStation {
 
   /**
    * Determines whether any listener attached to the station matches the given listener.
-   * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+   * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
   public hasListener(listener: Listener, exactMatch?: boolean): boolean {
     return hasListener(this.stationMeta, listener, exactMatch);
