@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeEach, afterEach } from "bun:test";
 
-import EventStation from "../../../src/main";
+import { EventStation } from "../../../src/main";
 describe("Listeners#addTo()", function () {
   let station, station2, listeners;
 

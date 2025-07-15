@@ -10,7 +10,7 @@ var Benchmark,
   station,
   stationConfigured;
 
-EventStation = require("../dist/main").default;
+EventStation = require("../dist/event-station").EventStation;
 EventEmitter2 = require("eventemitter2").EventEmitter2;
 callback = undefined;
 emitter2 = undefined;

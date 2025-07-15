@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 describe("EventStation#removeListener()", function () {
   let callback, context, station, station2, stationMeta;
   callback = undefined;

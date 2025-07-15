@@ -1,4 +1,4 @@
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 import { expect } from "bun:test";
 import { describe, it } from "bun:test";
 

@@ -1,8 +1,7 @@
 import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
-Promise = require("bluebird");
-import EventStation from "../../../src/main";
+import { EventStation } from "../../../src/main";
 describe("Listeners#race()", function () {
   let listeners, station;
   listeners = undefined;

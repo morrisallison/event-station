@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { beforeAll, describe, it, beforeEach, afterEach } from "bun:test";
 
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 describe("EventStation#isHeard()", function () {
   let teacher, student;
   teacher = undefined;
