@@ -22,7 +22,7 @@
     "isolatedModules": false,
     "noEmit": false,
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "lib"
   },
   "include": ["src/**/*"],
   "exclude": [
@@ -30,6 +30,7 @@
     "__mocks__",
     "__snapshots__",
     "dist",
+    "lib",
     "node_modules"
   ]
 }
