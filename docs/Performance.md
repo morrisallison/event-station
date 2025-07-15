@@ -15,7 +15,7 @@ An overview of the performance of Event-Station compared to other event emitters
 
 ## Benchmarks
 
-The results below were from [benchmarks](https://github.com/morrisallison/event-station/blob/master/benchmarks/) run on Node.js v4.2.1 using the following modules:
+The results below were from [benchmarks](https://github.com/morrisallison/event-station/blob/main/benchmarks/) run on Node.js v4.2.1 using the following modules:
 
 * EventEmitter &mdash; `v4.2.1`
 * EventEmitter2 &mdash; `v0.4.14`

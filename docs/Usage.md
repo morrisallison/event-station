@@ -6,34 +6,34 @@ More examples can be found in the [Examples document](./Examples.md), or in the 
 
 ## Table of Contents
 
-* [Terminology](#terminology)
-* [Configuration](#configuration)
-    * [Options](#options)
-    * [Reset](#reset)
-* [Listeners](#listeners)
-    1. [Single Event String](#single-event-name)
-    2. [Delimited Event Strings](#delimited-event-names)
-    3. [Event String Array](#event-name-array)
-    4. [Listener Map](#listener-map)
-* [Attaching Listeners](#attaching-listeners)
-* [Removing Listeners](#removing-listeners)
-* [Asynchronous Listeners](#asynchronous-listeners)
-* [Emitting Events](#emitting-events)
-* [Providing Context](#providing-context)
-* [Cross-emitter Listening](#cross-emitter-listening)
-* [Limiting Occurrences](#limiting-occurrences)
-* [Regular Expression Listeners](#regular-expression-listeners)
-* [Listener Modifiers](#listener-modifiers)
-* [Browser Usage](#browser-usage)
-* [Inheritance](#object-inheritance)
-    * [ES6](#es6)
-    * [ES5](#es5)
-    * [CoffeeScript](#coffeescript)
-    * [Object Literal](#object-literal)
+- [Terminology](#terminology)
+- [Configuration](#configuration)
+  - [Options](#options)
+  - [Reset](#reset)
+- [Listeners](#listeners)
+  1. [Single Event String](#single-event-name)
+  2. [Delimited Event Strings](#delimited-event-names)
+  3. [Event String Array](#event-name-array)
+  4. [Listener Map](#listener-map)
+- [Attaching Listeners](#attaching-listeners)
+- [Removing Listeners](#removing-listeners)
+- [Asynchronous Listeners](#asynchronous-listeners)
+- [Emitting Events](#emitting-events)
+- [Providing Context](#providing-context)
+- [Cross-emitter Listening](#cross-emitter-listening)
+- [Limiting Occurrences](#limiting-occurrences)
+- [Regular Expression Listeners](#regular-expression-listeners)
+- [Listener Modifiers](#listener-modifiers)
+- [Browser Usage](#browser-usage)
+- [Inheritance](#object-inheritance)
+  - [ES6](#es6)
+  - [ES5](#es5)
+  - [CoffeeScript](#coffeescript)
+  - [Object Literal](#object-literal)
 
 ## Terminology
 
-* `student` and `teacher` are used as examples of `EventStation` instances.
+- `student` and `teacher` are used as examples of `EventStation` instances.
 
 ## Configuration
 
@@ -47,14 +47,6 @@ EventStation.config(options);
 
 ```javascript
 new EventStation(options);
-```
-
-Other objects can be configured and initialized by using the `init()` static method.
-
-```javascript
-let emitter = {};
-
-EventStation.init(emitter, options);
 ```
 
 ### Options
@@ -79,9 +71,9 @@ Determines whether an emitter can use regular expression listeners.
 
 The character used to mark regular expression listeners.
 
-| Type      | Default |
-| --------- | ------- |
-| `string`  | `"%"`   |
+| Type     | Default |
+| -------- | ------- |
+| `string` | `"%"`   |
 
 #### enableDelimiter
 
@@ -95,9 +87,9 @@ Determines whether an emitter can use delimited event names.
 
 The character used to delimit event names in a string.
 
-| Type      | Default       |
-| --------- | ------------- |
-| `string`  | `" "` (space) |
+| Type     | Default       |
+| -------- | ------------- |
+| `string` | `" "` (space) |
 
 ### Reset
 
@@ -111,19 +103,26 @@ Each listener is an object with its own state. As a result, listeners can mainta
 
 Listener methods on the `EventStation` class share the same basic interface, which accepts:
 
-* A `string` with a single event
+- A `string` with a single event
+
 ```javascript
-"foo"
+"foo";
 ```
-* A `string` of delimited events
+
+- A `string` of delimited events
+
 ```javascript
-"foo bar"
+"foo bar";
 ```
-* An `Array` of `string` events
+
+- An `Array` of `string` events
+
 ```javascript
-["foo", "bar"]
+["foo", "bar"];
 ```
-* A listener map with events as keys and callbacks as properties
+
+- A listener map with events as keys and callbacks as properties
+
 ```javascript
 {
     foo: function () {},
@@ -136,8 +135,8 @@ Listener methods on the `EventStation` class share the same basic interface, whi
 A single event can be given to create one listener for one event.
 
 ```javascript
-let listeners = student.on('wakeup', function () {
-    console.error("No, five more minutes, please.")
+let listeners = student.on("wakeup", function () {
+  console.error("No, five more minutes, please.");
 });
 ```
 
@@ -148,8 +147,8 @@ Delimited events can be given to create multiple listeners with the same callbac
 By default, events are delimited by spaces. This can be changed by setting the [`delimiter`](#delimiter) option.
 
 ```javascript
-let listeners = student.on('eating-breakfast taking-shower', function () {
-    console.warn("I'm running late!")
+let listeners = student.on("eating-breakfast taking-shower", function () {
+  console.warn("I'm running late!");
 });
 ```
 
@@ -160,8 +159,8 @@ An array of events can be given to create multiple listeners with the same callb
 Delimiters are ignored in event arrays.
 
 ```javascript
-let listeners = student.on(['need more', 'sleep'], function () {
-    console.warn("I'm really late!")
+let listeners = student.on(["need more", "sleep"], function () {
+  console.warn("I'm really late!");
 });
 ```
 
@@ -174,12 +173,12 @@ _**Note:** Delimiters are ignored in listener maps._
 
 ```javascript
 let listeners = student.on({
-    forgotHomework: function () {
-        console.error("I'm in trouble.");
-    },
-    'forgot-books': function () {
-        console.error("This is bad.");
-    },
+  forgotHomework: function () {
+    console.error("I'm in trouble.");
+  },
+  "forgot-books": function () {
+    console.error("This is bad.");
+  },
 });
 ```
 
@@ -190,12 +189,12 @@ Listeners can be added via the `on()`, `once()`, `hear()`, and `hearOnce()` meth
 The `addTo()` and `moveTo()` listener modifiers can also be used to add listeners to an emitter.
 
 ```javascript
-student.on('read', function () {
-    console.log("The student is reading.");
+student.on("read", function () {
+  console.log("The student is reading.");
 });
 
-let listeners = student.hear(teacher, 'lecture', function () {
-    console.log("Someone is lecturing.");
+let listeners = student.hear(teacher, "lecture", function () {
+  console.log("Someone is lecturing.");
 });
 
 // The same listener is now listening for 'lecture' events by both the student and teacher.
@@ -208,7 +207,7 @@ Listeners can be removed via the `off()` and `disregard()` methods.
 
 The `removeFrom()` and `moveTo()` listener modifiers can also be used to remove listeners from an emitter.
 
-The `off()` listener modifier will remove the collection of listeners from *all* emitters.
+The `off()` listener modifier will remove the collection of listeners from _all_ emitters.
 
 ```javascript
 // Removes all listeners from the teacher
@@ -219,12 +218,12 @@ student.disregard(teacher);
 student.off();
 
 // Removes only the listeners that match the callback and context
-student.off('study', studyCallback, studyContext);
+student.off("study", studyCallback, studyContext);
 ```
 
 ```javascript
-let listeners = student.on('read', function () {
-    console.log("The student is reading.");
+let listeners = student.on("read", function () {
+  console.log("The student is reading.");
 });
 
 // Removes the listener from all emitters, including the `student`
@@ -238,16 +237,16 @@ An asynchronous listener has a callback that returns a `Promise` compatible obje
 Examples of asynchronous listeners:
 
 ```javascript
-emitter.on('foo', function () {
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            resolve();
-        }, 2000);
-    });
+emitter.on("foo", function () {
+  return new Promise(function (resolve) {
+    setTimeout(function () {
+      resolve();
+    }, 2000);
+  });
 });
 
-emitter.on('bar', function () {
-    return Promise.reject();
+emitter.on("bar", function () {
+  return Promise.reject();
 });
 ```
 
@@ -256,9 +255,9 @@ The `emitAsync()` method will capture the returned promises, and return a new pr
 when all of the captured promises have resolved.
 
 ```javascript
-emitter.emitAsync(['foo', 'bar']).then(function () {
-    console.log('All "foo" and "bar" listeners have completed.');
-});
+await emitter.emitAsync(["foo", "bar"]);
+
+console.log('All "foo" and "bar" listeners have completed.');
 ```
 
 _See the [Asynchronous Listeners](./Examples.md#asynchronous-listeners) example._
@@ -277,12 +276,12 @@ The first argument can be an event string, a string of delimited events, or an a
 All arguments after the first are passed to each listener's callback function.
 
 ```javascript
-teacher.on('lecture', function (bookTitle, pageNumber) {
-    // We're reading page 741 in History 101.
-    console.log(`We're reading page ${pageNumber} in ${bookTitle}.`);
+teacher.on("lecture", function (bookTitle, pageNumber) {
+  // We're reading page 741 in History 101.
+  console.log(`We're reading page ${pageNumber} in ${bookTitle}.`);
 });
 
-teacher.emit('lecture', 'History 101', 741);
+teacher.emit("lecture", "History 101", 741);
 ```
 
 ## Providing Context
@@ -294,9 +293,13 @@ The `using()` listener modifier can be used to change the context of listeners.
 ```javascript
 let context = new Date();
 
-let listeners = student.on('wakeup', function () {
+let listeners = student.on(
+  "wakeup",
+  function () {
     this.getFullYear();
-}, context);
+  },
+  context
+);
 
 listeners.using(new Date());
 ```
@@ -309,8 +312,8 @@ In the following example, the `student` emitter attaches a listener to the `teac
 The listener will "remember" that is was attached by the `student` method.
 
 ```javascript
-student.hear(teacher, 'lecture', function (bookTitle, pageNumber) {
-    student.sleep();
+student.hear(teacher, "lecture", function (bookTitle, pageNumber) {
+  student.sleep();
 });
 ```
 
@@ -331,13 +334,13 @@ Occurrences can be limited via the `occur()` and `once()` listener modifiers, or
 When a listener reaches its occurrence limit, it will be removed from all emitters which it's attached to.
 
 ```javascript
-student.once('talk', function () {});
+student.once("talk", function () {});
 
-student.on('talk', function () {}).occur(5);
+student.on("talk", function () {}).occur(5);
 
-student.hearOnce(teacher, 'lecture');
+student.hearOnce(teacher, "lecture");
 
-student.hear(teacher, 'lecture').once(function () {});
+student.hear(teacher, "lecture").once(function () {});
 ```
 
 ## Regular Expression Listeners
@@ -350,14 +353,14 @@ When enabled, RegExp listeners are recognized by a marker. The marker is a singl
 The RegExp marker is `"%"` by default and can be changed by setting the [`regExpMarker`](#regExpMarker) option.
 
 ```javascript
-emitter.on('%foo/bar/[^/]+/1', callback);
+emitter.on("%foo/bar/[^/]+/1", callback);
 ```
 
 Aside from the marker, the general interface remains unchanged.
 In the following code, both a RegExp listener and a normal listener, will be attached to the emitter.
 
 ```javascript
-emitter.on(['%foo/bar/[^/]+/1', 'hello-world'], callback);
+emitter.on(["%foo/bar/[^/]+/1", "hello-world"], callback);
 ```
 
 ## Listener Modifiers
@@ -366,7 +369,7 @@ Listener modifiers are located on the `EventStation.Listeners` class and provide
 
 A `Listeners` instance can be created via the `on()`, `once()`, `hear()`, `hearOnce()`, `makeListeners()`, and `getListeners()` methods.
 
-Please refer to the [module definition](https://github.com/morrisallison/event-station/blob/master/dist/event-station.d.ts) for details on each modifier.
+Please refer to the [module definition](https://github.com/morrisallison/event-station/blob/main/dist/event-station.d.ts) for details on each modifier.
 
 ## Browser Usage
 
@@ -385,53 +388,5 @@ The `EventStation` class can be extended directly.
 ```javascript
 class Teacher extends EventStation {}
 
-/* true */ new Teacher instanceof EventStation;
-```
-
-#### ES5
-
-```javascript
-function Teacher () {
-    EventStation.init(this);
-}
-
-EventStation.extend(Teacher.prototype);
-
-/* false */ new Teacher instanceof EventStation;
-```
-
-```javascript
-function Teacher () {
-    EventStation.init(this);
-}
-
-Teacher.prototype = new EventStation;
-
-/* true */ new Teacher instanceof EventStation;
-```
-
-#### CoffeeScript
-
-```coffeescript
-class Teacher extends EventStation
-```
-
-#### Object Literal
-
-`EventStation` can also be mixed into any object.
-
-```javascript
-let student = EventStation.extend({ name: 'Johnny', });
-
-EventStation.init(student);
-
-/* false */ student instanceof EventStation;
-```
-
-The `make()` method can also be used to create an initialized object literal.
-
-```javascript
-let emitter = EventStation.make();
-
-/* false */ emitter instanceof EventStation;
+/* true */ new Teacher() instanceof EventStation;
 ```

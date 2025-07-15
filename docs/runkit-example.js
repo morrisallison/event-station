@@ -1,4 +1,4 @@
-const EventStation = require("event-station");
+const { EventStation } = require("event-station");
 
 class Spaceship extends EventStation {
   launch(destination) {
