@@ -25,23 +25,25 @@ describe("EventStation#emitAsync()", function () {
 
     expect(result).toEqual([]);
   });
-  it("must return a promise that is resolved when no listeners return promises", function () {
+  it("must return a promise that is resolved when no listeners return promises", async () => {
     station.on("pow", function () {
       powDone++;
     });
     station.on("boom", function () {
       boomDone++;
     });
+
     expect(powDone).toBe(0);
     expect(boomDone).toBe(0);
-    return station.emitAsync(["pow", "boom"]).then(function () {
-      expect(powDone).toBe(1);
-      expect(boomDone).toBe(1);
-    });
+
+    await station.emitAsync(["pow", "boom"]);
+
+    expect(powDone).toBe(1);
+    expect(boomDone).toBe(1);
   });
-  it("must return a promise that resolves after all listeners have finished", function () {
-    let promise;
+  it("must return a promise that resolves after all listeners have finished", async () => {
     station.on("pow", function () {});
+
     station.on("boom", async () => {
       await new Promise<void>((resolve) => {
         setTimeout(() => {
@@ -50,11 +52,14 @@ describe("EventStation#emitAsync()", function () {
         }, 0);
       });
     });
-    promise = station.emitAsync(["pow", "boom"]).then(function () {
-      expect(boomDone).toBe(1);
-    });
+
+    const promise = station.emitAsync(["pow", "boom"]);
+
     expect(boomDone).toBe(0);
-    return promise;
+
+    await promise;
+
+    expect(boomDone).toBe(1);
   });
   it("must not delay synchronous listeners", function () {
     let promise;
