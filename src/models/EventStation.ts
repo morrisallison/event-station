@@ -471,47 +471,6 @@ export class EventStation {
   }
 
   /**
-   * @returns A new Rx.Observable object from the station
-   * This method is dependant on `rx`.
-   * @see inject()
-   */
-  public toObservable<T>(
-    eventNames: string[],
-    context?: any,
-    selector?: (args: any[]) => T
-  ): Rx.Observable;
-  public toObservable<T>(
-    eventName: string,
-    context?: any,
-    selector?: (args: any[]) => T
-  ): Rx.Observable;
-  public toObservable<T>(
-    q: any,
-    s?: any,
-    selector?: (args: any[]) => T
-  ): Rx.Observable {
-    if (!injector.deps.$RxObservable) {
-      throw new Error(
-        `Rx has not been injected. See documentation for details.`
-      );
-    }
-
-    const addHandler = (r: Function) => {
-      this.on(q, r, s);
-    };
-
-    const removeHandler = (r: Function) => {
-      this.off(q, r, s);
-    };
-
-    return injector.deps.$RxObservable.fromEventPattern<T>(
-      addHandler,
-      removeHandler,
-      selector
-    );
-  }
-
-  /**
    * Stops the propagation of an emitted event. When called, this method effectively does
    * nothing if an event is not being emitted at the time.
    */
@@ -549,12 +508,6 @@ export class EventStation {
     return EventStation;
   }
 
-  public static inject(name: string, obj: any): typeof EventStation {
-    injector.inject(name, obj);
-
-    return EventStation;
-  }
-
   /** Modifies the global configuration */
   public static config(opts: Options): typeof EventStation {
     config.config(opts);
@@ -565,7 +518,6 @@ export class EventStation {
   /** Resets the global configuration and injected dependencies */
   public static reset(): typeof EventStation {
     config.reset();
-    injector.reset();
 
     return EventStation;
   }
