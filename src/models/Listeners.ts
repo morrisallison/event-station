@@ -150,7 +150,7 @@ export class Listeners {
 
   /**
    * Determines whether any listener in the collection matches the given listener.
-   * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+   * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
   public has(
     matchingListener: MatchingListener,
@@ -390,7 +390,7 @@ export function isListenerAttached(listener: Listener): boolean {
 
 /**
  * Determines whether the given station meta has listeners that match the given listeners
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+ * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
 function hasListeners(
   stationMeta: Meta,

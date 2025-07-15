@@ -4,7 +4,7 @@ import type { Meta } from "../types/Meta";
 
 /**
  * Removes all listeners that match the given listener from the given station meta.
- * @param exactMatch If true, an exact value match will be performed instead of an approximate match.
+ * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
 export function removeListener(
   stationMeta: Meta,
