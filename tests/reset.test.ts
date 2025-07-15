@@ -3,7 +3,7 @@ import { beforeAll, describe, it, beforeEach, afterAll } from "bun:test";
 
 import rx from "rx";
 import { deps } from "../src/injector";
-import EventStation from "../src/main";
+import { EventStation } from "../src/main";
 describe("EventStation.config()", function () {
   beforeEach(function () {
     EventStation.config({

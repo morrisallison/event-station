@@ -3,7 +3,7 @@
   import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
-  import EventStation from "../../src/main";
+  import { EventStation } from "../../src/main";
   describe('EventStation#hear()', function(){
     let student, teacher;
     student = undefined;

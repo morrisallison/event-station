@@ -16,7 +16,7 @@ var Benchmark,
   stationConfigured,
   stationHeardConfigured;
 
-EventStation = require("../dist/main").default;
+EventStation = require("../dist/event-station").EventStation;
 Backbone = require("backbone");
 underscore = require("underscore");
 backbone = undefined;

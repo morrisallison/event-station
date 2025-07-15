@@ -17,7 +17,7 @@ var Benchmark,
   emitter3;
 
 EventEmitter = require("events").EventEmitter;
-EventStation = require("../dist/main").default;
+EventStation = require("../dist/event-station").EventStation;
 Backbone = require("backbone");
 EventEmitter2 = require("eventemitter2").EventEmitter2;
 EventEmitter3 = require("eventemitter3");

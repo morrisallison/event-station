@@ -2,7 +2,7 @@ import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
 import rx from "rx";
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 describe("EventStation#toObservable()", function () {
   let action,
     actionApplied,

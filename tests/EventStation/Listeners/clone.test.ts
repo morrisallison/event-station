@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
-import EventStation from "../../../src/main";
+import { EventStation } from "../../../src/main";
 describe("Listeners#clone()", function () {
   let callback, clones, context, listeners, station, station2;
   callback = undefined;

@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { describe, it, beforeAll, beforeEach, afterEach } from "bun:test";
 
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 describe("My imagination (>.<)", function () {
   let JusticeLeague;
   JusticeLeague = undefined;

@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { describe, it, beforeEach } from "bun:test";
 
-import EventStation from "../../src/main";
+import { EventStation } from "../../src/main";
 
 describe("EventStation", function () {
   let listener, Wonderfuls, wonderfulsHeardSinging, WonderGirls;

@@ -13,7 +13,7 @@ var Benchmark,
   station,
   stationConfigured;
 
-EventStation = require("../dist/main").default;
+EventStation = require("../dist/event-station").EventStation;
 
 Backbone = require("backbone");
 EventEmitter3 = require("eventemitter3");

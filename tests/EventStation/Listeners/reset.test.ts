@@ -3,7 +3,7 @@
   import { expect } from "bun:test";
 import { describe, it, beforeEach, afterEach } from "bun:test";
 
-  import EventStation from "../../../src/main";
+  import { EventStation } from "../../../src/main";
   describe('Listeners#reset()', function(){
     let station, listeners;
     station = undefined;
