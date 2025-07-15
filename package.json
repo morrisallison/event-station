@@ -1,6 +1,6 @@
 {
   "name": "event-station",
-  "version": "1.1.4",
+  "version": "2.0.0-beta.1",
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
   "license": "MIT",
@@ -26,60 +26,52 @@
     "standalone",
     "typescript"
   ],
-  "directories": {
-    "test": "tests"
-  },
   "dependencies": {},
   "devDependencies": {
-    "@types/node": "^8.0.9",
+    "@microsoft/api-extractor": "^7.52.8",
+    "backbone": "^1.6.1",
     "benchmark": "^2.1.4",
-    "bluebird": "^3.5.0",
-    "livescript": "^1.5.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^3.4.2",
-    "must": "^0.13.4",
-    "npm-install-version": "^6.0.2",
-    "npm-run-all": "^4.0.2",
-    "nyc": "^11.0.2",
-    "rimraf": "^2.6.1",
-    "rollup": "^0.50.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rx": "^4.1.0",
-    "ts-node": "^3.0.6",
-    "typescript": "^2.3.4",
-    "uglify-js": "^3.0.17"
+    "bun-types": "1.2.18",
+    "eventemitter2": "^6.4.9",
+    "eventemitter3": "^5.0.1",
+    "typescript": "^5.8.3",
+    "underscore": "^1.13.7"
+  },
+  "devDependenciesComments": {
+    "@microsoft/api-extractor": "Used for rolling up the TypeScript definitions",
+    "backbone": "Used for benchmarking against Backbone's Events module",
+    "benchmark": "Used for running benchmarks",
+    "bun-types": "Provides TypeScript definitions for Bun.js",
+    "eventemitter2": "Used for benchmarking against EventEmitter2",
+    "eventemitter3": "Used for benchmarking against EventEmitter3",
+    "typescript": "Used for building the TypeScript source files",
+    "underscore": "Used for benchmarking against Underscore's Event module"
   },
   "scripts": {
-    "benchmark": "lsc benchmarks/event-callback.ls",
-    "build": "run-s compile bundle optimize",
-    "bundle": "run-s bundle:**",
-    "bundle:dts": "node scripts/bundle-dts.js",
-    "bundle:es5": "rollup --sourcemap -c config/rollup.config.es5.js",
-    "bundle:es6": "rollup --sourcemap -c config/rollup.config.es6.js",
-    "clean": "rimraf dist build coverage",
-    "compile": "run-p compile:**",
-    "compile:default": "tsc",
-    "compile:dts": "tsc -p config/tsconfig.dts.json",
-    "compile:es5": "tsc -p config/tsconfig.es5.json",
-    "compile:es6": "tsc -p config/tsconfig.es6.json",
-    "optimize": "uglifyjs -c -m --comments -o dist/event-station.min.js --source-map filename=dist/event-station.min.js.map dist/event-station.js",
-    "test": "run-s clean build validate unit:cover",
-    "unit": "mocha --compilers ts:ts-node/register,ls:livescript --recursive tests",
-    "unit:cover": "nyc --reporter lcov --reporter text --reporter html --extension .ts npm run unit",
-    "validate": "tsc --lib 'es5','es2015.promise' --noEmit dist/event-station.d.ts"
+    "benchmark": "bun test benchmarks/event-callback.test.ts",
+    "build": "tsc --build --pretty --verbose .",
+    "build:force": "tsc --build --pretty --force --verbose .",
+    "bundle": "bun run bundle:js && bun run bundle:js-min && bun run bundle:dts",
+    "bundle:js": "bun build --format=esm --target=browser --packages=external --outfile=dist/event-station.js --banner=\"$(bun ./scripts/banner.js)\" ./lib/main.js",
+    "bundle:js-min": "bun build --format=esm --target=browser --packages=external --outfile=event-station.min.js --banner=\"$(bun ./scripts/banner.js)\" ./dist/event-station.js --sourcemap=linked --minify",
+    "bundle:dts": "api-extractor run --local",
+    "dev": "bun run build:force && bun run watch",
+    "watch": "tsc --build --watch --pretty --verbose .",
+    "watch:force": "tsc --build --watch --pretty --force --verbose .",
+    "check": "tsc --build --watch --pretty --force --verbose --noEmit ./tsconfig.test.json",
+    "clean": "rm -rf ./dest ./lib ./*.tsbuildinfo",
+    "test": "bun test tests --coverage",
+    "test:watch": "bun test tests --watch",
+    "prepublishOnly": "bun run clean && bun run test && bun run build && bun run bundle"
   },
+  "type": "module",
   "main": "./dist/event-station.js",
-  "jsnext:main": "./dist/event-station.jsnext.js",
+  "jsnext:main": "./dist/event-station.js",
   "typings": "./dist/event-station.d.ts",
   "jspm": {
     "format": "esm",
     "jspmNodeConversion": false,
-    "main": "./dist/event-station.jsnext.js"
-  },
-  "config": {
-    "rollup": {
-      "moduleName": "EventStation"
-    }
+    "main": "./dist/event-station.js"
   },
   "files": [
     "CHANGELOG.md",
