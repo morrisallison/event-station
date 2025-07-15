@@ -10,7 +10,6 @@ describe("EventStation#emitAsync()", function () {
   station = undefined;
   totalEvents = undefined;
   beforeEach(function () {
-    EventStation.inject("Promise", Promise);
     station = new EventStation();
     boomDone = 0;
     powDone = 0;
@@ -75,19 +74,7 @@ describe("EventStation#emitAsync()", function () {
     expect(powDone).toBe(1);
     return promise;
   });
-  it("must throw an error when a promise object is NOT available", function () {
-    let promiseCallback, check;
-    EventStation.inject("Promise", undefined);
-    promiseCallback = function () {
-      return Promise.resolve();
-    };
-    station.on("pow", promiseCallback);
-    station.on("boom", promiseCallback);
-    check = function () {
-      station.emitAsync(["pow", "boom"]);
-    };
-    expect(check).toThrow(Error);
-  });
+
   it("must emit four events to three listeners while passing arguments and returning a promise", async () => {
     station.on("all", async (eventName, bash, bam, smash) => {
       expect(eventName === "pow" || eventName === "boom").toBe(true);

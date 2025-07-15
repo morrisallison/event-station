@@ -9,23 +9,12 @@ describe("Listeners#all()", function () {
   listeners = undefined;
 
   beforeEach(function () {
-    EventStation.inject("Promise", Promise);
     station = new EventStation();
     listeners = station.on("boom pow bash", function () {});
   });
 
   afterEach(function () {
     EventStation.reset();
-  });
-
-  it("must throw an error if promises are not available", function () {
-    EventStation.inject("Promise", undefined);
-
-    const check = function () {
-      listeners.all();
-    };
-
-    expect(check).toThrow(Error);
   });
 
   it("must make a promise that resolves when all of the listeners have been applied at least once", async () => {
