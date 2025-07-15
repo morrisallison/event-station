@@ -2,5 +2,8 @@ syntax: glob
 .nyc_output
 build
 coverage
+lib
 node_modules
 npm-debug.log
+*tsbuildinfo
+dist/tsdoc-metadata.json
