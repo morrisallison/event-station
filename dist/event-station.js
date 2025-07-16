@@ -121,17 +121,17 @@ function removeListenerFromAll(listener) {
 }
 
 // lib/actions/applyListeners.js
-function applyListeners(listeners, originStation, enableAsync, args) {
+function applyListeners(_listeners, originStation, enableAsync, args) {
   const argsLength = args.length;
   const stationMeta = originStation.stationMeta;
   stationMeta.isPropagationStopped = false;
-  const promises = [];
-  let result = undefined;
-  listeners = listeners.slice();
+  const results = [];
+  const listeners = _listeners.slice();
   for (const listener of listeners) {
+    let result;
     if (stationMeta.isPropagationStopped) {
       stationMeta.isPropagationStopped = false;
-      return;
+      return results;
     }
     if (listener.isPaused)
       continue;
@@ -155,9 +155,7 @@ function applyListeners(listeners, originStation, enableAsync, args) {
           result = callback.apply(context, args);
           break;
       }
-    }
-    if (enableAsync && result && typeof result.then === "function" && typeof result.catch === "function") {
-      promises.push(result);
+      results.push(result);
     }
     const resolves = listener.resolves;
     if (resolves) {
@@ -178,7 +176,7 @@ function applyListeners(listeners, originStation, enableAsync, args) {
       }
     }
   }
-  return promises;
+  return results;
 }
 
 // lib/actions/getAllListeners.js
@@ -222,18 +220,7 @@ function hasListener(stationMeta, listener, exactMatch) {
   return matchListeners(listener, attachedListeners, exactMatch);
 }
 
-// lib/injector.js
-var deps;
-(function(deps2) {
-  deps2.$RxObservable = undefined;
-  deps2.$Promise = Promise;
-})(deps || (deps = {}));
-
 // lib/models/Listeners.js
-var errors = {
-  NO_PROMISE: "No promises implementation available."
-};
-
 class Listeners {
   get count() {
     return this.listeners.length;
@@ -357,16 +344,10 @@ class Listeners {
     return promises;
   }
   all() {
-    if (!deps.$Promise) {
-      throw new Error(errors.NO_PROMISE);
-    }
-    return deps.$Promise.all(this.toPromises());
+    return Promise.all(this.toPromises());
   }
   race() {
-    if (!deps.$Promise) {
-      throw new Error(errors.NO_PROMISE);
-    }
-    return deps.$Promise.race(this.toPromises());
+    return Promise.race(this.toPromises());
   }
   reset() {
     const listeners = this.listeners;
@@ -403,10 +384,7 @@ class Listeners {
   }
 }
 function makePromise(listener) {
-  if (!deps.$Promise) {
-    throw new Error(errors.NO_PROMISE);
-  }
-  return new deps.$Promise((resolve) => {
+  return new Promise((resolve) => {
     if (!listener.resolves) {
       listener.resolves = [resolve];
     } else {
@@ -456,7 +434,7 @@ function makeStationId() {
 }
 
 // lib/config.js
-var allEvent = "all";
+var ALL_EVENT_NAME = "all";
 var defaultOptions = {
   delimiter: " ",
   emitAllEvent: true,
@@ -635,31 +613,22 @@ class EventStation {
   }
   emit(input, ...args) {
     const stationMeta = this.stationMeta;
-    if (stationMeta.listenerCount < 1)
-      return;
-    const eventNames = parseEventNames(input, stationMeta);
-    for (const eventName of eventNames) {
-      emitEvent(eventName, this, false, args);
-    }
-  }
-  emitAsync(input, ...args) {
-    if (!deps.$Promise) {
-      throw new Error(`No promises implementation available.`);
-    }
-    const stationMeta = this.stationMeta;
     if (stationMeta.listenerCount < 1) {
-      return deps.$Promise.resolve([]);
+      return [];
     }
     const eventNames = parseEventNames(input, stationMeta);
-    let promises = [];
+    let results = [];
     for (const eventName of eventNames) {
-      promises = promises.concat(emitEvent(eventName, this, true, args));
+      results = results.concat(emitEvent(eventName, this, false, args));
     }
-    if (promises.length > 0) {
-      return deps.$Promise.all(promises);
-    } else {
-      return deps.$Promise.resolve([]);
+    return results;
+  }
+  async emitAsync(input, ...args) {
+    const results = this.emit(input, ...args);
+    if (results.length === 0) {
+      return [];
     }
+    return Promise.all(results);
   }
   makeListeners(q, r, s) {
     const listeners = makeListeners(this, false, q, r, s);
@@ -750,8 +719,8 @@ function makeListeners(origin, isMatching, q, r, s) {
     const enableDelimiter = stationMeta.enableDelimiter;
     const delimiter = stationMeta.delimiter;
     if (enableDelimiter && q.indexOf(delimiter) >= 0) {
-      q = q.split(delimiter);
-      return makeListenersFromArray(origin, isMatching, q, r, s);
+      const _q = q.split(delimiter);
+      return makeListenersFromArray(origin, isMatching, _q, r, s);
     }
     return [
       {
@@ -773,7 +742,8 @@ function makeListeners(origin, isMatching, q, r, s) {
 }
 function makeListenersFromMap(originStation, isMatching, listenerMap, context) {
   const listeners = [];
-  for (const eventName in listenerMap) {
+  const eventNames = Object.getOwnPropertyNames(listenerMap);
+  for (const eventName of eventNames) {
     listeners.push({
       eventName,
       callback: listenerMap[eventName],
@@ -807,23 +777,23 @@ function emitEvent(eventName, originStation, enableAsync, args) {
   } else {
     listeners = listenersMap[eventName];
   }
-  let promises = [];
+  let results = [];
   if (listeners) {
-    const result = applyListeners(listeners, originStation, enableAsync, args);
-    if (enableAsync && result) {
-      promises = promises.concat(result);
-    }
+    results = [
+      ...results,
+      ...applyListeners(listeners, originStation, enableAsync, args)
+    ];
   }
-  const listenersMapAll = listenersMap[allEvent];
+  const listenersMapAll = listenersMap[ALL_EVENT_NAME];
   if (stationMeta.emitAllEvent && listenersMapAll) {
     const argsAll = args.slice();
     argsAll.splice(0, 0, eventName);
-    const result = applyListeners(listenersMapAll, originStation, enableAsync, argsAll);
-    if (enableAsync && result) {
-      promises = promises.concat(result);
-    }
+    results = [
+      ...results,
+      ...applyListeners(listenersMapAll, originStation, enableAsync, argsAll)
+    ];
   }
-  return promises;
+  return results;
 }
 function searchListeners(eventName, listenersMap, regExpMarker) {
   let listeners = [];
