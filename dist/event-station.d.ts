@@ -188,7 +188,7 @@ export declare class EventStation<EVT = ListenersDefinition> {
     /** Resets the global configuration and injected dependencies */
     static reset(): typeof EventStation;
     /** Creates a new station with the given options */
-    static create<EVT>(options?: Options): Emitter<EVT>;
+    static create<EVT>(options?: Options): EventStation<EVT>;
 }
 
 declare interface ForEachCallback<EVT> {
@@ -212,7 +212,7 @@ declare type InputEventNames<EVT> = (ListenersDefinition.ToEventName<EVT> | conf
 
 /**
  * An object that holds the state of a listener.
- * Listeners can can exist while separated from a station,
+ * Listeners can exist while separated from a station,
  * and can be moved between stations freely.
  */
 declare interface Listener<EVT> {
@@ -402,7 +402,7 @@ declare namespace ListenersDefinition {
 }
 
 /** An object of listener arrays with event names and expressions as keys */
-declare type ListenersMap<EVT> = Record<ListenersDefinition.ToEventName<EVT> | typeof ALL_EVENT_NAME | RegExpString, Listener<EVT>[]>;
+declare type ListenersMap<EVT> = Record<ListenersDefinition.ToEventName<EVT> | AllEventName | RegExpString, Listener<EVT>[]>;
 
 /**
  * A subset of the Listener interface used only for
