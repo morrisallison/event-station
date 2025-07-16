@@ -4,7 +4,7 @@ import type { ListenersDefinition } from "./ListenersDefinition";
 
 /**
  * An object that holds the state of a listener.
- * Listeners can can exist while separated from a station,
+ * Listeners can exist while separated from a station,
  * and can be moved between stations freely.
  */
 export interface Listener<EVT> {
