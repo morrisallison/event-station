@@ -8,20 +8,33 @@ import { Listeners } from "./Listeners";
 import type { ListenersMap } from "../types/ListenersMap";
 import { makeStationId } from "../actions/makeStationId";
 import { matchListener } from "../actions/matchListener";
-import type { Meta } from "../types/Meta";
+import type { StationMeta } from "../types/StationMeta";
 import type { Options } from "../types/Options";
 import { removeListener } from "../actions/removeListener";
-import type { Rx } from "../types/Rx";
 import type { StationMap } from "../types/StationMap";
 import * as config from "../config";
-import * as injector from "../injector";
+import type {
+  ListenersDefinition,
+  CallbackFunction,
+} from "../types/ListenersDefinition";
+
+/** @internal */
+export type InputEventName<EVT> =
+  | ListenersDefinition.ToEventName<EVT>
+  | config.AllEventName;
+
+/** @internal */
+export type InputEventNames<EVT> = (
+  | ListenersDefinition.ToEventName<EVT>
+  | config.AllEventName
+)[];
 
 /**
  * Event emitter class and namespace
  */
-export class EventStation {
+export class EventStation<EVT = ListenersDefinition> {
   /** Container for the station's context */
-  public stationMeta!: Meta;
+  public stationMeta!: StationMeta<EVT>;
 
   constructor(options?: Options) {
     EventStation.init(this, options);
@@ -46,21 +59,33 @@ export class EventStation {
   }
 
   /** Array of event names which have listeners on the station */
-  public get listenerEventNames(): string[] {
-    return Object.getOwnPropertyNames(this.stationMeta.listenersMap);
+  public get listenerEventNames(): ListenersDefinition.ToEventName<EVT>[] {
+    return Object.getOwnPropertyNames(
+      this.stationMeta.listenersMap
+    ) as ListenersDefinition.ToEventName<EVT>[];
   }
 
   /**
    * Creates and attaches listeners to the station
    */
-  public on(listenerMap: CallbackMap, context?: any): Listeners;
-  public on(
-    eventNames: string[],
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public on(eventName: string, callback?: Function, context?: any): Listeners;
-  public on(q: any, r?: any, s?: any): Listeners {
+  public on(listenerMap: CallbackMap<EVT>, context?: any): Listeners<EVT>;
+
+  public on<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT>;
+
+  public on<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT>;
+
+  public on(q: any, r?: any, s?: any): Listeners<EVT> {
     const stationMeta = this.stationMeta;
     const listeners = makeListeners(this, false, q, r, s);
 
@@ -74,14 +99,24 @@ export class EventStation {
   /**
    * Creates and attaches listeners to the station that are applied once and removed
    */
-  public once(listenerMap: CallbackMap, context?: any): Listeners;
-  public once(
-    eventNames: string[],
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public once(eventName: string, callback?: Function, context?: any): Listeners;
-  public once(q: any, r?: any, s?: any): Listeners {
+  public once(listenerMap: CallbackMap<EVT>, context?: any): Listeners<EVT>;
+
+  public once<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT>;
+
+  public once<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT>;
+
+  public once(q: any, r?: any, s?: any): Listeners<EVT> {
     return this.on(q, r, s).occur(1);
   }
 
@@ -91,9 +126,24 @@ export class EventStation {
    * including listeners that were attached via `hear()` or `hearOnce()`.
    */
   public off(): void;
-  public off(listenerMap: CallbackMap, context?: any): void;
-  public off(eventNames: string[], callback?: Function, context?: any): void;
-  public off(eventName: string, callback?: Function, context?: any): void;
+
+  public off(listenerMap: CallbackMap<EVT>, context?: any): void;
+
+  public off<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): void;
+
+  public off<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): void;
+
   public off(q?: any, r?: any, s?: any): void {
     const stationMeta = this.stationMeta;
 
@@ -111,7 +161,7 @@ export class EventStation {
       typeof q === "string" &&
       (!stationMeta.enableDelimiter || q.indexOf(stationMeta.delimiter) < 0)
     ) {
-      removeListeners(q, stationMeta);
+      removeListeners(q as ListenersDefinition.ToEventName<EVT>, stationMeta);
       return;
     }
 
@@ -127,23 +177,29 @@ export class EventStation {
    * Listeners attached using this method can be removed specifically by using `disregard()`.
    */
   public hear(
-    station: Emitter,
-    listenerMap: CallbackMap,
+    station: Emitter<EVT>,
+    listenerMap: CallbackMap<EVT>,
     context?: any
-  ): Listeners;
-  public hear(
-    station: Emitter,
-    eventNames: string[],
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public hear(
-    station: Emitter,
-    eventName: string,
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public hear(station: Emitter, q: any, r?: any, s?: any): Listeners {
+  ): Listeners<EVT>;
+
+  public hear<TEventNames extends InputEventNames<EVT>>(
+    station: Emitter<EVT>,
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT>;
+
+  public hear<TEventName extends InputEventName<EVT>>(
+    station: Emitter<EVT>,
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT>;
+
+  public hear(station: Emitter<EVT>, q: any, r?: any, s?: any): Listeners<EVT> {
     const heardStations = this.stationMeta.heardStations;
     const listeners = makeListeners(this, false, q, r, s);
     const targetStationMeta = station.stationMeta;
@@ -163,23 +219,34 @@ export class EventStation {
    * Listeners attached using this method can be removed specifically by using `disregard()`.
    */
   public hearOnce(
-    station: Emitter,
-    listenerMap: CallbackMap,
+    station: Emitter<EVT>,
+    listenerMap: CallbackMap<EVT>,
     context?: any
-  ): Listeners;
+  ): Listeners<EVT>;
+
+  public hearOnce<TEventNames extends InputEventNames<EVT>>(
+    station: Emitter<EVT>,
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT>;
+
+  public hearOnce<TEventName extends InputEventName<EVT>>(
+    station: Emitter<EVT>,
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT>;
+
   public hearOnce(
-    station: Emitter,
-    eventNames: string[],
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public hearOnce(
-    station: Emitter,
-    eventName: string,
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public hearOnce(station: Emitter, q: any, r?: any, s?: any): Listeners {
+    station: Emitter<EVT>,
+    q: any,
+    r?: any,
+    s?: any
+  ): Listeners<EVT> {
     return this.hear(station, q, r, s).occur(1);
   }
 
@@ -189,31 +256,39 @@ export class EventStation {
    * that were attached to other stations are removed.
    */
   public disregard(): void;
-  public disregard(target: Emitter | Emitter[]): void;
+
+  public disregard(target: Emitter<EVT> | Emitter<EVT>[]): void;
+
   public disregard(
-    target: Emitter | Emitter[],
-    listenerMap: CallbackMap,
+    target: Emitter<EVT> | Emitter<EVT>[],
+    listenerMap: CallbackMap<EVT>,
     context?: any
   ): void;
-  public disregard(
-    target: Emitter | Emitter[],
-    eventNames: string[],
-    callback?: Function,
-    context?: any
+
+  public disregard<TEventNames extends InputEventNames<EVT>>(
+    target: Emitter<EVT> | Emitter<EVT>[],
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
   ): void;
-  public disregard(
-    target: Emitter | Emitter[],
-    eventName: string,
-    callback?: Function,
-    context?: any
+
+  public disregard<TEventName extends InputEventName<EVT>>(
+    target: Emitter<EVT> | Emitter<EVT>[],
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
   ): void;
+
   public disregard(target?: any, q?: any, r?: any, s?: any): void {
     const stationMeta = this.stationMeta;
 
     if (stationMeta.hearingCount < 1) return;
 
     let isRemovingAll = false;
-    let listeners: Listener[] = [];
+    let listeners: Listener<EVT>[] = [];
 
     // If no listener targets were given
     if (q === undefined) {
@@ -253,17 +328,24 @@ export class EventStation {
    * whether the station has any attached listeners.
    */
   public isHeard(): boolean;
-  public isHeard(listenerMap: CallbackMap, context?: any): boolean;
-  public isHeard(
-    eventNames: string[],
-    callback?: Function,
-    context?: any
+
+  public isHeard(listenerMap: CallbackMap<EVT>, context?: any): boolean;
+
+  public isHeard<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
   ): boolean;
-  public isHeard(
-    eventName: string,
-    callback?: Function,
-    context?: any
+
+  public isHeard<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
   ): boolean;
+
   public isHeard(q?: any, r?: any, s?: any): boolean {
     const stationMeta = this.stationMeta;
     const listenerCount = stationMeta.listenerCount;
@@ -291,21 +373,29 @@ export class EventStation {
    * have any listeners attached by the station via `hear()` and `hearOnce()`.
    */
   public isHearing(): boolean;
-  public isHearing(target: Emitter | Emitter[]): boolean;
+
+  public isHearing(target: Emitter<EVT> | Emitter<EVT>[]): boolean;
+
   public isHearing(
-    target: Emitter | Emitter[],
-    listenerMap: CallbackMap
+    target: Emitter<EVT> | Emitter<EVT>[],
+    listenerMap: CallbackMap<EVT>
   ): boolean;
-  public isHearing(
-    target: Emitter | Emitter[],
-    eventNames: string[],
-    callback?: Function
+
+  public isHearing<TEventNames extends InputEventNames<EVT>>(
+    target: Emitter<EVT> | Emitter<EVT>[],
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >
   ): boolean;
-  public isHearing(
-    target: Emitter | Emitter[],
-    eventName: string,
-    callback?: Function
+
+  public isHearing<TEventName extends InputEventName<EVT>>(
+    target: Emitter<EVT> | Emitter<EVT>[],
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>
   ): boolean;
+
   public isHearing(target?: any, q?: any, r?: any, s?: any): boolean {
     const stationMeta = this.stationMeta;
 
@@ -313,7 +403,7 @@ export class EventStation {
 
     const stations = getTargetedStations(stationMeta, target);
     let matchAllListeners: boolean = false;
-    let listeners: Listener[] = [];
+    let listeners: Listener<EVT>[] = [];
 
     // If no listener targets were given
     if (q) {
@@ -347,18 +437,45 @@ export class EventStation {
    * Emits events on the station.
    * Parameters after the first are passed to each listener's callback function.
    */
-  public emit(eventNames: string[], ...args: any[]): void;
-  public emit(eventName: string, ...args: any[]): void;
-  public emit(input: any, ...args: any[]): void {
+  public emit<EventNames extends ListenersDefinition.ToEventName<EVT>[]>(
+    eventNames: EventNames,
+    ...args: CallbackFunction.ToArgs<
+      ListenersDefinition.PickCallbackFunction<EVT, EventNames[number]>
+    >
+  ): ReturnType<
+    ListenersDefinition.PickCallbackFunction<EVT, EventNames[number]>
+  >[];
+
+  public emit<EventName extends ListenersDefinition.ToEventName<EVT>>(
+    eventName: EventName,
+    ...args: CallbackFunction.ToArgs<
+      ListenersDefinition.PickCallbackFunction<EVT, EventName>
+    >
+  ): ReturnType<ListenersDefinition.PickCallbackFunction<EVT, EventName>>[];
+
+  public emit(input: any, ...args: any[]): any[] {
     const stationMeta = this.stationMeta;
 
-    if (stationMeta.listenerCount < 1) return;
+    if (stationMeta.listenerCount < 1) {
+      return [];
+    }
 
     const eventNames = parseEventNames(input, stationMeta);
 
+    let results: unknown[] = [];
+
     for (const eventName of eventNames) {
-      emitEvent(eventName, this, false, args);
+      results = results.concat(
+        emitEvent(
+          eventName,
+          this,
+          false,
+          args as ListenersDefinition.ToArgs<EVT>
+        )
+      );
     }
+
+    return results;
   }
 
   /**
@@ -366,57 +483,68 @@ export class EventStation {
    * Parameters after the first are passed to each listener's callback function.
    * @returns A `Promise` that resolves after all of the return listener promises resolve.
    */
-  public emitAsync<R extends any>(
-    eventNames: string[],
-    ...args: any[]
-  ): Promise<R[]>;
-  public emitAsync<R extends any>(
-    eventName: string,
-    ...args: any[]
-  ): Promise<R[]>;
-  public emitAsync<R extends any>(input: any, ...args: any[]): Promise<R[]> {
-    if (!injector.deps.$Promise) {
-      throw new Error(`No promises implementation available.`);
+  public async emitAsync<
+    EventNames extends ListenersDefinition.ToEventName<EVT>[]
+  >(
+    eventNames: EventNames,
+    ...args: CallbackFunction.ToArgs<
+      ListenersDefinition.PickCallbackFunction<EVT, EventNames[number]>
+    >
+  ): Promise<
+    Awaited<
+      ReturnType<
+        ListenersDefinition.PickCallbackFunction<EVT, EventNames[number]>
+      >
+    >[]
+  >;
+
+  public async emitAsync<
+    EventName extends ListenersDefinition.ToEventName<EVT>
+  >(
+    eventName: EventName,
+    ...args: CallbackFunction.ToArgs<
+      ListenersDefinition.PickCallbackFunction<EVT, EventName>
+    >
+  ): Promise<
+    Awaited<
+      ReturnType<ListenersDefinition.PickCallbackFunction<EVT, EventName>>
+    >[]
+  >;
+
+  public async emitAsync(input: any, ...args: any[]): Promise<any[]> {
+    const results = this.emit(input, ...(args as any));
+
+    if (results.length === 0) {
+      return [];
     }
 
-    const stationMeta = this.stationMeta;
-
-    if (stationMeta.listenerCount < 1) {
-      return injector.deps.$Promise.resolve([]);
-    }
-
-    const eventNames = parseEventNames(input, stationMeta);
-
-    let promises: Promise<R>[] = [];
-
-    for (const eventName of eventNames) {
-      promises = promises.concat(
-        emitEvent<Promise<R>>(eventName, this, true, args)
-      );
-    }
-
-    if (promises.length > 0) {
-      return injector.deps.$Promise.all<R>(promises);
-    } else {
-      return injector.deps.$Promise.resolve([]);
-    }
+    return Promise.all<any>(results);
   }
 
   /**
    * Creates listeners without attaching them to the station
    */
-  public makeListeners(listenerMap: CallbackMap, context?: any): Listeners;
   public makeListeners(
-    eventNames: string[],
-    callback?: Function,
+    listenerMap: CallbackMap<EVT>,
     context?: any
-  ): Listeners;
-  public makeListeners(
-    eventName: string,
-    callback?: Function,
-    context?: any
-  ): Listeners;
-  public makeListeners(q: any, r?: any, s?: any): Listeners {
+  ): Listeners<EVT>;
+
+  public makeListeners<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT>;
+
+  public makeListeners<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT>;
+
+  public makeListeners(q: any, r?: any, s?: any): Listeners<EVT> {
     const listeners = makeListeners(this, false, q, r, s);
 
     return new Listeners(this, listeners);
@@ -427,22 +555,29 @@ export class EventStation {
    * If no arguments are given, all listeners will be returned;
    * including listeners that were attached via `hear()` or `hearOnce()`.
    */
-  public getListeners(): Listeners | undefined;
+  public getListeners(): Listeners<EVT> | undefined;
+
   public getListeners(
-    listenerMap: CallbackMap,
+    listenerMap: CallbackMap<EVT>,
     context?: any
-  ): Listeners | undefined;
-  public getListeners(
-    eventNames: string[],
-    callback?: Function,
-    context?: any
-  ): Listeners | undefined;
-  public getListeners(
-    eventName: string,
-    callback?: Function,
-    context?: any
-  ): Listeners | undefined;
-  public getListeners(q?: any, r?: any, s?: any): Listeners | undefined {
+  ): Listeners<EVT> | undefined;
+
+  public getListeners<TEventNames extends InputEventNames<EVT>>(
+    eventNames: TEventNames,
+    callback?: ListenersDefinition.PickCallbackFunction<
+      EVT,
+      TEventNames[number]
+    >,
+    context?: ListenersDefinition.PickContext<EVT, TEventNames[number]>
+  ): Listeners<EVT> | undefined;
+
+  public getListeners<TEventName extends InputEventName<EVT>>(
+    eventName: TEventName,
+    callback?: ListenersDefinition.PickCallbackFunction<EVT, TEventName>,
+    context?: ListenersDefinition.PickContext<EVT, TEventName>
+  ): Listeners<EVT> | undefined;
+
+  public getListeners(q?: any, r?: any, s?: any): Listeners<EVT> | undefined {
     const attachedListeners = getAllListeners(this.stationMeta);
 
     if (attachedListeners.length < 1) {
@@ -453,7 +588,7 @@ export class EventStation {
     }
 
     const matchingListeners = makeListeners(this, true, q, r, s);
-    const listeners: Listener[] = [];
+    const listeners: Listener<EVT>[] = [];
 
     for (const attachedListener of attachedListeners) {
       for (const matchingListener of matchingListeners) {
@@ -481,7 +616,7 @@ export class EventStation {
   /**
    * Adds the given listener to the station
    */
-  public addListener(listener: Listener): void {
+  public addListener(listener: Listener<EVT>): void {
     addListener(this.stationMeta, listener);
   }
 
@@ -489,7 +624,7 @@ export class EventStation {
    * Removes all listeners that match the given listener from the station
    * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
-  public removeListener(listener: Listener, exactMatch?: boolean): void {
+  public removeListener(listener: Listener<EVT>, exactMatch?: boolean): void {
     removeListener(this.stationMeta, listener, exactMatch);
   }
 
@@ -497,7 +632,7 @@ export class EventStation {
    * Determines whether any listener attached to the station matches the given listener.
    * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
-  public hasListener(listener: Listener, exactMatch?: boolean): boolean {
+  public hasListener(listener: Listener<EVT>, exactMatch?: boolean): boolean {
     return hasListener(this.stationMeta, listener, exactMatch);
   }
 
@@ -523,14 +658,23 @@ export class EventStation {
   }
 
   /** Creates a new station with the given options */
-  public static create(options?: Options): Emitter {
+  public static create<EVT>(options?: Options): Emitter<EVT> {
     return new EventStation(options);
   }
 }
 
-function parseEventNames(eventNames: string[], options: Meta): string[];
-function parseEventNames(eventName: string, options: Meta): string[];
-function parseEventNames(input: any, options: Meta): string[] {
+function parseEventNames<EVT>(
+  eventNames: ListenersDefinition.ToEventName<EVT>[],
+  options: StationMeta<EVT>
+): ListenersDefinition.ToEventName<EVT>[];
+function parseEventNames<EVT>(
+  eventName: ListenersDefinition.ToEventName<EVT>,
+  options: StationMeta<EVT>
+): ListenersDefinition.ToEventName<EVT>[];
+function parseEventNames<EVT>(
+  input: any,
+  options: StationMeta<EVT>
+): ListenersDefinition.ToEventName<EVT>[] {
   let names: string[];
 
   if (typeof input === "string") {
@@ -547,11 +691,11 @@ function parseEventNames(input: any, options: Meta): string[] {
     throw new Error(`Invalid first argument`);
   }
 
-  return names;
+  return names as ListenersDefinition.ToEventName<EVT>[];
 }
 
 /** Creates a new station meta object from the given configuration options */
-function makeStationMeta(options: Options = {}): Meta {
+function makeStationMeta<EVT>(options: Options = {}): StationMeta<EVT> {
   const state = {
     heardStations: Object.create(null),
     hearingCount: 0,
@@ -561,7 +705,11 @@ function makeStationMeta(options: Options = {}): Meta {
     stationId: makeStationId(),
   };
 
-  const meta = config.mergeOptions<Meta>(state, config.globalOptions, options);
+  const meta = config.mergeOptions<StationMeta<EVT>>(
+    state,
+    config.globalOptions,
+    options
+  );
 
   config.assertOptions(meta);
 
@@ -572,46 +720,52 @@ function makeStationMeta(options: Options = {}): Meta {
  * Makes an array of listeners from the given parameters
  * This function normalizes the four ways to make listeners.
  */
-function makeListeners(
-  origin: Emitter,
+function makeListeners<EVT>(
+  origin: Emitter<EVT>,
   isMatching: boolean,
-  listenerMap: CallbackMap,
-  context?: Emitter
-): Listener[];
-function makeListeners(
-  origin: Emitter,
+  listenerMap: CallbackMap<EVT>,
+  context?: Emitter<EVT>
+): Listener<EVT>[];
+
+function makeListeners<EVT>(
+  origin: Emitter<EVT>,
   isMatching: boolean,
-  eventNames: string[],
-  callback?: Function,
-  context?: Emitter
-): Listener[];
-function makeListeners(
-  origin: Emitter,
+  eventNames: InputEventNames<EVT>,
+  callback?: ListenersDefinition.ToCallbackFunction<EVT>,
+  context?: Emitter<EVT>
+): Listener<EVT>[];
+
+function makeListeners<EVT>(
+  origin: Emitter<EVT>,
   isMatching: boolean,
-  eventName: string,
-  callback?: Function,
-  context?: Emitter
-): Listener[];
-function makeListeners(
-  origin: Emitter,
+  eventName: InputEventName<EVT>,
+  callback?: ListenersDefinition.ToCallbackFunction<EVT>,
+  context?: Emitter<EVT>
+): Listener<EVT>[];
+
+function makeListeners<EVT>(
+  origin: Emitter<EVT>,
   isMatching: boolean,
   q: any,
   r?: any,
   s?: any
-): Listener[] {
+): Listener<EVT>[] {
   if (typeof q === "string") {
     const stationMeta = origin.stationMeta;
     const enableDelimiter = stationMeta.enableDelimiter;
     const delimiter = stationMeta.delimiter;
 
     if (enableDelimiter && q.indexOf(delimiter) >= 0) {
-      q = (<string>q).split(delimiter);
-      return makeListenersFromArray(origin, isMatching, q, r, s);
+      const _q = (q as string).split(
+        delimiter
+      ) as ListenersDefinition.ToEventName<EVT>[];
+
+      return makeListenersFromArray<EVT>(origin, isMatching, _q, r, s);
     }
 
     return [
       {
-        eventName: q,
+        eventName: q as ListenersDefinition.ToEventName<EVT>,
         callback: r,
         context: !isMatching && s === undefined ? origin : s,
         matchCallback: r,
@@ -632,22 +786,27 @@ function makeListeners(
 }
 
 /** Makes an array of listeners from the given listener map */
-function makeListenersFromMap(
-  originStation: Emitter,
+function makeListenersFromMap<EVT>(
+  originStation: Emitter<EVT>,
   isMatching: boolean,
-  listenerMap: CallbackMap,
+  listenerMap: CallbackMap<EVT>,
   context: any
-): Listener[] {
-  const listeners: Listener[] = [];
+): Listener<EVT>[] {
+  const listeners: Listener<EVT>[] = [];
+  const eventNames = Object.getOwnPropertyNames(
+    listenerMap
+  ) as ListenersDefinition.ToEventName<EVT>[];
 
-  // `listenersMap` has no prototype
-  // tslint:disable-next-line:no-for-in forin
-  for (const eventName in listenerMap) {
+  for (const eventName of eventNames) {
     listeners.push({
-      eventName: eventName,
-      callback: listenerMap[eventName],
+      eventName: eventName as unknown as ListenersDefinition.ToEventName<EVT>,
+      callback: listenerMap[
+        eventName
+      ] as ListenersDefinition.ToCallbackFunction<EVT>,
       context: !isMatching && context === undefined ? originStation : context,
-      matchCallback: listenerMap[eventName],
+      matchCallback: listenerMap[
+        eventName
+      ] as ListenersDefinition.ToCallbackFunction<EVT>,
       matchContext: context,
     });
   }
@@ -656,14 +815,14 @@ function makeListenersFromMap(
 }
 
 /** Makes an array of listeners from the given event name array */
-function makeListenersFromArray(
-  origin: Emitter,
+function makeListenersFromArray<EVT>(
+  origin: Emitter<EVT>,
   isMatching: boolean,
-  eventNames: string[],
-  callback: Function,
+  eventNames: ListenersDefinition.ToEventName<EVT>[],
+  callback: ListenersDefinition.ToCallbackFunction<EVT>,
   context: any
-): Listener[] {
-  const listeners: Listener[] = [];
+): Listener<EVT>[] {
+  const listeners: Listener<EVT>[] = [];
   const count = eventNames.length;
 
   for (let i = 0; i < count; i++) {
@@ -679,16 +838,16 @@ function makeListenersFromArray(
   return listeners;
 }
 
-function emitEvent<P extends Promise<any>>(
-  eventName: string,
-  originStation: Emitter,
+function emitEvent<EVT>(
+  eventName: ListenersDefinition.ToEventName<EVT>,
+  originStation: Emitter<EVT>,
   enableAsync: boolean,
-  args: any[]
-): P[] {
+  args: ListenersDefinition.ToArgs<EVT>
+): ListenersDefinition.ToReturnValue<EVT>[] {
   const stationMeta = originStation.stationMeta;
   const listenersMap = stationMeta.listenersMap;
 
-  let listeners: Listener[] | undefined = undefined;
+  let listeners: Listener<EVT>[] | undefined = undefined;
 
   if (stationMeta.enableRegExp) {
     listeners = searchListeners(
@@ -700,41 +859,35 @@ function emitEvent<P extends Promise<any>>(
     listeners = listenersMap[eventName];
   }
 
-  let promises: P[] = [];
+  let results: ListenersDefinition.ToReturnValue<EVT>[] = [];
 
   if (listeners) {
-    const result = applyListeners<P>(
-      listeners,
-      originStation,
-      enableAsync,
-      args
-    );
-
-    if (enableAsync && result) {
-      promises = promises.concat(result);
-    }
+    results = [
+      ...results,
+      ...applyListeners<EVT>(listeners, originStation, enableAsync, args),
+    ];
   }
 
-  const listenersMapAll: Listener[] | undefined = listenersMap[config.allEvent];
+  const listenersMapAll: Listener<EVT>[] | undefined =
+    listenersMap[config.ALL_EVENT_NAME];
 
   if (stationMeta.emitAllEvent && listenersMapAll) {
-    const argsAll = args.slice();
+    const argsAll = args.slice() as ListenersDefinition.ToArgs<EVT>;
 
     argsAll.splice(0, 0, eventName);
 
-    const result = applyListeners<P>(
-      listenersMapAll,
-      originStation,
-      enableAsync,
-      argsAll
-    );
-
-    if (enableAsync && result) {
-      promises = promises.concat(result);
-    }
+    results = [
+      ...results,
+      ...applyListeners<EVT>(
+        listenersMapAll,
+        originStation,
+        enableAsync,
+        argsAll
+      ),
+    ];
   }
 
-  return promises;
+  return results;
 }
 
 /**
@@ -742,15 +895,13 @@ function emitEvent<P extends Promise<any>>(
  * that match the given event name. Specifically,
  * this function recognizes regular expression listeners.
  */
-function searchListeners(
-  eventName: string,
-  listenersMap: ListenersMap,
+function searchListeners<EVT>(
+  eventName: ListenersDefinition.ToEventName<EVT>,
+  listenersMap: ListenersMap<EVT>,
   regExpMarker: string
-): Listener[] {
-  let listeners: Listener[] = [];
+): Listener<EVT>[] {
+  let listeners: Listener<EVT>[] = [];
 
-  // `listenersMap` has no prototype
-  // tslint:disable-next-line:no-for-in forin
   for (const expression in listenersMap) {
     if (expression.indexOf(regExpMarker) === 0) {
       if (new RegExp(expression.substr(regExpMarker.length)).test(eventName)) {
@@ -765,12 +916,10 @@ function searchListeners(
 }
 
 /** Clean the `heardStations` property of the meta of the given station */
-function cleanHeardStations(station: Emitter): void {
-  const stationMap: StationMap = Object.create(null);
+function cleanHeardStations<EVT>(station: Emitter<EVT>): void {
+  const stationMap: StationMap<EVT> = Object.create(null);
   const heardStations = station.stationMeta.heardStations;
 
-  // `heardStations` has no prototype
-  // tslint:disable-next-line:no-for-in forin
   for (const stationId in heardStations) {
     const heardStation = heardStations[stationId];
 
@@ -783,11 +932,9 @@ function cleanHeardStations(station: Emitter): void {
 }
 
 /** Removes all listeners from then given station meta */
-function removeAllListeners(stationMeta: Meta): void {
+function removeAllListeners<EVT>(stationMeta: StationMeta<EVT>): void {
   const listenersMap = stationMeta.listenersMap;
 
-  // `listenersMap` has no prototype
-  // tslint:disable-next-line:no-for-in forin
   for (const eventName in listenersMap) {
     const listeners = listenersMap[eventName];
 
@@ -805,7 +952,10 @@ function removeAllListeners(stationMeta: Meta): void {
 }
 
 /** Removes all listeners for a particular event from the given station meta */
-function removeListeners(eventName: string, stationMeta: Meta): void {
+function removeListeners<EVT>(
+  eventName: ListenersDefinition.ToEventName<EVT>,
+  stationMeta: StationMeta<EVT>
+): void {
   const listenersMap = stationMeta.listenersMap;
   const listeners = listenersMap[eventName];
 
@@ -831,10 +981,10 @@ function removeListeners(eventName: string, stationMeta: Meta): void {
  * This function normalizes the the target station for
  * cross-emitter listening methods.
  */
-function getTargetedStations(
-  stationMeta: Meta,
-  target?: Emitter | Emitter[]
-): Emitter[] {
+function getTargetedStations<EVT>(
+  stationMeta: StationMeta<EVT>,
+  target?: Emitter<EVT> | Emitter<EVT>[]
+): Emitter<EVT>[] {
   if (target === undefined) {
     return getHeardStations(stationMeta);
   }
@@ -853,12 +1003,10 @@ function getTargetedStations(
 /**
  * @returns the heard stations of a given station's meta as an array
  */
-function getHeardStations(stationMeta: Meta): Emitter[] {
-  const stations: Emitter[] = [];
+function getHeardStations<EVT>(stationMeta: StationMeta<EVT>): Emitter<EVT>[] {
+  const stations: Emitter<EVT>[] = [];
   const heardStations = stationMeta.heardStations;
 
-  // `heardStations` has no prototype
-  // tslint:disable-next-line:no-for-in forin
   for (const stationId in heardStations) {
     stations.push(heardStations[stationId]);
   }
@@ -870,6 +1018,11 @@ function getHeardStations(stationMeta: Meta): Emitter[] {
  * A literal object with non-delimited event names
  * as keys and callback functions as values.
  */
-export interface CallbackMap {
-  [eventName: string]: Function;
-}
+export type CallbackMap<EVT> = EVT extends ListenersDefinition
+  ? Partial<
+      Record<
+        ListenersDefinition.ToEventName<EVT>,
+        ListenersDefinition.ToCallbackFunction<EVT>
+      >
+    >
+  : Partial<Record<string, CallbackFunction.Any>>;

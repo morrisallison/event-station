@@ -1,8 +1,11 @@
 import type { Listener } from "../types/Listener";
-import type { Meta } from "../types/Meta";
+import type { StationMeta } from "../types/StationMeta";
 
 /** Adds the given listener to the given station meta */
-export function addListener(stationMeta: Meta, listener: Listener): void {
+export function addListener<EVT>(
+  stationMeta: StationMeta<EVT>,
+  listener: Listener<EVT>
+): void {
   const eventName = listener.eventName;
   const listenersMap = stationMeta.listenersMap;
 

@@ -1,4 +1,5 @@
 import type { Emitter } from "./Emitter";
+import type { ListenersDefinition } from "./ListenersDefinition";
 
 /**
  * A subset of the Listener interface used only for
@@ -6,13 +7,13 @@ import type { Emitter } from "./Emitter";
  * @see Listener
  * @see matchListener()
  */
-export interface MatchingListener {
+export interface MatchingListener<EVT> {
   /** @see Listener.eventName */
-  eventName?: string;
+  eventName?: ListenersDefinition.ToEventName<EVT>;
   /** @see Listener.matchCallback */
-  matchCallback?: Function;
+  matchCallback?: ListenersDefinition.ToCallbackFunction<EVT>;
   /** @see Listener.matchContext */
   matchContext?: any;
   /** @see Listener.hearer */
-  hearer?: Emitter;
+  hearer?: Emitter<EVT>;
 }

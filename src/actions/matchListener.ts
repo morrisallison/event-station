@@ -5,9 +5,9 @@ import type { MatchingListener } from "../types/MatchingListener";
  * using the `matchCallback`, `matchContext`, `hearer`, and `eventName` properties.
  * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
-export function matchListener(
-  matchingListener: MatchingListener,
-  attachedListener: MatchingListener,
+export function matchListener<EVT>(
+  matchingListener: MatchingListener<EVT>,
+  attachedListener: MatchingListener<EVT>,
   exactMatch?: boolean
 ): boolean {
   if (exactMatch === true) {

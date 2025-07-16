@@ -1,7 +1,6 @@
+import { EventStation } from "../src/main";
 import { expect } from "bun:test";
 import { describe, it, beforeEach } from "bun:test";
-
-import { EventStation } from "../../src/main";
 
 describe("EventStation", function () {
   let listener, Wonderfuls, wonderfulsHeardSinging, WonderGirls;
@@ -27,5 +26,24 @@ describe("EventStation", function () {
     WonderGirls.emit("sing");
     expect(Wonderfuls.isHearing(WonderGirls)).toBe(true);
     expect(wonderfulsHeardSinging).toBe(true);
+  });
+
+  describe("extends EventStation", function () {
+    class Martian extends EventStation {}
+
+    it("must work as an EventStation instance", function () {
+      const alien = new Martian();
+      const earthling = new EventStation();
+
+      let earthlingGreeted = false;
+
+      alien.hear(earthling, "greet", function () {
+        earthlingGreeted = true;
+      });
+
+      earthling.emit("greet");
+
+      expect(earthlingGreeted).toBe(true);
+    });
   });
 });

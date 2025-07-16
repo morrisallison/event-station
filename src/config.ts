@@ -1,6 +1,8 @@
 import type { Options } from "./types/Options";
 
-export const allEvent = "all";
+export const ALL_EVENT_NAME = "all";
+
+export type AllEventName = typeof ALL_EVENT_NAME;
 
 /** Container for global configuration options */
 export const defaultOptions = {
@@ -59,7 +61,6 @@ export function mergeOptions(target: any) {
   for (let i = 1; i < arguments.length; i++) {
     const source = arguments[i];
 
-    // tslint:disable-next-line:no-for-in forin
     for (const option in source) {
       const isValidOption = defaultOptions.hasOwnProperty(option);
       const value = source[option];
