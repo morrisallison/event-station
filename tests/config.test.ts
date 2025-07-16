@@ -53,6 +53,7 @@ describe("EventStation.config()", function () {
     };
     expect(check).toThrow(Error);
   });
+
   it("must throw an error when the RegExp marker contains the delimiter", function () {
     let check;
     check = function () {
@@ -62,12 +63,17 @@ describe("EventStation.config()", function () {
     };
     expect(check).toThrow(Error);
   });
+
   it("must not set invalid options", function () {
     let station;
+
     EventStation.config(config);
+
     station = new EventStation({
+      // @ts-expect-error Invalid option
       foo: "bar",
     });
+
     expect(station.stationMeta.foo).toBeUndefined();
   });
 });

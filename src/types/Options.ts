@@ -1,6 +1,5 @@
 /**
- * See the [configuration section](http://morrisallison.github.io/event-station/usage.html#configuration)
- * of the usage documentation for general usage.
+ * @see [Configuration documentation](https://github.com/morrisallison/event-station/blob/main/docs/Usage.md#configuration)
  */
 export interface Options {
   /**
@@ -28,6 +27,4 @@ export interface Options {
    * `"%"` by default.
    */
   regExpMarker?: string;
-  [key: string]: string | boolean | undefined;
-  [key: number]: undefined;
 }

@@ -1,15 +1,15 @@
 import type { Listener } from "../types/Listener";
-import type { Meta } from "../types/Meta";
+import type { StationMeta } from "../types/StationMeta";
 
 /** Retrieves all listeners attached to the given Meta */
-export function getAllListeners(stationMeta: Meta): Listener[] {
+export function getAllListeners<EVT>(
+  stationMeta: StationMeta<EVT>
+): Listener<EVT>[] {
   if (stationMeta.listenerCount < 1) return [];
 
   const listenersMap = stationMeta.listenersMap;
-  let listeners: Listener[] = [];
+  let listeners: Listener<EVT>[] = [];
 
-  // `listenersMap` has no prototype
-  // tslint:disable-next-line:no-for-in forin
   for (const eventName in listenersMap) {
     listeners = listeners.concat(listenersMap[eventName]);
   }

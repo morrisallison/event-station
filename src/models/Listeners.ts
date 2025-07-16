@@ -1,34 +1,30 @@
 import { addListener } from "../actions/addListener";
-import { deps } from "../injector";
 import type { Emitter } from "../types/Emitter";
 import { hasListener } from "../actions/hasListener";
 import type { Listener } from "../types/Listener";
 import type { MatchingListener } from "../types/MatchingListener";
 import { matchListeners } from "../actions/matchListeners";
-import type { Meta } from "../types/Meta";
+import type { StationMeta } from "../types/StationMeta";
 import { removeListener } from "../actions/removeListener";
 import { removeListenerFromAll } from "../actions/removeListenerFromAll";
-
-const errors = {
-  NO_PROMISE: "No promises implementation available.",
-};
+import type { ListenersDefinition } from "../types/ListenersDefinition";
 
 /**
  * A class for operations targeting a collection of listeners
  */
-export class Listeners {
+export class Listeners<EVT> {
   /** @returns The number of listeners in the collection */
   public get count(): number {
     return this.listeners.length;
   }
 
   /** The station which the listeners originate from */
-  private originStation: Emitter;
+  private originStation: Emitter<EVT>;
 
   /** An array of listeners */
-  private listeners: Listener[];
+  private listeners: Listener<EVT>[];
 
-  constructor(originStation: Emitter, listeners: Listener[]) {
+  constructor(originStation: Emitter<EVT>, listeners: Listener<EVT>[]) {
     this.originStation = originStation;
     this.listeners = listeners;
   }
@@ -36,7 +32,7 @@ export class Listeners {
   /**
    * Sets each listener's maximum occurrence
    */
-  public occur(maxOccurrences: number): Listeners {
+  public occur(maxOccurrences: number): Listeners<EVT> {
     if (maxOccurrences < 1) {
       throw new Error(
         `The maximum occurrences must be greater than or equal to one.`
@@ -55,7 +51,9 @@ export class Listeners {
   /**
    * Sets each listener's callback function
    */
-  public calling(callback: Function): Listeners {
+  public calling(
+    callback: ListenersDefinition.ToCallbackFunction<EVT>
+  ): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -69,14 +67,16 @@ export class Listeners {
   /**
    * Sets each listener's callback function, and maximum occurrence to one(1)
    */
-  public once(callback: Function): Listeners {
+  public once(
+    callback: ListenersDefinition.ToCallbackFunction<EVT>
+  ): Listeners<EVT> {
     return this.calling(callback).occur(1);
   }
 
   /**
    * Removes the listeners from all stations
    */
-  public off(): Listeners {
+  public off(): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -89,7 +89,7 @@ export class Listeners {
   /**
    * Sets the context of each listener
    */
-  public using(context: any): Listeners {
+  public using(context: any): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -103,7 +103,7 @@ export class Listeners {
   /**
    * Adds each listener to the given station
    */
-  public addTo(station: Emitter): Listeners {
+  public addTo(station: Emitter<EVT>): Listeners<EVT> {
     const listeners = this.listeners;
     const stationMeta = station.stationMeta;
 
@@ -125,7 +125,7 @@ export class Listeners {
   /**
    * Removes each listener from the given station
    */
-  public removeFrom(station: Emitter): Listeners {
+  public removeFrom(station: Emitter<EVT>): Listeners<EVT> {
     const listeners = this.listeners;
     const stationMeta = station.stationMeta;
 
@@ -140,7 +140,7 @@ export class Listeners {
    * Moves the listeners to another station.
    * This method changes the origin station.
    */
-  public moveTo(station: Emitter): Listeners {
+  public moveTo(station: Emitter<EVT>): Listeners<EVT> {
     this.removeFrom(this.originStation);
     this.originStation = station;
     this.addTo(station);
@@ -153,7 +153,7 @@ export class Listeners {
    * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
    */
   public has(
-    matchingListener: MatchingListener,
+    matchingListener: MatchingListener<EVT>,
     exactMatch?: boolean
   ): boolean {
     return matchListeners(matchingListener, this.listeners, exactMatch);
@@ -162,14 +162,14 @@ export class Listeners {
   /**
    * Adds the listeners to the origin station
    */
-  public attach(): Listeners {
+  public attach(): Listeners<EVT> {
     return this.addTo(this.originStation);
   }
 
   /**
    * Removes the listeners from the origin station
    */
-  public detach(): Listeners {
+  public detach(): Listeners<EVT> {
     return this.removeFrom(this.originStation);
   }
 
@@ -178,7 +178,7 @@ export class Listeners {
    * If no station is given, the method determines whether any of the listeners
    * are attached to *any* station.
    */
-  public isAttachedTo(station?: Emitter): boolean {
+  public isAttachedTo(station?: Emitter<EVT>): boolean {
     if (!station) {
       return isListenersAttached(this.listeners);
     }
@@ -196,7 +196,7 @@ export class Listeners {
   /**
    * Pauses each listener
    */
-  public pause(): Listeners {
+  public pause(): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -209,7 +209,7 @@ export class Listeners {
   /**
    * Un-pauses each listener
    */
-  public resume(): Listeners {
+  public resume(): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -238,8 +238,8 @@ export class Listeners {
    * This method is dependant on `Promise`.
    * @see inject()
    */
-  public toPromises(): Array<Promise<Listener>> {
-    const promises: Array<Promise<Listener>> = [];
+  public toPromises(): Array<Promise<Listener<EVT>>> {
+    const promises: Array<Promise<Listener<EVT>>> = [];
     const listeners = this.listeners;
     const count = listeners.length;
 
@@ -258,12 +258,8 @@ export class Listeners {
    * This method is dependant on `Promise`.
    * @see inject()
    */
-  public all(): Promise<Listener[]> {
-    if (!deps.$Promise) {
-      throw new Error(errors.NO_PROMISE);
-    }
-
-    return deps.$Promise.all<Listener>(this.toPromises());
+  public all(): Promise<Listener<EVT>[]> {
+    return Promise.all<Listener<EVT>>(this.toPromises());
   }
 
   /**
@@ -271,18 +267,14 @@ export class Listeners {
    * This method is dependant on `Promise`.
    * @see inject()
    */
-  public race(): Promise<Listener> {
-    if (!deps.$Promise) {
-      throw new Error(errors.NO_PROMISE);
-    }
-
-    return deps.$Promise.race<Listener>(this.toPromises());
+  public race(): Promise<Listener<EVT>> {
+    return Promise.race<Listener<EVT>>(this.toPromises());
   }
 
   /**
    * Un-pauses each listener, and resets each listener's occurrence count
    */
-  public reset(): Listeners {
+  public reset(): Listeners<EVT> {
     const listeners = this.listeners;
 
     for (const listener of listeners) {
@@ -294,7 +286,7 @@ export class Listeners {
   }
 
   /** Similar to Array.prototype.forEach() */
-  public forEach(func: ForEachCallback): Listeners {
+  public forEach(func: ForEachCallback<EVT>): Listeners<EVT> {
     const listeners = this.listeners;
     const count = listeners.length;
 
@@ -309,12 +301,12 @@ export class Listeners {
 
   /** Retrieves a listener located at the given index */
   // tslint:disable-next-line:no-reserved-keywords
-  public get(index: number): Listener {
+  public get(index: number): Listener<EVT> {
     return this.listeners[index];
   }
 
   /** Retrieves the index of the given listener */
-  public index(listener: Listener): number | undefined {
+  public index(listener: Listener<EVT>): number | undefined {
     const listeners = this.listeners;
     const count = listeners.length;
 
@@ -328,7 +320,7 @@ export class Listeners {
   /**
    * @returns A new `Listeners` object containing a clone of each Listener
    */
-  public clone(): Listeners {
+  public clone(): Listeners<EVT> {
     const clonedListeners = this.listeners.map(cloneListener);
 
     return new Listeners(this.originStation, clonedListeners);
@@ -336,12 +328,8 @@ export class Listeners {
 }
 
 /** Creates a `Promise` and adds its `resolve` function to the listener's `resolves` array */
-function makePromise(listener: Listener): Promise<Listener> {
-  if (!deps.$Promise) {
-    throw new Error(errors.NO_PROMISE);
-  }
-
-  return new deps.$Promise<Listener>((resolve) => {
+function makePromise<EVT>(listener: Listener<EVT>): Promise<Listener<EVT>> {
+  return new Promise<Listener<EVT>>((resolve) => {
     if (!listener.resolves) {
       listener.resolves = [resolve];
     } else {
@@ -355,7 +343,7 @@ function makePromise(listener: Listener): Promise<Listener> {
  * Does not clone the listener's `stationMetas` or `resolves` properties
  * @throws an `Error` if the listener is a cross-emitter listener
  */
-function cloneListener(listener: Listener): Listener {
+function cloneListener<EVT>(listener: Listener<EVT>): Listener<EVT> {
   if (listener.hearer) {
     throw new Error(`Cross-emitter listeners can't be cloned.`);
   }
@@ -373,7 +361,7 @@ function cloneListener(listener: Listener): Listener {
 }
 
 /** Determines whether the given listeners are attached to any stations */
-export function isListenersAttached(listeners: Listener[]) {
+export function isListenersAttached<EVT>(listeners: Listener<EVT>[]) {
   for (const listener of listeners) {
     if (isListenerAttached(listener)) {
       return true;
@@ -384,7 +372,7 @@ export function isListenersAttached(listeners: Listener[]) {
 }
 
 /** Determines whether the given listener is attached to any stations */
-export function isListenerAttached(listener: Listener): boolean {
+export function isListenerAttached<EVT>(listener: Listener<EVT>): boolean {
   return listener.stationMetas !== undefined;
 }
 
@@ -392,9 +380,9 @@ export function isListenerAttached(listener: Listener): boolean {
  * Determines whether the given station meta has listeners that match the given listeners
  * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
-function hasListeners(
-  stationMeta: Meta,
-  listeners: Listener[],
+function hasListeners<EVT>(
+  stationMeta: StationMeta<EVT>,
+  listeners: Listener<EVT>[],
   exactMatch?: boolean
 ) {
   for (const listener of listeners) {
@@ -405,6 +393,6 @@ function hasListeners(
   return false;
 }
 
-export interface ForEachCallback {
-  (listener: Listener, index: number, listeners: Listener[]): any;
+export interface ForEachCallback<EVT> {
+  (listener: Listener<EVT>, index: number, listeners: Listener<EVT>[]): any;
 }

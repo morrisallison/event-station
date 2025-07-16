@@ -1,29 +1,35 @@
 import type { Emitter } from "../types/Emitter";
 import type { Listener } from "../types/Listener";
 import { removeListenerFromAll } from "./removeListenerFromAll";
+import type {
+  ListenersDefinition,
+  CallbackFunction,
+} from "../types/ListenersDefinition";
 
 /** Applies the given listeners with the given arguments */
-export function applyListeners<P extends Promise<any>>(
-  listeners: Listener[],
-  originStation: Emitter,
+export function applyListeners<EVT>(
+  _listeners: Listener<EVT>[],
+  originStation: Emitter<EVT>,
   enableAsync: boolean,
-  args: ListenerArguments
-): P[] | undefined {
+  args: ListenersDefinition.ToArgs<EVT>
+): ListenersDefinition.ToReturnValue<EVT>[] {
   const argsLength = args.length;
   const stationMeta = originStation.stationMeta;
 
   stationMeta.isPropagationStopped = false;
 
-  const promises: P[] = [];
-  let result: P | undefined = undefined;
+  const results: ListenersDefinition.ToReturnValue<EVT>[] = [];
 
   /* Clone array to prevent mutation */
-  listeners = listeners.slice();
+  const listeners = _listeners.slice();
 
   for (const listener of listeners) {
+    let result: ListenersDefinition.ToReturnValue<EVT>;
+
     if (stationMeta.isPropagationStopped) {
       stationMeta.isPropagationStopped = false;
-      return;
+
+      return results;
     }
 
     if (listener.isPaused) continue;
@@ -32,6 +38,11 @@ export function applyListeners<P extends Promise<any>>(
     const context = listener.context;
 
     if (callback) {
+      // This is/was a performance optimization to use `call` instead of `apply`
+      // when the number of arguments is known to be small.
+      // However, engine optimizations have improved to the point that this may
+      // not be beneficial anymore; it's been almost a decade.
+      // TODO: Benchmark this again.
       switch (argsLength) {
         case 0:
           result = callback.call(context);
@@ -49,18 +60,8 @@ export function applyListeners<P extends Promise<any>>(
           result = callback.apply(context, args);
           break;
       }
-    }
 
-    /*
-     * Is async enabled, and is the result a Promise-like object
-     */
-    if (
-      enableAsync &&
-      result &&
-      typeof result.then === "function" &&
-      typeof result.catch === "function"
-    ) {
-      promises.push(result);
+      results.push(result);
     }
 
     const resolves = listener.resolves;
@@ -89,7 +90,7 @@ export function applyListeners<P extends Promise<any>>(
     }
   }
 
-  return promises;
+  return results;
 }
 
 export interface ListenerArguments {

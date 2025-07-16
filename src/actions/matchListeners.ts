@@ -1,9 +1,9 @@
 import type { MatchingListener } from "../types/MatchingListener";
 import { matchListener } from "./matchListener";
 
-export function matchListeners(
-  matchingListener: MatchingListener,
-  attachedListeners: MatchingListener[],
+export function matchListeners<EVT>(
+  matchingListener: MatchingListener<EVT>,
+  attachedListeners: MatchingListener<EVT>[],
   exactMatch?: boolean
 ): boolean {
   const count = attachedListeners.length;

@@ -25,7 +25,7 @@ export function runBenchmark(
     .on("cycle", function (event, bench) {
       console.log(event.target.toString());
     })
-    .on("complete", function () {
+    .on("complete", function (this: any) {
       console.log("\nFastest is " + this.filter("fastest").map("name"));
     });
 

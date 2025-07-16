@@ -1,14 +1,14 @@
 import type { Listener } from "../types/Listener";
 import { matchListener } from "./matchListener";
-import type { Meta } from "../types/Meta";
+import type { StationMeta } from "../types/StationMeta";
 
 /**
  * Removes all listeners that match the given listener from the given station meta.
  * @param exactMatch - If true, an exact value match will be performed instead of an approximate match.
  */
-export function removeListener(
-  stationMeta: Meta,
-  listener: Listener,
+export function removeListener<EVT>(
+  stationMeta: StationMeta<EVT>,
+  listener: Listener<EVT>,
   exactMatch?: boolean
 ): void {
   if (stationMeta.listenerCount < 1) return;
@@ -52,7 +52,10 @@ export function removeListener(
   }
 }
 
-function removeMetaFromStation(targetMeta: Meta, listener: Listener) {
+function removeMetaFromStation<EVT>(
+  targetMeta: StationMeta<EVT>,
+  listener: Listener<EVT>
+) {
   const stationMetas = listener.stationMetas;
 
   if (!stationMetas) return;
@@ -62,7 +65,7 @@ function removeMetaFromStation(targetMeta: Meta, listener: Listener) {
     return;
   }
 
-  const newStationMetas: Meta[] = [];
+  const newStationMetas: StationMeta<EVT>[] = [];
 
   for (const stationMeta of stationMetas) {
     if (stationMeta !== targetMeta) {
@@ -83,7 +86,9 @@ function removeMetaFromStation(targetMeta: Meta, listener: Listener) {
   }
 }
 
-function reduceHearerHearingCount(listener: Listener): void {
+function reduceHearerHearingCount<EVT>(
+  listener: Listener<EVT>
+): void {
   /*
    * Update the hearingCount of given listener's hearer
    */
