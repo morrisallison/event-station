@@ -1,5 +1,5 @@
 import type { Listener } from "./Listener";
-import type { ALL_EVENT_NAME } from "../config";
+import type { AllEventName } from "../config";
 import type { ListenersDefinition } from "./ListenersDefinition";
 
 /**
@@ -17,6 +17,6 @@ type RegExpString = string;
 
 /** An object of listener arrays with event names and expressions as keys */
 export type ListenersMap<EVT> = Record<
-  ListenersDefinition.ToEventName<EVT> | typeof ALL_EVENT_NAME | RegExpString,
+  ListenersDefinition.ToEventName<EVT> | AllEventName | RegExpString,
   Listener<EVT>[]
 >;
