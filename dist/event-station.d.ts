@@ -277,7 +277,7 @@ declare interface Listener<EVT> {
 /**
  * A class for operations targeting a collection of listeners
  */
-declare class Listeners<EVT> {
+export declare class Listeners<EVT> {
     /** @returns The number of listeners in the collection */
     get count(): number;
     /** The station which the listeners originate from */
@@ -426,7 +426,7 @@ declare function mergeOptions<T extends typeof defaultOptions>(target: any, ...s
 /**
  * @see [Configuration documentation](https://github.com/morrisallison/event-station/blob/main/docs/Usage.md#configuration)
  */
-declare interface Options {
+export declare interface Options {
     /**
      * The character used to delimit event names in a string.
      * `" "` (space) by default.

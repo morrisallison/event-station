@@ -18,6 +18,9 @@
 
 #### Non-breaking Changes
 
+- Add a generic type for defining event listeners.
+- Update `emit` to return an array of returned values from called listeners.
+- Update `emitAsync`'s returned promise, to resolve all returned values, regardless of whether they're promise-like.
 - Added `EventStation.create()` — A static method to create a new station with the given configuration.
 
 #### Project Changes

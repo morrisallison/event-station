@@ -1,5 +1,5 @@
 /*
- * event-station v2.0.0-beta.1
+ * event-station v2.0.0-beta.2
  * Copyright (c) 2016-2025 Morris Allison III <author@morris.xyz> (http://morris.xyz). All rights reserved.
  * Released under the MIT license
  * @preserve
