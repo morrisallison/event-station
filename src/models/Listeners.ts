@@ -12,7 +12,7 @@ import type { ListenersDefinition } from "../types/ListenersDefinition";
 /**
  * A class for operations targeting a collection of listeners
  */
-export class Listeners<EVT> {
+export class Listeners<EVT = ListenersDefinition> {
   /** @returns The number of listeners in the collection */
   public get count(): number {
     return this.listeners.length;
