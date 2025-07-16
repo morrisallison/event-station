@@ -658,8 +658,8 @@ export class EventStation<EVT = ListenersDefinition> {
   }
 
   /** Creates a new station with the given options */
-  public static create<EVT>(options?: Options): Emitter<EVT> {
-    return new EventStation(options);
+  public static create<EVT>(options?: Options): EventStation<EVT> {
+    return new EventStation<EVT>(options);
   }
 }
 
