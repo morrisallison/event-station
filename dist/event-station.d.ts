@@ -8,12 +8,21 @@ declare type AllEventName = typeof ALL_EVENT_NAME;
  */
 declare function assertOptions<T extends typeof defaultOptions>(opts: T): void;
 
-declare type CallbackFunction<Context, Args extends any[], ReturnValue> = (this: Context, ...args: Args) => ReturnValue;
+/**
+ * A function that is used as a listener callback.
+ */
+export declare type CallbackFunction<Context, Args extends any[], ReturnValue> = (this: Context, ...args: Args) => ReturnValue;
 
-declare namespace CallbackFunction {
-    type Any = CallbackFunction<any, any[], any>;
-    type ToContext<CF> = CF extends CallbackFunction<infer C, any[], any> ? C : any;
-    type ToArgs<CF> = CF extends CallbackFunction<any, infer A, any> ? A : any[];
+export declare namespace CallbackFunction {
+    export type Any = CallbackFunction<any, any[], any>;
+    /**
+     * Extracts the context type from a callback function.
+     */
+    export type ToContext<CF> = CF extends CallbackFunction<infer C, any[], any> ? C : any;
+    /**
+     * Extracts the arguments type from a callback function.
+     */
+    export type ToArgs<CF> = CF extends CallbackFunction<any, infer A, any> ? A : any[];
 }
 
 /**
@@ -277,7 +286,7 @@ declare interface Listener<EVT> {
 /**
  * A class for operations targeting a collection of listeners
  */
-export declare class Listeners<EVT> {
+export declare class Listeners<EVT = ListenersDefinition> {
     /** @returns The number of listeners in the collection */
     get count(): number;
     /** The station which the listeners originate from */
@@ -389,16 +398,52 @@ export declare class Listeners<EVT> {
     clone(): Listeners<EVT>;
 }
 
-declare type ListenersDefinition<E extends string = string, C = CallbackFunction.Any> = Record<E, C>;
+/**
+ * A type that defines a mapping of event names to callback functions.
+ * This is used to define the structure of listeners in an event station.
+ *
+ * @remarks
+ *
+ * It's not recommended to use this type to define listeners, instead
+ * use a plain object with event names as keys and callback functions as values.
+ */
+export declare type ListenersDefinition<E extends string = string, C = CallbackFunction.Any> = Record<E, C>;
 
-declare namespace ListenersDefinition {
-    type ToEventName<EVT> = EVT extends ListenersDefinition ? Exclude<keyof EVT, symbol | number> : string;
-    type ToReturnValue<EVT> = EVT extends Record<string, CallbackFunction<any, any[], infer R>> ? R : unknown;
-    type PickCallbackFunction<EVT, EventName> = EventName extends AllEventName ? CallbackFunction.Any : EventName extends keyof EVT ? EVT[EventName] extends CallbackFunction.Any ? EVT[EventName] : never : never;
-    type PickContext<EVT, EventName> = EventName extends AllEventName ? any : EventName extends keyof EVT ? EVT[EventName] extends CallbackFunction.Any ? CallbackFunction.ToContext<EVT[EventName]> : never : never;
-    type ToCallbackFunction<EVT> = EVT extends Record<string, CallbackFunction.Any> ? EVT[keyof EVT] : CallbackFunction.Any;
-    type ToContext<EVT> = CallbackFunction.ToContext<ToCallbackFunction<EVT>>;
-    type ToArgs<EVT> = CallbackFunction.ToArgs<ToCallbackFunction<EVT>>;
+export declare namespace ListenersDefinition {
+    /**
+     * Extracts the event name type from a listeners definition.
+     */
+    export type ToEventName<EVT> = EVT extends ListenersDefinition ? Exclude<keyof EVT, symbol | number> : string;
+    /**
+     * Extracts the return value type from a listeners definition.
+     * This is used to determine the type of value returned by a listener callback.
+     */
+    export type ToReturnValue<EVT> = EVT extends Record<string, CallbackFunction<any, any[], infer R>> ? R : unknown;
+    /**
+     * Extracts the callback function type for a specific event name from a listeners definition.
+     * This is useful for getting the type of a listener callback for a specific event.
+     */
+    export type PickCallbackFunction<EVT, EventName> = EventName extends AllEventName ? CallbackFunction.Any : EventName extends keyof EVT ? EVT[EventName] extends CallbackFunction.Any ? EVT[EventName] : never : never;
+    /**
+     * Extracts the context type for a specific event name from a listeners definition.
+     * This is useful for getting the type of `this` context used in a listener callback.
+     */
+    export type PickContext<EVT, EventName> = EventName extends AllEventName ? any : EventName extends keyof EVT ? EVT[EventName] extends CallbackFunction.Any ? CallbackFunction.ToContext<EVT[EventName]> : never : never;
+    /**
+     * Extracts the callback function type from a listeners definition.
+     * This is useful for getting the type of a listener callback for any event of the definition.
+     */
+    export type ToCallbackFunction<EVT> = EVT extends Record<string, CallbackFunction.Any> ? EVT[keyof EVT] : CallbackFunction.Any;
+    /**
+     * Extracts the context type from a listeners definition.
+     * This is useful for getting the type of `this` context used in any listener callback of the definition.
+     */
+    export type ToContext<EVT> = CallbackFunction.ToContext<ToCallbackFunction<EVT>>;
+    /**
+     * Extracts the arguments type from a listeners definition.
+     * This is useful for getting the type of arguments passed to any listener callback of the definition.
+     */
+    export type ToArgs<EVT> = CallbackFunction.ToArgs<ToCallbackFunction<EVT>>;
 }
 
 /** An object of listener arrays with event names and expressions as keys */
@@ -425,6 +470,8 @@ declare function mergeOptions<T extends typeof defaultOptions>(target: any, ...s
 
 /**
  * @see [Configuration documentation](https://github.com/morrisallison/event-station/blob/main/docs/Usage.md#configuration)
+ *
+ * @public
  */
 export declare interface Options {
     /**

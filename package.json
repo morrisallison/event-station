@@ -1,6 +1,6 @@
 {
   "name": "event-station",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0",
   "author": "Morris Allison III <author@morris.xyz> (http://morris.xyz)",
   "description": "A versatile and robust event emitter class.",
   "license": "MIT",
