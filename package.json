@@ -79,6 +79,5 @@
     "docs",
     "LICENSE",
     "README.md"
-  ],
-  "runkitExampleFilename": "./docs/runkit-example.js"
+  ]
 }
