@@ -2,8 +2,7 @@ import type { ListenersMap } from "./ListenersMap";
 import type { StationMap } from "./StationMap";
 import type { Options } from "./Options";
 
-export interface StationMeta<EVT>
-  extends Required<Options> {
+export interface StationMeta<EVT> extends Required<Options> {
   /**
    * Stations that have listeners that were attached by this station.
    * The object must not have a prototype.

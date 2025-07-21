@@ -1,5 +1,7 @@
 /**
  * @see [Configuration documentation](https://github.com/morrisallison/event-station/blob/main/docs/Usage.md#configuration)
+ *
+ * @public
  */
 export interface Options {
   /**
