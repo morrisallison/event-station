@@ -1,6 +1,6 @@
 # Changelog
 
-### NEXT RELEASE
+### 2.0.0
 
 #### Breaking Changes
 
