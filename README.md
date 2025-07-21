@@ -112,7 +112,7 @@ npm install event-station
 
 ## License
 
-Copyright &copy; 2016-2025 [Morris Allison III](http://morris.xyz).
+Copyright &copy; 2015-2025 [Morris Allison III](http://morris.xyz).
 <br>Released under the [MIT license][license].
 
 ## References
