@@ -54,7 +54,7 @@
     "bundle": "bun run bundle:js && bun run bundle:js-min && bun run bundle:dts",
     "bundle:js": "bun build --format=esm --target=browser --packages=external --outfile=dist/event-station.js --banner=\"$(bun ./scripts/banner.js)\" ./lib/main.js",
     "bundle:js-min": "bun build --format=esm --target=browser --packages=external --outfile=event-station.min.js --banner=\"$(bun ./scripts/banner.js)\" ./dist/event-station.js --sourcemap=linked --minify",
-    "bundle:dts": "api-extractor run --local",
+    "bundle:dts": "api-extractor run --config ./scripts/api-extractor.json",
     "dev": "bun run build:force && bun run watch",
     "watch": "tsc --build --watch --pretty --verbose .",
     "watch:force": "tsc --build --watch --pretty --force --verbose .",
