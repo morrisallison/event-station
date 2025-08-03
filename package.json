@@ -64,6 +64,26 @@
     "test:watch": "bun test tests --watch",
     "prepublishOnly": "bun run clean && bun run test && bun run build && bun run bundle"
   },
+  "scriptDescriptions": {
+    "benchmark": "Runs the benchmarks against other event emitter implementations",
+    "build": "Builds the TypeScript source files",
+    "build:force": "Builds the TypeScript source files, forcing a rebuild",
+    "bundle": "Bundles the JavaScript and TypeScript definitions",
+    "bundle:js": "Bundles the JavaScript source file into a single file for browser usage",
+    "bundle:js-min": "Minifies the bundled JavaScript file",
+    "bundle:dts": "Generates TypeScript definitions using API Extractor",
+    "dev": "Builds and watches for changes in the source files",
+    "watch": "Watches for changes in the TypeScript source files and rebuilds on change",
+    "watch:force": "Watches for changes and forces a rebuild on change",
+    "check": "Checks TypeScript types without emitting output files",
+    "clean": "Cleans up build artifacts",
+    "test": "Runs tests with coverage reporting",
+    "test:watch": "Runs tests in watch mode",
+    "prepublishOnly": "Prepares the package for publishing"
+  },
+  "scriptsComments": {
+    "bundle:js-min": "It's necessary to build off the un-minified bundle, because the Bun CLI bundler handles the `outfile` parameter inconsistently."
+  },
   "type": "module",
   "main": "./dist/event-station.js",
   "jsnext:main": "./dist/event-station.js",
